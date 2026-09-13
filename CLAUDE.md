@@ -17,13 +17,19 @@
 - `.clang-format` : 서식
 - `.clang-tidy` : 네이밍. 도구가 못 잡는 항목은 CODING_STYLE.md 6절에 있음
 
-## 검사
+## 빌드와 검사
 
-    clang-format --dry-run -Werror <파일>
-    clang-tidy <파일> -- <컴파일 옵션>
+- Visual Studio 빌드 : `DxRenderDojo.sln`. x64 전용
+- 검사용 CMake 빌드 : VS 개발자 명령 프롬프트(`vcvars64.bat`)에서 실행. `build-win/compile_commands.json` 이 생겨 clang-tidy 가 컴파일 옵션을 그대로 씀
+
+```
+cmake -B build-win -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+cmake --build build-win
+clang-format --dry-run -Werror <파일>
+clang-tidy -p build-win <파일>
+```
 
 - clang-tidy 는 20 이상을 씀. VS 2022 에 들어 있는 19.1.5 는 VS 18 표준 라이브러리 헤더가 거부함 (VS 18 의 LLVM 은 22.1.3)
-- clang-tidy 는 컴파일 옵션(C++ 표준, include 경로, `UNICODE`)을 줘야 돎. 옵션은 1단계에서 프로젝트를 만들 때 확정
 
 ## 인코딩·줄끝
 
