@@ -3,8 +3,8 @@
 *.h            text eol=crlf
 *.cpp          text eol=crlf
 *.hlsl         text eol=crlf
-*.vs           text eol=crlf
-*.ps           text eol=crlf
+*.vs           text eol=crlf linguist-language=HLSL
+*.ps           text eol=crlf linguist-language=HLSL
 *.sln          text eol=crlf
 *.vcxproj*     text eol=crlf
 
