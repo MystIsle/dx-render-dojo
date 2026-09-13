@@ -9,3 +9,8 @@ end_of_line = crlf
 
 [{*.sh,*.cmake,CMakeLists.txt,*.md,*.json,*.xml}]
 end_of_line = lf
+
+[*.DotSettings]
+# Rider 가 저장할 때마다 BOM 을 붙인다
+charset = utf-8-bom
+end_of_line = lf
