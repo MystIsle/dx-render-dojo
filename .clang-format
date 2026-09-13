@@ -1,6 +1,7 @@
 BasedOnStyle: Microsoft
 BreakBeforeBraces: Allman
 UseTab: ForIndentation
+AccessModifierOffset: -4
 ColumnLimit: 120
 MaxEmptyLinesToKeep: 1
 AllowShortFunctionsOnASingleLine: InlineOnly
