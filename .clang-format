@@ -1,0 +1,8 @@
+BasedOnStyle: Microsoft
+BreakBeforeBraces: Allman
+UseTab: ForIndentation
+ColumnLimit: 120
+MaxEmptyLinesToKeep: 1
+AllowShortFunctionsOnASingleLine: InlineOnly
+BinPackArguments: false
+BinPackParameters: false

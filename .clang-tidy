@@ -1,0 +1,20 @@
+Checks: '-*,readability-identifier-naming'
+CheckOptions:
+  readability-identifier-naming.ClassCase: CamelCase
+  readability-identifier-naming.ClassPrefix: F
+  readability-identifier-naming.ClassIgnoredRegexp: '^T[A-Z][a-zA-Z0-9]*$'
+  readability-identifier-naming.AbstractClassCase: CamelCase
+  readability-identifier-naming.AbstractClassPrefix: A
+  readability-identifier-naming.AbstractClassIgnoredRegexp: '^I[A-Z][a-zA-Z0-9]*$'
+  readability-identifier-naming.StructCase: CamelCase
+  readability-identifier-naming.StructPrefix: F
+  readability-identifier-naming.EnumCase: CamelCase
+  readability-identifier-naming.EnumPrefix: E
+  readability-identifier-naming.FunctionCase: CamelCase
+  readability-identifier-naming.MethodCase: CamelCase
+  readability-identifier-naming.MemberCase: CamelCase
+  readability-identifier-naming.MemberIgnoredRegexp: '^b[A-Z][a-zA-Z0-9]*$'
+  readability-identifier-naming.ParameterCase: CamelCase
+  readability-identifier-naming.ParameterIgnoredRegexp: '^b[A-Z][a-zA-Z0-9]*$'
+  readability-identifier-naming.LocalVariableCase: CamelCase
+  readability-identifier-naming.LocalVariableIgnoredRegexp: '^b[A-Z][a-zA-Z0-9]*$'

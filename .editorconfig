@@ -1,0 +1,11 @@
+root = true
+
+[*]
+# BOM 없음. 셰이더는 D3DCompileFromFile 이 BOM 을 거부하고(X3000), C++ 은 /utf-8 로 읽는다
+charset = utf-8
+
+[*.{h,cpp,hlsl,vs,ps,sln,vcxproj,vcxproj.filters}]
+end_of_line = crlf
+
+[{*.sh,*.cmake,CMakeLists.txt,*.md,*.json,*.xml}]
+end_of_line = lf

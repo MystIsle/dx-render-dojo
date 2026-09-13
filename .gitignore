@@ -1,69 +1,25 @@
-# Prerequisites
-*.d
-
-# Compiled Object files
-*.slo
-*.lo
-*.o
+# 빌드 산출물
 *.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Linker files
-*.ilk
-
-# Debugger Files
 *.pdb
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-*.so.*
-
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
+*.ilk
 *.exe
-*.out
-*.app
+*.lib
+*.dll
+[Dd]ebug/
+[Rr]elease/
+x64/
+build*/
+cmake-build-*/
 
-# Build directories
-build/
-Build/
-build-*/
+# Visual Studio · Rider
+.vs/
+*.user
+*.suo
+.idea/
 
-# CMake generated files
-CMakeFiles/
-CMakeCache.txt
-cmake_install.cmake
-Makefile
-install_manifest.txt
-compile_commands.json
+# 맥 Wine
+.wineprefix/
 
-# Temporary files
-*.tmp
-*.log
-*.bak
-*.swp
-
-# vcpkg
-vcpkg_installed/
-
-# debug information files
-*.dwo
-
-# test output & cache
-Testing/
-.cache/
+# Claude Code 개인 설정 · 병렬 작업 워크트리
+.claude/settings.local.json
+.claude/worktrees/
