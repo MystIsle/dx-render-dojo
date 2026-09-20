@@ -30,6 +30,8 @@ clang-tidy -p build-win <파일>
 ```
 
 - clang-tidy 는 20 이상을 씀. VS 2022 에 들어 있는 19.1.5 는 VS 18 표준 라이브러리 헤더가 거부함 (VS 18 의 LLVM 은 22.1.3)
+- 맥 : `./scripts/mac-build.sh` 로 빌드, `./scripts/mac-run.sh` 로 실행(Wine), `./scripts/mac-lint.sh [파일...]` 로 검사. 검사는 Homebrew `llvm` 이 필요하고, 인자가 없으면 `Source/` 전체를 봄
+- 맥의 clang-tidy 는 mingw 타깃·sysroot·`-std=c++20` 을 따로 넘겨야 헤더를 찾음. 인자는 `mac-lint.sh` 에 있음
 
 ## 인코딩·줄끝
 
