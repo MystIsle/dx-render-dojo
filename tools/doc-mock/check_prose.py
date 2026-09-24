@@ -149,7 +149,7 @@ def check_markers(source, tag, built, report):
             report.error(f"SYMBOL 마커에 심볼이 없음 : {body}")
         if kind == "SLICE" and not re.fullmatch(r".+?:.+?=>.+", body, re.S):
             report.error(f"SLICE 마커 형식이 `경로:시작=>끝` 이 아님 : {body}")
-        if kind == "DIFF" and ":" in body and not re.fullmatch(r"[^:]+?:.+?=>.+", body, re.S):
+        if kind == "DIFF" and ":" in body and not re.fullmatch(r"[^:>\n]+?:.+?=>.+", body, re.S):
             report.error(f"범위 DIFF 마커 형식이 `경로:시작=>끝` 이 아님 : {body}")
 
     if built and markers:
