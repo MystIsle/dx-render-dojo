@@ -913,7 +913,7 @@ details.diff-file summary .why { color: var(--slate); }
 					<p>Visual Studio 에서는 솔루션 탐색기에 <code>App</code>·<code>Core</code> 필터를 만들고 새 <code>.h</code>·<code>.cpp</code> 를 기존 항목 추가로 넣어요. 프로젝트 속성은 아래를 고쳐요. 이 조작들이 <code>DxRenderDojo.vcxproj</code> 와 <code>DxRenderDojo.vcxproj.filters</code> 를 바꿔요.</p>
 					<ul class="walk">
 						<li>모든 구성 · C/C++ › 일반 › 추가 포함 디렉터리 : <code>$(ProjectDir)Source</code></li>
-						<li>모든 구성 · 매니페스트 도구 › 입력 및 출력 › 추가 매니페스트 파일 : <code>$(ProjectDir)DxRenderDojo.manifest</code>. 같은 곳의 DPI 인식 항목은 끔. 매니페스트 파일이 직접 선언함</li>
+						<li>모든 구성 · 매니페스트 도구 › 입력 및 출력 › 추가 매니페스트 파일 : <code>$(ProjectDir)DxRenderDojo.manifest</code>. 같은 곳의 DPI 인식은 없음으로 고름(vcxproj 에는 <code>EnableDpiAwareness</code> 가 <code>false</code> 로 남음). 매니페스트 파일이 직접 선언함</li>
 						<li>Debug·Release 각각 · C/C++ › 전처리기 › 전처리기 정의 : <code>WIN32_LEAN_AND_MEAN</code> 추가</li>
 						<li><code>DxRenderDojo.rc</code> 는 Visual Studio 프로젝트에 빌드 항목으로 넣지 않음. 넣으면 <a href="#pitfalls">흔한 실수</a> 3번의 <code>CVT1100</code></li>
 					</ul>
