@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """교재 원고(template-NN.html)의 기계 점검.
 
-사람이 읽어야 아는 것은 다루지 않는다. 셀 수 있는 것만 센다 : 마커, 앵커, 태그 짝, 어미, 금지 표현, 리듬 수치.
+사람이 읽어야 아는 것은 다루지 않는다. 셀 수 있는 것만 센다 : 마커, 따라 하기 조각의 빠짐없음, 앵커, 태그 짝, 어미, 금지 표현, 리듬 수치.
 규칙의 출처는 docs/DOC_STYLE.md 다.
 
 사용법 :
@@ -45,6 +45,11 @@ PAIRED_TAGS = ["details", "summary", "figure", "figcaption", "section", "ul", "o
 
 MARKER = re.compile(r"<!--(INCLUDE|FILE|SYMBOL|DIFF|SLICE):(.*?)-->", re.S)
 
+# 빠짐없음을 세는 파일. 프로젝트 파일은 솔루션 탐색기로 바뀌는 것이라 본문이 언급하는지만 본다.
+CODE_PATH = re.compile(r"^(Source/|CMakeLists\.txt$|[^/]+\.(manifest|rc)$)")
+PROJECT_FILE = re.compile(r"\.vcxproj(\.filters)?$")
+ACTION_BADGES = ("새로", "바꿈", "지움")
+
 
 class Report:
     def __init__(self):
@@ -70,13 +75,66 @@ def split_sentences(text):
     return [part.strip() for part in re.split(r"(?<=[.?!])\s+", text) if part.strip()]
 
 
+def git_run(*args):
+    result = subprocess.run(["git", "-C", str(REPO), *args], capture_output=True, text=True, encoding="utf-8")
+    return result.stdout if result.returncode == 0 else None
+
+
 def git_lines(tag, path):
-    result = subprocess.run(
-        ["git", "-C", str(REPO), "show", f"{tag}:{path}"], capture_output=True, text=True, encoding="utf-8"
-    )
-    if result.returncode != 0:
+    output = git_run("show", f"{tag}:{path}")
+    return None if output is None else output.split("\n")
+
+
+def symbol_bounds(lines, symbol):
+    start = next((i for i, line in enumerate(lines) if symbol in line), -1)
+    if start < 0:
         return None
-    return result.stdout.split("\n")
+    first = start
+    while first > 0 and lines[first - 1].lstrip().startswith("//"):
+        first -= 1
+    depth, opened = 0, False
+    for i in range(start, len(lines)):
+        depth += lines[i].count("{") - lines[i].count("}")
+        opened = opened or "{" in lines[i]
+        if opened and depth <= 0:
+            return first, i
+    return None
+
+
+def slice_bounds(lines, begin, until):
+    start = next((i for i, line in enumerate(lines) if begin in line), -1)
+    if start < 0:
+        return None
+    stop = next((i for i in range(start + 1, len(lines)) if until in lines[i]), -1)
+    if stop < 0:
+        return None
+    first = start
+    while first > 0 and lines[first - 1].lstrip().startswith("//"):
+        first -= 1
+    last = stop - 1
+    while last > start and (lines[last].strip() == "" or lines[last].lstrip().startswith("//")):
+        last -= 1
+    return first, last
+
+
+def code_blocks(lines):
+    """중괄호 블록의 (머리 줄, 끝 줄, 네임스페이스인지). 문자열과 // 주석 안의 중괄호는 세지 않는다."""
+    blocks, stack = [], []
+    for i, line in enumerate(lines):
+        code = re.sub(r'"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'', "", line)
+        code = code.split("//", 1)[0]
+        for char in code:
+            if char == "{":
+                head = i
+                if code.strip() == "{":
+                    head = i - 1
+                    while head > 0 and lines[head].strip() == "":
+                        head -= 1
+                stack.append((head, lines[head].strip().startswith("namespace")))
+            elif char == "}" and stack:
+                head, is_namespace = stack.pop()
+                blocks.append((head, i, is_namespace))
+    return blocks
 
 
 def check_markers(source, tag, built, report):
@@ -91,6 +149,8 @@ def check_markers(source, tag, built, report):
             report.error(f"SYMBOL 마커에 심볼이 없음 : {body}")
         if kind == "SLICE" and not re.fullmatch(r".+?:.+?=>.+", body, re.S):
             report.error(f"SLICE 마커 형식이 `경로:시작=>끝` 이 아님 : {body}")
+        if kind == "DIFF" and ":" in body and not re.fullmatch(r"[^:]+?:.+?=>.+", body, re.S):
+            report.error(f"범위 DIFF 마커 형식이 `경로:시작=>끝` 이 아님 : {body}")
 
     if built and markers:
         report.error(f"생성 결과에 채워지지 않은 마커 {len(markers)}개")
@@ -119,13 +179,145 @@ def check_markers(source, tag, built, report):
             symbol = body.split(":", 1)[1]
             if not any(symbol in line for line in lines):
                 report.error(f"SYMBOL : {path} 에 없는 문자열 : {symbol}")
-        if kind == "SLICE":
+        if kind == "SLICE" or (kind == "DIFF" and ":" in body):
             begin, until = body.split(":", 1)[1].split("=>", 1)
             start = next((i for i, line in enumerate(lines) if begin in line), -1)
             if start < 0:
-                report.error(f"SLICE : {path} 에 없는 시작 문자열 : {begin}")
+                report.error(f"{kind} : {path} 에 없는 시작 문자열 : {begin}")
             elif not any(until in line for line in lines[start + 1 :]):
-                report.error(f"SLICE : {path} 에서 시작 줄 뒤에 끝 문자열이 없음 : {until}")
+                report.error(f"{kind} : {path} 에서 시작 줄 뒤에 끝 문자열이 없음 : {until}")
+
+
+def step_pieces(steps, tag):
+    """따라 하기 절의 코드 조각을 문서 순서대로 돌려준다. (종류, 경로, 첫 줄, 끝 줄, 배지)"""
+    pieces = []
+    for figure in re.finditer(r"<figure\b.*?</figure>", steps, re.S):
+        badges = re.findall(r'<span class="badge[^"]*">\s*([^<]*?)\s*</span>', figure.group(0))
+        action = next((b for b in badges if b in ACTION_BADGES), None)
+        for kind, body in MARKER.findall(figure.group(0)):
+            if kind == "INCLUDE":
+                continue
+            path = body.split(":", 1)[0]
+            lines = git_lines(tag, path)
+            if lines is None:
+                continue
+            if kind == "FILE" or (kind == "DIFF" and ":" not in body):
+                bounds = (0, len(lines) - 1)
+            elif kind == "SYMBOL":
+                bounds = symbol_bounds(lines, body.split(":", 1)[1])
+            else:
+                begin, until = body.split(":", 1)[1].split("=>", 1)
+                bounds = slice_bounds(lines, begin, until)
+            if bounds is not None:
+                label = "DIFF범위" if kind == "DIFF" and ":" in body else kind
+                pieces.append((label, path, *bounds, action))
+    return pieces
+
+
+def changed_lines(base, tag, path):
+    """이전 태그에서 이 태그로 오며 추가된 줄 번호와 지운 줄 묶음. 공백만 바뀐 줄은 뺀다."""
+    added, removed = set(), []
+    output = git_run("diff", "-w", "--ignore-blank-lines", "-U0", base, tag, "--", path) or ""
+    for line in output.split("\n"):
+        match = re.match(r"@@ -\d+(?:,(\d+))? \+(\d+)(?:,(\d+))? @@", line)
+        if not match:
+            continue
+        old_count = int(match.group(1)) if match.group(1) is not None else 1
+        new_start = int(match.group(2))
+        new_count = int(match.group(3)) if match.group(3) is not None else 1
+        added.update(range(new_start - 1, new_start - 1 + new_count))
+        if old_count:
+            around = range(new_start - 1, new_start - 1 + new_count) if new_count else range(new_start - 1, new_start + 1)
+            removed.append((set(around), old_count))
+    return added, removed
+
+
+def spans_text(numbers):
+    spans, run = [], []
+    for number in sorted(numbers):
+        if run and number != run[-1] + 1:
+            spans.append(run)
+            run = []
+        run.append(number)
+    if run:
+        spans.append(run)
+    return ", ".join(str(s[0] + 1) if len(s) == 1 else f"{s[0] + 1}-{s[-1] + 1}" for s in spans)
+
+
+def check_follow_along(source, tag, report):
+    ref = tag if tag.startswith("refs/") else f"refs/tags/{tag}"
+    number = re.search(r"tut(\d+)$", ref)
+    base = f"refs/tags/tut{int(number.group(1)) - 1:02d}" if number else None
+    if base is None or git_run("rev-parse", "--verify", "--quiet", base) is None:
+        report.note("빠짐없음 : 이전 태그가 없어 건너뜀")
+        return
+
+    steps_match = re.search(r'<section id="steps".*?</section>', source, re.S)
+    if not steps_match:
+        return
+    steps = steps_match.group(0)
+    pieces = step_pieces(steps, ref)
+
+    unbadged = sum(1 for piece in pieces if piece[4] is None)
+    if unbadged:
+        report.warn(f"배지(새로·바꿈·지움)가 없는 코드 조각 {unbadged}개")
+
+    names = [name for name in (git_run("diff", "--name-only", base, ref) or "").split("\n") if name]
+    if any(PROJECT_FILE.search(name) for name in names) and "vcxproj" not in strip_tags(steps):
+        report.error("빠짐없음 : 프로젝트 파일이 바뀌었는데 따라 하기 본문이 언급하지 않음")
+
+    total_added = total_missing = total_removed = total_removed_missing = 0
+    for path in names:
+        if not CODE_PATH.search(path) or PROJECT_FILE.search(path):
+            continue
+        lines = git_lines(ref, path) or []
+        covered, removal_covered = set(), set()
+        for kind, piece_path, first, last, action in pieces:
+            if piece_path != path:
+                continue
+            covered.update(range(first, last + 1))
+            # 지운 줄은 diff 조각이나 바꿈 배지를 단 통째 조각만 덮는다. 통째로 보이기만 해서는 무엇을 지웠는지 드러나지 않는다.
+            if kind in ("DIFF", "DIFF범위") or action == "바꿈":
+                removal_covered.update(range(first, last + 2))
+        added, removed = changed_lines(base, ref, path)
+        added = {i for i in added if i < len(lines) and lines[i].strip() != ""}
+        missing = added - covered
+        removed_missing = [(around, count) for around, count in removed if not (around & removal_covered)]
+        total_added += len(added)
+        total_missing += len(missing)
+        total_removed += sum(count for _, count in removed)
+        total_removed_missing += sum(count for _, count in removed_missing)
+        if missing:
+            report.error(f"빠짐없음 : {path} 추가 줄 {len(missing)}개가 조각에 없음 [{spans_text(missing)}]")
+        if removed_missing:
+            where = spans_text({min(around) for around, _ in removed_missing})
+            report.error(f"빠짐없음 : {path} 지운 줄 {sum(c for _, c in removed_missing)}개가 조각에 없음 [새 파일 {where}줄 근처]")
+    report.note(f"빠짐없음 : 추가 {total_added}줄 중 빠짐 {total_missing}, 지운 {total_removed}줄 중 빠짐 {total_removed_missing}")
+
+    check_piece_order(pieces, ref, report)
+
+
+def check_piece_order(pieces, ref, report):
+    """한 덩어리(함수 본문, 클래스 선언, 파일 머리)를 나눈 조각은 문서 순서와 소스 순서가 같아야 한다. 네임스페이스는 덩어리로 치지 않는다."""
+    groups = {}
+    for index, (kind, path, first, last, _) in enumerate(pieces):
+        if kind not in ("SLICE", "DIFF범위"):
+            continue
+        lines = git_lines(ref, path) or []
+        enclosing = [
+            (head, end)
+            for head, end, is_namespace in code_blocks(lines)
+            if not is_namespace and head <= first and last <= end and not (first <= head and end <= last)
+        ]
+        key = (path, max(enclosing) if enclosing else None)
+        groups.setdefault(key, []).append((index, first))
+    for (path, block), members in groups.items():
+        starts = [first for _, first in members]
+        if starts != sorted(starts):
+            lines = git_lines(ref, path) or []
+            where = lines[block[0]].strip() if block else "파일 머리"
+            order = ", ".join(str(s + 1) for s in starts)
+            report.error(f"덩어리 순서 : {path} `{where}` 의 조각 순서가 소스와 다름 (문서 순서의 시작 줄 {order})")
 
 
 def check_structure(body, report):
@@ -247,6 +439,8 @@ def main():
 
     report = Report()
     check_markers(source, args.tag, args.built, report)
+    if args.tag and not args.built:
+        check_follow_along(source, args.tag, report)
     check_structure(body, report)
     check_prose(body, report)
 

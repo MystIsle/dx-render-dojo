@@ -48,11 +48,8 @@ function Get-Symbol([string] $Path, [string] $Symbol) {
 	return ($All[$First..$End]) -join "`n"
 }
 
-# Begin 문자열이 나오는 줄부터 Until 문자열 앞줄까지. 시작 쪽 주석은 포함하고,
-# 끝에 남는 빈 줄·주석(다음 덩어리 것)은 잘라낸 뒤 공통 들여쓰기를 제거한다.
-function Get-Slice([string] $Path, [string] $Begin, [string] $Until) {
-	$All = Get-BlobLines $Path
-
+# Get-Slice 와 범위 DIFF 가 같이 쓰는 범위 계산. 0부터 센 첫 줄과 끝 줄을 돌려준다.
+function Get-SliceBounds([string[]] $All, [string] $Path, [string] $Begin, [string] $Until) {
 	$Start = -1
 	for ($i = 0; $i -lt $All.Count; $i++) {
 		if ($All[$i].Contains($Begin)) { $Start = $i; break }
@@ -70,6 +67,15 @@ function Get-Slice([string] $Path, [string] $Begin, [string] $Until) {
 
 	$Last = $Stop - 1
 	while ($Last -gt $Start -and ($All[$Last].Trim() -eq '' -or $All[$Last].TrimStart().StartsWith('//'))) { $Last-- }
+
+	return @($First, $Last)
+}
+
+# Begin 문자열이 나오는 줄부터 Until 문자열 앞줄까지. 시작 쪽 주석은 포함하고,
+# 끝에 남는 빈 줄·주석(다음 덩어리 것)은 잘라낸 뒤 공통 들여쓰기를 제거한다.
+function Get-Slice([string] $Path, [string] $Begin, [string] $Until) {
+	$All = Get-BlobLines $Path
+	$First, $Last = Get-SliceBounds $All $Path $Begin $Until
 
 	$Chunk = $All[$First..$Last]
 	$Indent = ($Chunk | Where-Object { $_.Trim() -ne '' } |
@@ -92,19 +98,84 @@ $SliceEvaluator = [Text.RegularExpressions.MatchEvaluator] {
 	return Escape-Html (Get-Slice $Match.Groups[1].Value $Match.Groups[2].Value $Match.Groups[3].Value)
 }
 
+# diff 에서 머리글을 빼고 헝크만 돌려준다. 머리글 줄 수가 새 파일과 바뀐 파일에서 달라서 첫 @@ 부터 자른다.
+function Get-DiffHunks([string] $Path) {
+	$Lines = @(& git -C $Repo diff -U3 $BaseTag $Tag -- $Path)
+	if ($LASTEXITCODE -ne 0) { throw "git diff failed: $Path" }
+	$First = 0
+	while ($First -lt $Lines.Count -and $Lines[$First].StartsWith('@@') -eq $false) { $First++ }
+	if ($First -ge $Lines.Count) { throw "no diff: $Path" }
+	return ,$Lines[$First..($Lines.Count - 1)]
+}
+
+# 범위 DIFF. SLICE 와 같은 규칙으로 잡은 범위 안의 줄만 남기고 헝크 머리글을 다시 계산한다. 범위 끝 줄 바로 뒤에서 지운 줄도 범위에 넣는다.
+function Get-DiffRange([string] $Path, [string] $Begin, [string] $Until) {
+	$All = Get-BlobLines $Path
+	$First, $Last = Get-SliceBounds $All $Path $Begin $Until
+	$From = $First + 1
+	$To = $Last + 1
+
+	$Result = New-Object System.Collections.Generic.List[string]
+	$Kept = New-Object System.Collections.Generic.List[string]
+	$KeptOld = 0
+	$KeptNew = 0
+	$OldNo = 0
+	$NewNo = 0
+
+	$Flush = {
+		if (($Kept | Where-Object { $_.StartsWith('+') -or $_.StartsWith('-') }).Count -gt 0) {
+			$OldCount = ($Kept | Where-Object { $_.StartsWith(' ') -or $_.StartsWith('-') }).Count
+			$NewCount = ($Kept | Where-Object { $_.StartsWith(' ') -or $_.StartsWith('+') }).Count
+			$Result.Add("@@ -$KeptOld,$OldCount +$KeptNew,$NewCount @@")
+			$Result.AddRange($Kept)
+		}
+		$Kept.Clear()
+	}
+
+	foreach ($Line in (Get-DiffHunks $Path)) {
+		$Header = [regex]::Match($Line, '^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@')
+		if ($Header.Success) {
+			. $Flush
+			$OldNo = [int]$Header.Groups[1].Value
+			$NewNo = [int]$Header.Groups[2].Value
+			continue
+		}
+		if ($Line.StartsWith('\')) { continue }
+
+		$Removed = $Line.StartsWith('-')
+		if (($NewNo -ge $From -and $NewNo -le $To) -or ($Removed -and $NewNo -eq $To + 1)) {
+			if ($Kept.Count -eq 0) { $KeptOld = $OldNo; $KeptNew = $NewNo }
+			$Kept.Add($Line)
+		}
+		elseif ($Kept.Count -gt 0) {
+			. $Flush
+		}
+
+		if ($Removed) { $OldNo++ }
+		elseif ($Line.StartsWith('+')) { $NewNo++ }
+		else { $OldNo++; $NewNo++ }
+	}
+	. $Flush
+
+	if ($Result.Count -eq 0) { throw "no diff in range: $Begin => $Until ($Path)" }
+	return ($Result -join "`n")
+}
+
 $DiffEvaluator = [Text.RegularExpressions.MatchEvaluator] {
 	param($Match)
-	$Path = $Match.Groups[1].Value
-	$Lines = & git -C $Repo diff -U3 $BaseTag $Tag -- $Path
-	if ($LASTEXITCODE -ne 0) { throw "git diff failed: $Path" }
-	$Body = $Lines | Select-Object -Skip 4
-	return Escape-Html (($Body -join "`n"))
+	return Escape-Html ((Get-DiffHunks $Match.Groups[1].Value) -join "`n")
+}
+
+$DiffRangeEvaluator = [Text.RegularExpressions.MatchEvaluator] {
+	param($Match)
+	return Escape-Html (Get-DiffRange $Match.Groups[1].Value $Match.Groups[2].Value $Match.Groups[3].Value)
 }
 
 $Output = [regex]::Replace($Template, '<!--FILE:(.+?)-->', $FileEvaluator)
 $Output = [regex]::Replace($Output, '<!--SYMBOL:(.+?):(.+?)-->', $SymbolEvaluator)
 $Output = [regex]::Replace($Output, '<!--SLICE:(.+?):(.+?)=>(.+?)-->', $SliceEvaluator)
-$Output = [regex]::Replace($Output, '<!--DIFF:(.+?)-->', $DiffEvaluator)
+$Output = [regex]::Replace($Output, '<!--DIFF:([^:]+?):(.+?)=>(.+?)-->', $DiffRangeEvaluator)
+$Output = [regex]::Replace($Output, '<!--DIFF:([^:]+?)-->', $DiffEvaluator)
 $Target = Join-Path $Dir "tutorial-$Number.html"
 [IO.File]::WriteAllText($Target, $Output, $Utf8)
 
