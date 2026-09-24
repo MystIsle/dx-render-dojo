@@ -954,7 +954,7 @@ using Microsoft::WRL::ComPtr;</pre>
 						</ul>
 					</details>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">Initialize ① 시작</span></figcaption>
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">Initialize ① 시작 · include 묶음 다음</span></figcaption>
 <pre class="snip" data-lang="cpp">void FD3D11Graphics::Initialize(const FWindow&amp; Window, const FDisplaySettings&amp; Settings)
 {
 	bVSync = Settings.bVSync;</pre>
@@ -977,25 +977,25 @@ using Microsoft::WRL::ComPtr;</pre>
 					<p><code>FD3D11Graphics::Initialize</code> 는 먼저 DXGI 팩토리로 어댑터를 골라요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">Initialize ③ 어댑터 고르기</span></figcaption>
-<pre class="snip" data-lang="cpp">ComPtr&lt;IDXGIFactory2&gt; Factory;
-CHECK_FATAL(CreateDXGIFactory2(FactoryFlags, IID_PPV_ARGS(Factory.GetAddressOf())));
+<pre class="snip" data-lang="cpp">	ComPtr&lt;IDXGIFactory2&gt; Factory;
+	CHECK_FATAL(CreateDXGIFactory2(FactoryFlags, IID_PPV_ARGS(Factory.GetAddressOf())));
 
-ComPtr&lt;IDXGIAdapter1&gt; Adapter;
-ComPtr&lt;IDXGIFactory6&gt; Factory6;
-if (SUCCEEDED(Factory-&gt;QueryInterface(IID_PPV_ARGS(Factory6.GetAddressOf()))))
-{
-	CHECK_FATAL(Factory6-&gt;EnumAdapterByGpuPreference(
-	    0, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(Adapter.GetAddressOf())));
-}
-else
-{
-	CHECK_FATAL(Factory-&gt;EnumAdapters1(0, Adapter.GetAddressOf()));
-}
+	ComPtr&lt;IDXGIAdapter1&gt; Adapter;
+	ComPtr&lt;IDXGIFactory6&gt; Factory6;
+	if (SUCCEEDED(Factory-&gt;QueryInterface(IID_PPV_ARGS(Factory6.GetAddressOf()))))
+	{
+		CHECK_FATAL(Factory6-&gt;EnumAdapterByGpuPreference(
+		    0, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(Adapter.GetAddressOf())));
+	}
+	else
+	{
+		CHECK_FATAL(Factory-&gt;EnumAdapters1(0, Adapter.GetAddressOf()));
+	}
 
-DXGI_ADAPTER_DESC1 AdapterDesc = {};
-CHECK_FATAL(Adapter-&gt;GetDesc1(&amp;AdapterDesc));
-FLog::Info(std::format(
-    L"그래픽 카드 : {} ({} MB)", AdapterDesc.Description, AdapterDesc.DedicatedVideoMemory / 1024 / 1024));</pre>
+	DXGI_ADAPTER_DESC1 AdapterDesc = {};
+	CHECK_FATAL(Adapter-&gt;GetDesc1(&amp;AdapterDesc));
+	FLog::Info(std::format(
+	    L"그래픽 카드 : {} ({} MB)", AdapterDesc.Description, AdapterDesc.DedicatedVideoMemory / 1024 / 1024));</pre>
 					</figure>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
@@ -1140,7 +1140,7 @@ FLog::Info(std::format(
 					</details>
 					<p>백 버퍼는 텍스처일 뿐이라 그대로는 지울 수도 그릴 수도 없어요. <code>CreateSizeDependentResources</code> 가 백 버퍼로 RTV 를 만들고, 4단계는 이 RTV 를 거쳐 백 버퍼를 지워요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">FD3D11Graphics::CreateSizeDependentResources</span></figcaption>
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">FD3D11Graphics::CreateSizeDependentResources · Initialize 다음</span></figcaption>
 <pre class="snip" data-lang="cpp">void FD3D11Graphics::CreateSizeDependentResources()
 {
 	ComPtr&lt;ID3D11Texture2D&gt; BackBuffer;
@@ -1213,14 +1213,14 @@ FLog::Info(std::format(
 }</pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">FD3D11Graphics::BeginScene</span></figcaption>
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">FD3D11Graphics::BeginScene · Initialize 다음, CreateSizeDependentResources 앞</span></figcaption>
 <pre class="snip" data-lang="cpp">void FD3D11Graphics::BeginScene(const std::array&lt;float, 4&gt;&amp; Color)
 {
 	Context-&gt;ClearRenderTargetView(RenderTargetView.Get(), Color.data());
 }</pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">FD3D11Graphics::EndScene</span></figcaption>
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">FD3D11Graphics::EndScene · BeginScene 다음</span></figcaption>
 <pre class="snip" data-lang="cpp">void FD3D11Graphics::EndScene()
 {
 	CHECK_FATAL(SwapChain-&gt;Present(bVSync ? 1 : 0, 0));
@@ -1261,7 +1261,7 @@ FLog::Info(std::format(
 					<p>스왑체인 버퍼의 크기는 만들 때 정해지고 창을 따라 저절로 바뀌지 않아요. 창 크기가 바뀌면 <code>ResizeBuffers</code> 로 버퍼를 다시 만들어야 해요.</p>
 					<p><code>ResizeBuffers</code> 는 백 버퍼를 참조하는 RTV 가 남아 있으면 실패해요. 그래서 RTV 를 먼저 놓고 버퍼를 다시 만든 뒤 새 백 버퍼로 RTV 를 다시 만들어요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">FD3D11Graphics::Resize</span></figcaption>
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">FD3D11Graphics::Resize · Initialize 다음, BeginScene 앞</span></figcaption>
 <pre class="snip" data-lang="cpp">void FD3D11Graphics::Resize(int Width, int Height)
 {
 	// 백 버퍼를 가리키는 뷰가 남아 있으면 ResizeBuffers 가 실패한다. Flush 는 D3D 가 미뤄 둔 해제를 지금 끝낸다.
@@ -1451,56 +1451,56 @@ FLog::Info(std::format(
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">새로</span><span class="badge">HandleMessage 의 switch 안, case WM_SIZE 다음</span></figcaption>
-<pre class="snip" data-lang="cpp">// 배율이 바뀌면 윈도우는 바깥 크기를 비율대로 키운다. 테두리는 비율대로 커지지 않아 안쪽 크기가 어긋나므로,
-// 안쪽 크기를 기준으로 계산한 바깥 크기를 알려 준다. 전체 화면과 최대화는 윈도우에 맡긴다.
-case WM_GETDPISCALEDSIZE:
-{
-	if (bFullScreen || IsZoomed(WindowHandle))
+<pre class="snip" data-lang="cpp">	// 배율이 바뀌면 윈도우는 바깥 크기를 비율대로 키운다. 테두리는 비율대로 커지지 않아 안쪽 크기가 어긋나므로,
+	// 안쪽 크기를 기준으로 계산한 바깥 크기를 알려 준다. 전체 화면과 최대화는 윈도우에 맡긴다.
+	case WM_GETDPISCALEDSIZE:
 	{
-		return FALSE;
+		if (bFullScreen || IsZoomed(WindowHandle))
+		{
+			return FALSE;
+		}
+
+		const int NewDpi = static_cast&lt;int&gt;(WParam);
+		RECT Client = {};
+		GetClientRect(WindowHandle, &amp;Client);
+
+		RECT Bounds = {0,
+		               0,
+		               MulDiv(Client.right, NewDpi, static_cast&lt;int&gt;(Dpi)),
+		               MulDiv(Client.bottom, NewDpi, static_cast&lt;int&gt;(Dpi))};
+		const DWORD Style = static_cast&lt;DWORD&gt;(GetWindowLongPtrW(WindowHandle, GWL_STYLE));
+		const DWORD ExStyle = static_cast&lt;DWORD&gt;(GetWindowLongPtrW(WindowHandle, GWL_EXSTYLE));
+		AdjustWindowRectExForDpi(&amp;Bounds, Style, FALSE, ExStyle, static_cast&lt;UINT&gt;(NewDpi));
+
+		SIZE* Size = reinterpret_cast&lt;SIZE*&gt;(LParam);
+		Size-&gt;cx = Bounds.right - Bounds.left;
+		Size-&gt;cy = Bounds.bottom - Bounds.top;
+		return TRUE;
 	}
 
-	const int NewDpi = static_cast&lt;int&gt;(WParam);
-	RECT Client = {};
-	GetClientRect(WindowHandle, &amp;Client);
-
-	RECT Bounds = {0,
-	               0,
-	               MulDiv(Client.right, NewDpi, static_cast&lt;int&gt;(Dpi)),
-	               MulDiv(Client.bottom, NewDpi, static_cast&lt;int&gt;(Dpi))};
-	const DWORD Style = static_cast&lt;DWORD&gt;(GetWindowLongPtrW(WindowHandle, GWL_STYLE));
-	const DWORD ExStyle = static_cast&lt;DWORD&gt;(GetWindowLongPtrW(WindowHandle, GWL_EXSTYLE));
-	AdjustWindowRectExForDpi(&amp;Bounds, Style, FALSE, ExStyle, static_cast&lt;UINT&gt;(NewDpi));
-
-	SIZE* Size = reinterpret_cast&lt;SIZE*&gt;(LParam);
-	Size-&gt;cx = Bounds.right - Bounds.left;
-	Size-&gt;cy = Bounds.bottom - Bounds.top;
-	return TRUE;
-}
-
-// 배율이 다른 모니터로 옮기거나 배율 설정을 바꾸면 온다.
-// 창 모드에서는 윈도우가 제안한 사각형을 그대로 쓰고, 전체 화면에서는 모니터를 다시 채운다.
-case WM_DPICHANGED:
-{
-	Dpi = HIWORD(WParam);
-	FLog::Info(std::format(L"DPI 변경 : {} (배율 {}%)", Dpi, ScaleForDpi(100)));
-
-	if (bFullScreen)
+	// 배율이 다른 모니터로 옮기거나 배율 설정을 바꾸면 온다.
+	// 창 모드에서는 윈도우가 제안한 사각형을 그대로 쓰고, 전체 화면에서는 모니터를 다시 채운다.
+	case WM_DPICHANGED:
 	{
-		FitToMonitor();
+		Dpi = HIWORD(WParam);
+		FLog::Info(std::format(L"DPI 변경 : {} (배율 {}%)", Dpi, ScaleForDpi(100)));
+
+		if (bFullScreen)
+		{
+			FitToMonitor();
+			return 0;
+		}
+
+		const RECT* Suggested = reinterpret_cast&lt;const RECT*&gt;(LParam);
+		SetWindowPos(WindowHandle,
+		             nullptr,
+		             Suggested-&gt;left,
+		             Suggested-&gt;top,
+		             Suggested-&gt;right - Suggested-&gt;left,
+		             Suggested-&gt;bottom - Suggested-&gt;top,
+		             SWP_NOZORDER | SWP_NOACTIVATE);
 		return 0;
-	}
-
-	const RECT* Suggested = reinterpret_cast&lt;const RECT*&gt;(LParam);
-	SetWindowPos(WindowHandle,
-	             nullptr,
-	             Suggested-&gt;left,
-	             Suggested-&gt;top,
-	             Suggested-&gt;right - Suggested-&gt;left,
-	             Suggested-&gt;bottom - Suggested-&gt;top,
-	             SWP_NOZORDER | SWP_NOACTIVATE);
-	return 0;
-}</pre>
+	}</pre>
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge mod">바꿈</span><span class="badge">HandleMessage 의 case WM_GETMINMAXINFO</span></figcaption>
@@ -1519,7 +1519,7 @@ case WM_DPICHANGED:
  	}</pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">새로</span><span class="badge">FWindow::ScaleForDpi</span></figcaption>
+						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">새로</span><span class="badge">FWindow::ScaleForDpi · 파일 끝, NotifyResize 다음</span></figcaption>
 <pre class="snip" data-lang="cpp">int FWindow::ScaleForDpi(int Value) const
 {
 	return MulDiv(Value, static_cast&lt;int&gt;(Dpi), USER_DEFAULT_SCREEN_DPI);
@@ -1537,22 +1537,22 @@ case WM_DPICHANGED:
 						<summary>전체 화면 코드</summary>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">새로</span><span class="badge">HandleMessage 의 switch 안, case WM_GETMINMAXINFO 다음</span></figcaption>
-<pre class="snip" data-lang="cpp">// Alt 와 함께 누른 키에 맞는 메뉴가 없으면 윈도우가 경고음을 낸다. Alt+Enter 마다 소리가 나지 않게 한다.
-case WM_MENUCHAR:
-	return MAKELRESULT(0, MNC_CLOSE);
+<pre class="snip" data-lang="cpp">	// Alt 와 함께 누른 키에 맞는 메뉴가 없으면 윈도우가 경고음을 낸다. Alt+Enter 마다 소리가 나지 않게 한다.
+	case WM_MENUCHAR:
+		return MAKELRESULT(0, MNC_CLOSE);
 
-// Alt+Enter 로 전체 화면을 켜고 끈다. 누르고 있는 동안 반복해서 오는 메시지는 건너뛴다.
-// 그 밖의 키는 default 로 넘겨 Alt+F4 같은 시스템 동작이 그대로 돈다.
-case WM_SYSKEYDOWN:
-	if (WParam == VK_RETURN &amp;&amp; (HIWORD(LParam) &amp; KF_ALTDOWN) != 0 &amp;&amp; (HIWORD(LParam) &amp; KF_REPEAT) == 0)
-	{
-		ToggleFullScreen();
-		return 0;
-	}
-	[[fallthrough]];</pre>
+	// Alt+Enter 로 전체 화면을 켜고 끈다. 누르고 있는 동안 반복해서 오는 메시지는 건너뛴다.
+	// 그 밖의 키는 default 로 넘겨 Alt+F4 같은 시스템 동작이 그대로 돈다.
+	case WM_SYSKEYDOWN:
+		if (WParam == VK_RETURN &amp;&amp; (HIWORD(LParam) &amp; KF_ALTDOWN) != 0 &amp;&amp; (HIWORD(LParam) &amp; KF_REPEAT) == 0)
+		{
+			ToggleFullScreen();
+			return 0;
+		}
+		[[fallthrough]];</pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">새로</span><span class="badge">FWindow::ToggleFullScreen</span></figcaption>
+						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">새로</span><span class="badge">FWindow::ToggleFullScreen · ScaleForDpi 다음</span></figcaption>
 <pre class="snip" data-lang="cpp">// 테두리 없는 전체 화면. 제목 표시줄과 테두리를 빼고 창이 있는 모니터를 채운다.
 // 되돌릴 때 쓰려고 원래 위치·크기·최대화 상태를 저장해 둔다.
 // 전환하는 동안 크기가 여러 번 바뀌므로 알림은 끝난 뒤 한 번만 보낸다.
@@ -1584,7 +1584,7 @@ void FWindow::ToggleFullScreen()
 }</pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">새로</span><span class="badge">FWindow::FitToMonitor</span></figcaption>
+						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">새로</span><span class="badge">FWindow::FitToMonitor · ToggleFullScreen 다음</span></figcaption>
 <pre class="snip" data-lang="cpp">void FWindow::FitToMonitor()
 {
 	MONITORINFO Monitor = {};
@@ -1626,7 +1626,7 @@ void FWindow::ToggleFullScreen()
 						<li><a href="#code-init-device">⑤ 조각 끝의 출력 창 끄기</a> : D3D11 런타임이 출력 창에 직접 쓰는 것을 끔. DXGI 런타임의 출력은 이것으로 꺼지지 않아서 Visual Studio 출력 창에는 DXGI 메시지가 두 번 찍힘</li>
 					</ul>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">FD3D11Graphics::FlushDebugMessages</span></figcaption>
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">FD3D11Graphics::FlushDebugMessages · 파일 끝, CreateSizeDependentResources 다음</span></figcaption>
 <pre class="snip" data-lang="cpp">void FD3D11Graphics::FlushDebugMessages()
 {
 	if (InfoQueue == nullptr)
@@ -1680,7 +1680,7 @@ void FWindow::ToggleFullScreen()
 					<details class="fold">
 						<summary>소멸자</summary>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">FD3D11Graphics::~FD3D11Graphics</span></figcaption>
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">FD3D11Graphics::~FD3D11Graphics · using 다음, Initialize 앞</span></figcaption>
 <pre class="snip" data-lang="cpp">FD3D11Graphics::~FD3D11Graphics()
 {
 	// Initialize 가 건 훅이 사라진 객체를 부르지 않게 푼다.
