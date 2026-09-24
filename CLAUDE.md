@@ -31,10 +31,13 @@
 - `Source/Core/` : 창·메시지 루프·입력·설정. D3D 를 부르는 곳은 `FSystem` 이 프레임 앞뒤와 크기 변경에서 `FD3D11Graphics` 를 부르는 자리뿐
 - `Source/App/` : 편마다 바뀌는 장면 코드 (`FApplication`)
 - `Source/Graphics/` : 03편부터. `FD3D11Graphics`(디바이스·스왑체인·파이프라인 전역 상태)·카메라·모델
-- `Source/Shaders/` : 04편부터. HLSL 을 감싸는 C++ 클래스
-- `Source/Utility/` : 02편부터. 공통 도구. 로그(`FLog`)·검사 매크로(`Check.h`)·싱글톤 틀(`TSingleton`)
+- `Source/Shaders/` : 04편부터. HLSL 파일(`.vs`·`.ps`, BOM 없음)과 그것을 감싸는 C++ 클래스. 빌드가 HLSL 파일을 exe 옆 `Shaders/` 로 복사하고, 코드는 exe 폴더 기준으로 읽음
+- `Source/Utility/` : 02편부터. 공통 도구. 로그(`FLog`)·검사 매크로(`Check.h`)·싱글톤 틀(`TSingleton`)·실행 파일 기준 경로(`FPaths`)
+- `external/DirectXMath/` : 공식 DirectXMath 릴리스의 `Inc/` 헤더. MSVC·mingw 가 같은 사본을 씀. 버전을 올릴 때는 통째로 바꿈
 
 새 소스는 `DxRenderDojo.vcxproj`(+ `.vcxproj.filters`)와 `CMakeLists.txt` 양쪽에 등록
+
+셰이더 파일은 vcxproj 에서 항목 형식을 "파일 복사"(대상 디렉터리 `$(OutDir)Shaders`)로, `CMakeLists.txt` 에서는 복사 목록에 넣음
 
 ## 빌드와 검사
 
@@ -61,6 +64,7 @@ clang-tidy -p build-win <파일>
 
 ## 자주 걸리는 곳
 
+- 플립 모델은 `Present` 가 백 버퍼를 파이프라인에서 뗌. RTV 는 `BeginScene` 에서 매 프레임 묶음
 - `ComPtr` 의 `&` 는 `ReleaseAndGetAddressOf()` 임. `OMSetRenderTargets(1, &Rtv, ...)` 처럼 넘기면 호출 직전에 RTV 가 해제돼 크래시. 주소는 항상 `.GetAddressOf()` 로 넘김
 - 매니페스트는 빌드마다 넣는 길이 다름. 한 exe 에 두 번 들어가면 `CVT1100` 으로 링크 실패
   - MSVC(vcxproj) : 링커의 "추가 매니페스트 파일"(`<Manifest><AdditionalManifestFiles>`)
