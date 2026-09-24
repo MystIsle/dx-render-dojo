@@ -498,7 +498,7 @@ figure.code .diff-view { border-top: 0; }
 			<p>800×600 창 가운데에 삼각형이 떠 있어요. 창을 1200×600 으로 넓히면 삼각형도 옆으로 늘어날까요?</p>
 			<details class="fold">
 				<summary>답 보기</summary>
-				<p>늘어나지 않아요. 800×600 에서도 1200×600 에서도 삼각형을 감싸는 상자는 약 288×288 픽셀이에요. 투영 행렬이 매 프레임 창의 가로세로 비율을 받아 넓어진 만큼 가로를 줄여요. (<a href="#step-camera">6단계</a>)</p>
+				<p>늘어나지 않아요. 800×600 에서도 1200×600 에서도 삼각형을 감싸는 상자는 약 290×290 픽셀이에요. 투영 행렬이 매 프레임 창의 가로세로 비율을 받아 넓어진 만큼 가로를 줄여요. (<a href="#step-camera">6단계</a>)</p>
 			</details>
 		</div>
 	</section>
@@ -816,7 +816,7 @@ figure.code .diff-view { border-top: 0; }
 					<p>카메라는 z = -5 에서 원점을 봐요. 시야각 45° 로 거리 5 를 보면 화면 세로에 2 × 5 × tan 22.5° ≈ 4.14 만큼 담겨서 높이 2 인 삼각형은 창 높이의 약 0.48 을 차지해요. 창 높이 600 픽셀이면 약 290 픽셀이에요.</p>
 					<p>행렬 셋은 상수 버퍼에 담아 넘겨요. <code>FColorShader::Initialize</code> 끝에서 상수 버퍼를 만들어요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Shaders/FColorShader.cpp</span><span class="badge new">새로</span><span class="badge">Initialize ② 상수 버퍼 · 함수 끝</span></figcaption>
+						<figcaption><span class="path">Source/Shaders/FColorShader.cpp</span><span class="badge new">새로</span><span class="badge">Initialize ② 상수 버퍼와 끝 · ① 조각 바로 뒤에 이어 붙임</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SLICE:Source/Shaders/FColorShader.cpp:// 상수 버퍼 크기는=>void FColorShader::Render--></pre>
 					</figure>
 					<details class="fold">
@@ -997,9 +997,9 @@ figure.code .diff-view { border-top: 0; }
 					</details>
 					<p>Visual Studio 에서는 <code>Graphics</code> 필터에 <code>FCamera</code>·<code>FModel</code> 의 두 파일씩을, 새 <code>Shaders</code> 필터에 <code>FColorShader.h</code>·<code>FColorShader.cpp</code>·<code>Color.vs</code>·<code>Color.ps</code> 를, <code>Utility</code> 필터에 <code>FPaths.h</code>·<code>FPaths.cpp</code> 를 기존 항목 추가로 넣어요.</p>
 					<p>프로젝트 속성은 구성을 모든 구성으로 두고 두 곳을 고쳐요. C/C++ › 일반 › 추가 포함 디렉터리에 <code>$(ProjectDir)external\DirectXMath\Inc</code> 를, 링커 › 입력 › 추가 종속성에 <code>d3dcompiler.lib</code> 를 더해요.</p>
-					<p><code>Color.vs</code>·<code>Color.ps</code> 는 둘을 함께 골라 속성을 열어요. 구성 속성 › 일반 › 항목 형식을 파일 복사로 바꾸고, 파일 복사 › 일반 › 대상 디렉터리에 <code>$(OutDir)Shaders</code> 를 적어요. 빌드할 때마다 exe 옆 <code>Shaders</code> 폴더로 복사되고 셰이더만 고쳐도 다시 복사돼요. 이 조작들이 <code>DxRenderDojo.vcxproj</code> 와 <code>DxRenderDojo.vcxproj.filters</code> 를 바꿔요.</p>
+					<p><code>Color.vs</code>·<code>Color.ps</code> 는 둘을 함께 골라 속성을 열고, 구성을 모든 구성으로 둬요. 구성 속성 › 일반 › 항목 형식을 파일 복사로 바꾸고, 파일 복사 › 일반 › 대상 디렉터리에 <code>$(OutDir)Shaders</code> 를 적어요. 빌드할 때마다 exe 옆 <code>Shaders</code> 폴더로 복사되고 셰이더만 고쳐도 다시 복사돼요. 이 조작들이 <code>DxRenderDojo.vcxproj</code> 와 <code>DxRenderDojo.vcxproj.filters</code> 를 바꿔요.</p>
 					<details class="fold">
-						<summary>프로젝트 파일을 직접 고칠 때의 diff</summary>
+						<summary>참고 : 위 조작이 프로젝트 파일에 남기는 diff · 따로 치지 않음</summary>
 					<figure class="code">
 						<figcaption><span class="path">DxRenderDojo.vcxproj</span><span class="badge mod">바꿈</span><span class="badge">tut03 → tut04</span></figcaption>
 <pre class="diff" data-lang="xml"><!--DIFF:DxRenderDojo.vcxproj--></pre>
@@ -1016,7 +1016,7 @@ figure.code .diff-view { border-top: 0; }
 		<h2>다 됐는지 확인</h2>
 		<p class="section-note">로그는 Visual Studio 출력 창과 디버그 빌드의 콘솔 창에 찍혀요. 크기 값은 배율 100% 에서 시작했을 때예요.</p>
 		<ul class="checks">
-			<li><label><input type="checkbox"><span class="label">실행</span><span class="what">검은 창 가운데에 초록 삼각형. 800×600 창에서 삼각형을 감싸는 상자가 약 288×288 픽셀</span></label></li>
+			<li><label><input type="checkbox"><span class="label">실행</span><span class="what">검은 창 가운데에 초록 삼각형. 800×600 창에서 삼각형을 감싸는 상자가 약 290×290 픽셀</span></label></li>
 			<li><label><input type="checkbox"><span class="label">로그</span><span class="what">03편과 같은 시작 로그 두 줄. 디버그 빌드 콘솔에 <code>[경고]</code>·<code>[에러]</code> 줄이 없음</span></label></li>
 			<li><label><input type="checkbox"><span class="label">창 비율</span><span class="what">테두리를 끌어 가로로 넓히거나 세로로 늘려도 삼각형이 늘어나지 않고 가운데에 있음</span></label></li>
 			<li><label><input type="checkbox"><span class="label">전체 화면</span><span class="what">Alt+Enter 로 켜고 끈 뒤에도 같은 모양</span></label></li>
@@ -1244,7 +1244,7 @@ figure.code .diff-view { border-top: 0; }
 		<ul class="labeled">
 			<li><span class="label">1</span><span>삼각형을 빨강으로 변경 (원문 과제 2)</span></li>
 			<li><span class="label">2</span><span>삼각형을 사각형으로 변경. 정점 넷과 인덱스 여섯, 두 삼각형 모두 시계 방향 (원문 과제 3)</span></li>
-			<li><span class="label">3</span><span>카메라를 10 뒤로 이동 (원문 과제 4). 288 픽셀이던 삼각형 높이가 몇 픽셀이 될지 6단계의 계산으로 먼저 구한 뒤 확인</span></li>
+			<li><span class="label">3</span><span>카메라를 10 뒤로 이동 (원문 과제 4). 약 290 픽셀이던 삼각형 높이가 몇 픽셀이 될지 6단계의 계산으로 먼저 구한 뒤 확인</span></li>
 			<li><span class="label">4</span><span>픽셀 셰이더에서 색을 절반 밝기로 변경 (원문 과제 5). 셰이더만 고치고 빌드한 뒤 exe 옆 복사본도 바뀌었는지 확인</span></li>
 			<li><span class="label">5</span><span><code>FApplication::Render</code> 가 넘기는 종횡비를 <code>800.0f / 600.0f</code> 로 고정하고 창을 가로로 넓혀 보기. 삼각형이 옆으로 늘어나는 것을 확인</span></li>
 		</ul>
