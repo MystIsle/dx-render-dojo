@@ -228,11 +228,11 @@ figure.code figcaption .path { font-family: var(--font-mono); color: var(--code-
 .copy { margin-left: auto; font: 600 0.8125rem/1 var(--font-body); color: var(--code-muted); background: transparent; border: 1px solid var(--code-rule); padding: 0.4rem 0.6rem; border-radius: 6px; cursor: pointer; }
 .copy:hover { color: var(--code-ink); }
 pre { margin: 0; padding: 0.6rem 0 0.9rem; font-family: var(--font-mono); font-size: 0.9375rem; font-weight: 400; line-height: 1.65; color: var(--code-ink); tab-size: 4; }
-pre .line { display: block; position: relative; white-space: pre-wrap; overflow-wrap: anywhere; padding: 0 1rem 0 calc(1rem + 4ch); text-indent: -4ch; }
+pre .line { --hang: 4ch; display: block; position: relative; white-space: pre-wrap; overflow-wrap: anywhere; padding: 0 1rem 0 calc(1rem + var(--hang)); text-indent: calc(-1 * var(--hang)); }
 pre.nowrap { overflow-x: auto; }
 pre.nowrap .line { white-space: pre; overflow-wrap: normal; width: max-content; min-width: 100%; box-sizing: border-box; }
 pre.src, pre.numbered { counter-reset: ln; }
-pre.src .line, pre.numbered .line { padding-left: calc(3.6rem + 4ch); }
+pre.src .line, pre.numbered .line { padding-left: calc(3.6rem + var(--hang)); }
 pre.src .line::before, pre.numbered .line::before { counter-increment: ln; content: counter(ln); position: absolute; left: 0; width: 2.6rem; text-align: right; text-indent: 0; color: var(--code-muted); opacity: 0.75; font-size: 0.8125rem; user-select: none; }
 
 /* 단계 안의 블록 */
@@ -284,7 +284,7 @@ details.diff-file summary .why { color: var(--slate); }
 .diff-view { font-family: var(--font-mono); font-size: 0.9375rem; line-height: 1.6; border-top: 1px solid var(--code-rule); padding: 0.35rem 0 0.5rem; color: var(--code-ink); tab-size: 4; }
 .dl { display: grid; grid-template-columns: 2.75rem 2.75rem minmax(0, 1fr); }
 .dl .no { text-align: right; padding-right: 0.55rem; color: var(--code-muted); opacity: 0.75; font-size: 0.8125rem; user-select: none; }
-.dl .code { white-space: pre-wrap; overflow-wrap: anywhere; padding: 0 1rem 0 2.6ch; text-indent: -2ch; }
+.dl .code { --hang: 0ch; white-space: pre-wrap; overflow-wrap: anywhere; padding: 0 1rem 0 calc(2.6ch + var(--hang)); text-indent: calc(-2ch - var(--hang)); }
 .dl .sign { user-select: none; }
 .dl.add { background: var(--diff-add-bg); }
 .dl.add .sign { color: var(--code-add); }
@@ -350,7 +350,7 @@ figure.code .diff-view { border-top: 0; }
 	.checks .label, .checks .what { grid-column: 2; }
 	.pager { grid-template-columns: minmax(0, 1fr); }
 	.step { grid-template-columns: 2.75rem minmax(0, 1fr); }
-	pre.src .line { padding-left: calc(2.6rem + 4ch); }
+	pre.src .line { padding-left: calc(2.6rem + var(--hang)); }
 	pre.src .line::before { width: 1.9rem; }
 	.dl { grid-template-columns: 2.1rem 2.1rem minmax(0, 1fr); }
 }
@@ -2495,12 +2495,24 @@ void FD3D11Graphics::FlushDebugMessages()
 		return Escape(Text);
 	};
 
+	// 접힌 줄의 뒷부분은 그 줄의 들여쓰기보다 4칸 더 들어가서 시작한다. 탭 칸이 어긋나지 않게 4의 배수로 맞춘다.
+	var Hang = function (Text) {
+		var Width = 0;
+		for (var i = 0; i < Text.length; i++) {
+			var Char = Text.charAt(i);
+			if (Char === "\t") { Width += 4 - (Width % 4); }
+			else if (Char === " ") { Width += 1; }
+			else { break; }
+		}
+		return Math.ceil((Math.min(Width, 40) + 4) / 4) * 4;
+	};
+
 	document.querySelectorAll("pre.src, pre.snip").forEach(function (Pre) {
 		var Lang = Pre.dataset.lang;
 		var Lines = Pre.textContent.replace(/\n$/, "").split("\n");
 		if (Lines.some(function (Line) { return /\\$/.test(Line); })) { Pre.classList.add("nowrap"); }
 		Pre.innerHTML = Lines.map(function (Line) {
-			return '<span class="line">' + (Line.length ? Highlight(Line, Lang) : " ") + "</span>";
+			return '<span class="line" style="--hang: ' + Hang(Line) + 'ch">' + (Line.length ? Highlight(Line, Lang) : " ") + "</span>";
 		}).join("");
 		if (Pre.dataset.start) {
 			Pre.classList.add("numbered");
@@ -2528,7 +2540,7 @@ void FD3D11Graphics::FlushDebugMessages()
 			var Kind = Sign === "+" ? "add" : (Sign === "-" ? "del" : "ctx");
 			var Old = Kind === "add" ? "" : OldNumber++;
 			var New = Kind === "del" ? "" : NewNumber++;
-			Rows.push('<div class="dl ' + Kind + '"><span class="no">' + Old + '</span><span class="no">' + New + '</span><span class="code"><span class="sign">' + (Kind === "ctx" ? " " : Sign) + " </span>" + (Body.length ? Highlight(Body, Lang) : "") + "</span></div>");
+			Rows.push('<div class="dl ' + Kind + '"><span class="no">' + Old + '</span><span class="no">' + New + '</span><span class="code" style="--hang: ' + Hang(Body) + 'ch"><span class="sign">' + (Kind === "ctx" ? " " : Sign) + " </span>" + (Body.length ? Highlight(Body, Lang) : "") + "</span></div>");
 		});
 		var View = document.createElement("div");
 		View.className = "diff-view";
