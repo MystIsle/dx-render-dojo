@@ -94,9 +94,21 @@ $SliceEvaluator = [Text.RegularExpressions.MatchEvaluator] {
 	return Escape-Html (Get-Slice $Match.Groups[1].Value $Match.Groups[2].Value $Match.Groups[3].Value)
 }
 
+# 옮긴 파일의 옛 경로. 옛 경로를 함께 넘겨야 git 이 짝을 지어 바뀐 줄만 보인다.
+function Get-OldPath([string] $Path) {
+	foreach ($Line in @(& git -C $Repo diff -M --name-status $BaseTag $Tag)) {
+		$Parts = $Line -split "`t"
+		if ($Parts.Count -eq 3 -and $Parts[0].StartsWith('R') -and $Parts[2] -eq $Path) { return $Parts[1] }
+	}
+	return $null
+}
+
 # diff 에서 머리글을 빼고 헝크만 돌려준다. 머리글 줄 수가 새 파일과 바뀐 파일에서 달라서 첫 @@ 부터 자른다.
 function Get-DiffHunks([string] $Path) {
-	$Lines = @(& git -C $Repo diff -U3 $BaseTag $Tag -- $Path)
+	$Paths = @($Path)
+	$OldPath = Get-OldPath $Path
+	if ($null -ne $OldPath) { $Paths = @($OldPath, $Path) }
+	$Lines = @(& git -C $Repo diff -M -U3 $BaseTag $Tag -- @Paths)
 	if ($LASTEXITCODE -ne 0) { throw "git diff failed: $Path" }
 	$First = 0
 	while ($First -lt $Lines.Count -and $Lines[$First].StartsWith('@@') -eq $false) { $First++ }
