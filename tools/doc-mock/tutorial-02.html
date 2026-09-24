@@ -1087,18 +1087,18 @@ private:
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge">HandleMessage 의 종료 메시지</span></figcaption>
-<pre class="snip" data-lang="cpp">case WM_CLOSE:
-	PostQuitMessage(0);
-	return 0;
-
-// 윈도우가 꺼질 때는 WM_CLOSE 가 오지 않는다. 종료 신호를 같은 길로 모은다.
-// WParam 이 FALSE 면 다른 앱이 종료를 거부한 것이라 그대로 둔다.
-case WM_ENDSESSION:
-	if (WParam == TRUE)
-	{
+<pre class="snip" data-lang="cpp">	case WM_CLOSE:
 		PostQuitMessage(0);
-	}
-	return 0;</pre>
+		return 0;
+
+	// 윈도우가 꺼질 때는 WM_CLOSE 가 오지 않는다. 종료 신호를 같은 길로 모은다.
+	// WParam 이 FALSE 면 다른 앱이 종료를 거부한 것이라 그대로 둔다.
+	case WM_ENDSESSION:
+		if (WParam == TRUE)
+		{
+			PostQuitMessage(0);
+		}
+		return 0;</pre>
 					</figure>
 					<p>ESC 는 앞 단계의 <code>Update</code> 가 <code>RequestExit</code> 을 부르고, 닫기 단추는 <code>WM_CLOSE</code> 로, Windows 종료는 <code>WM_ENDSESSION</code> 으로 와요. 세 곳 모두 <code>PostQuitMessage(0)</code> 만 부르고 창은 파괴하지 않아요.</p>
 					<p><code>WM_CLOSE</code> 를 <code>return 0</code> 으로 끝내지 않고 <code>DefWindowProcW</code> 에 넘기면 그쪽에서 창을 곧바로 파괴해요. 파괴하는 길이 소멸자 말고 하나 더 생기는 셈이라 넘기지 않아요.</p>
