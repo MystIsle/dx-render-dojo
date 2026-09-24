@@ -214,10 +214,22 @@ def step_pieces(steps, tag):
     return pieces
 
 
-def changed_lines(base, tag, path):
-    """이전 태그에서 이 태그로 오며 추가된 줄 번호와 지운 줄 묶음. 공백만 바뀐 줄은 뺀다."""
+def renamed_paths(base, tag):
+    """옮긴 파일의 새 경로에서 옛 경로로 가는 표."""
+    renames = {}
+    for line in (git_run("diff", "-M", "--name-status", base, tag) or "").split("\n"):
+        parts = line.split("\t")
+        if len(parts) == 3 and parts[0].startswith("R"):
+            renames[parts[2]] = parts[1]
+    return renames
+
+
+def changed_lines(base, tag, path, old_path=None):
+    """이전 태그에서 이 태그로 오며 추가된 줄 번호와 지운 줄 묶음. 공백만 바뀐 줄은 뺀다.
+    옮긴 파일은 옛 경로를 함께 넘겨야 git 이 짝을 지어 바뀐 줄만 돌려준다."""
     added, removed = set(), []
-    output = git_run("diff", "-w", "--ignore-blank-lines", "-U0", base, tag, "--", path) or ""
+    paths = [old_path, path] if old_path else [path]
+    output = git_run("diff", "-M", "-w", "--ignore-blank-lines", "-U0", base, tag, "--", *paths) or ""
     for line in output.split("\n"):
         match = re.match(r"@@ -\d+(?:,(\d+))? \+(\d+)(?:,(\d+))? @@", line)
         if not match:
@@ -262,9 +274,14 @@ def check_follow_along(source, tag, report):
     if unbadged:
         report.warn(f"배지(새로·바꿈·지움)가 없는 코드 조각 {unbadged}개")
 
-    names = [name for name in (git_run("diff", "--name-only", base, ref) or "").split("\n") if name]
-    if any(PROJECT_FILE.search(name) for name in names) and "vcxproj" not in strip_tags(steps):
+    names = [name for name in (git_run("diff", "-M", "--name-only", base, ref) or "").split("\n") if name]
+    renames = renamed_paths(base, ref)
+    steps_text = strip_tags(steps)
+    if any(PROJECT_FILE.search(name) for name in names) and "vcxproj" not in steps_text:
         report.error("빠짐없음 : 프로젝트 파일이 바뀌었는데 따라 하기 본문이 언급하지 않음")
+    unmentioned = sorted(Path(new).name for new in renames if CODE_PATH.search(new) and Path(new).name not in steps_text)
+    if unmentioned:
+        report.error("빠짐없음 : 옮긴 파일을 따라 하기 본문이 언급하지 않음 : " + ", ".join(unmentioned))
 
     total_added = total_missing = total_removed = total_removed_missing = 0
     for path in names:
@@ -279,7 +296,7 @@ def check_follow_along(source, tag, report):
             # 지운 줄은 diff 조각이나 바꿈 배지를 단 통째 조각만 덮는다. 통째로 보이기만 해서는 무엇을 지웠는지 드러나지 않는다.
             if kind in ("DIFF", "DIFF범위") or action == "바꿈":
                 removal_covered.update(range(first, last + 2))
-        added, removed = changed_lines(base, ref, path)
+        added, removed = changed_lines(base, ref, path, renames.get(path))
         added = {i for i in added if i < len(lines) and lines[i].strip() != ""}
         missing = added - covered
         removed_missing = [(around, count) for around, count in removed if not (around & removal_covered)]
