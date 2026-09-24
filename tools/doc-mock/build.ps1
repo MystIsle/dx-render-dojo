@@ -174,8 +174,8 @@ $DiffRangeEvaluator = [Text.RegularExpressions.MatchEvaluator] {
 $Output = [regex]::Replace($Template, '<!--FILE:(.+?)-->', $FileEvaluator)
 $Output = [regex]::Replace($Output, '<!--SYMBOL:(.+?):(.+?)-->', $SymbolEvaluator)
 $Output = [regex]::Replace($Output, '<!--SLICE:(.+?):(.+?)=>(.+?)-->', $SliceEvaluator)
-$Output = [regex]::Replace($Output, '<!--DIFF:([^:]+?):(.+?)=>(.+?)-->', $DiffRangeEvaluator)
-$Output = [regex]::Replace($Output, '<!--DIFF:([^:]+?)-->', $DiffEvaluator)
+$Output = [regex]::Replace($Output, '<!--DIFF:([^:>\n]+?):(.+?)=>(.+?)-->', $DiffRangeEvaluator)
+$Output = [regex]::Replace($Output, '<!--DIFF:([^:>\n]+?)-->', $DiffEvaluator)
 $Target = Join-Path $Dir "tutorial-$Number.html"
 [IO.File]::WriteAllText($Target, $Output, $Utf8)
 
