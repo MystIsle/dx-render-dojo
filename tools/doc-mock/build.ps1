@@ -72,15 +72,11 @@ function Get-SliceBounds([string[]] $All, [string] $Path, [string] $Begin, [stri
 }
 
 # Begin 문자열이 나오는 줄부터 Until 문자열 앞줄까지. 시작 쪽 주석은 포함하고,
-# 끝에 남는 빈 줄·주석(다음 덩어리 것)은 잘라낸 뒤 공통 들여쓰기를 제거한다.
+# 끝에 남는 빈 줄·주석(다음 덩어리 것)은 잘라낸다. 들여쓰기는 소스 그대로 둔다.
 function Get-Slice([string] $Path, [string] $Begin, [string] $Until) {
 	$All = Get-BlobLines $Path
 	$First, $Last = Get-SliceBounds $All $Path $Begin $Until
-
-	$Chunk = $All[$First..$Last]
-	$Indent = ($Chunk | Where-Object { $_.Trim() -ne '' } |
-		ForEach-Object { $_.Length - $_.TrimStart("`t").Length } | Measure-Object -Minimum).Minimum
-	return (($Chunk | ForEach-Object { if ($_.Trim() -eq '') { $_ } else { $_.Substring($Indent) } }) -join "`n")
+	return ($All[$First..$Last]) -join "`n"
 }
 
 $FileEvaluator = [Text.RegularExpressions.MatchEvaluator] {
