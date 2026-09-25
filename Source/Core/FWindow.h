@@ -23,13 +23,17 @@ public:
 	int GetHeight() const { return Height; }
 
 	void SetMessageCallback(std::function<void(UINT, WPARAM, LPARAM)> Callback);
+	void SetResizeCallback(std::function<void(int, int)> Callback);
 
 private:
 	LRESULT HandleMessage(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam);
+	void NotifyResize();
 
 	HWND Handle = nullptr;
 	int Width = 0;
 	int Height = 0;
 	bool bCursorHidden = false;
+	bool bSizing = false;
 	std::function<void(UINT, WPARAM, LPARAM)> MessageCallback;
+	std::function<void(int, int)> ResizeCallback;
 };

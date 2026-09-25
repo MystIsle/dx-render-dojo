@@ -22,6 +22,7 @@ private:
 	void Frame();
 
 	void OnWindowMessage(UINT Message, WPARAM WParam, LPARAM LParam);
+	void OnResize(int NewWidth, int NewHeight);
 
 	// 선언 순서가 곧 생성 순서이고 소멸은 그 역순이다.
 	// 창을 쓰는 멤버는 FWindow 뒤에 둔다.
