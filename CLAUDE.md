@@ -29,7 +29,7 @@
 
 `Source/` 를 include 기준으로 두고, include 는 항상 폴더까지 적음 (`#include "Core/FSystem.h"`)
 
-- `Source/Main.cpp` : `WinMain`
+- `Source/Main.cpp` : `wWinMain`
 - `Source/Core/` : 창·메시지 루프·입력·설정. D3D 를 부르는 곳은 `FSystem` 이 프레임 앞뒤와 크기 변경에서 `FD3D11Graphics` 를 부르는 자리뿐
 - `Source/App/` : 편마다 바뀌는 장면 코드 (`FApplication`)
 - `Source/Graphics/` : 03편부터. `FD3D11Graphics`(디바이스·스왑체인·파이프라인 전역 상태)·카메라·모델
@@ -37,9 +37,9 @@
 - `Source/Utility/` : 02편부터. 공통 도구. 로그(`FLog`)·검사 매크로(`Check.h`)·싱글톤 틀(`TSingleton`)·실행 파일 기준 경로(`FPaths`)
 - `external/DirectXMath/` : 공식 DirectXMath 릴리스의 `Inc/` 헤더. MSVC·mingw 가 같은 사본을 씀. 버전을 올릴 때는 통째로 바꿈
 
-새 소스는 `DxRenderDojo.vcxproj`(+ `.vcxproj.filters`)와 `CMakeLists.txt` 양쪽에 등록
+새 소스는 `DxRenderDojo.vcxproj`(+ `.vcxproj.filters`)에 등록. `CMakeLists.txt` 는 `Source/` 아래 `.cpp` 를 모으므로 적지 않음
 
-셰이더 파일은 vcxproj 에서 항목 형식을 "파일 복사"(대상 디렉터리 `$(OutDir)Shaders`)로, `CMakeLists.txt` 에서는 복사 목록에 넣음
+셰이더 파일은 vcxproj 에서 항목 형식을 "파일 복사"(대상 디렉터리 `$(OutDir)Shaders`)로 둠. `CMakeLists.txt` 는 `Source/Shaders` 의 `.vs`·`.ps` 를 모아 복사함
 
 ## 빌드와 검사
 

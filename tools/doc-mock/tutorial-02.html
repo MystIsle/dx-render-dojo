@@ -250,8 +250,6 @@ details.fold[open] > summary::before { content: "▾"; }
 details.fold > *:not(summary) { margin: 0 1.15rem 0.95rem; }
 details.fold > summary + * { margin-top: 0.3rem; }
 details.fold .walk { padding-left: 2.4rem; }
-details.fold.must { border-style: dashed; border-color: var(--accent); }
-details.fold.must > summary { color: var(--accent); }
 .checkpoint { display: grid; gap: 0.35rem; margin: 0; padding: 0.85rem 1.15rem; border: 1px solid var(--code-add); border-radius: var(--radius); }
 .checkpoint .box-label { color: var(--code-add); }
 .learn { display: grid; gap: 0.45rem; margin: 0; padding: 0.95rem 1.15rem; border-radius: var(--radius); background: var(--amber-soft); }
@@ -529,7 +527,7 @@ details.diff-file summary .why { color: var(--slate); }
 
 	<section id="steps" data-block="steps" data-source="직접">
 		<h2>따라 하기</h2>
-		<p class="section-note">코드 조각의 배지는 할 일이에요. <b>신규</b>는 추가, <b>수정</b>은 있던 함수나 파일을 통째로 바꿔 넣기, <b>삭제</b>는 빨간 줄 지우기예요. diff 조각은 초록 줄을 넣고 빨간 줄을 지워요. 점선 접기 안의 코드도 쳐야 해요. 단계마다 끝의 <b>여기까지</b> 상자대로 빌드하고 실행해 보세요.</p>
+		<p class="section-note">코드 조각의 배지는 할 일이에요. <b>신규</b>는 추가, <b>수정</b>은 있던 함수나 파일을 통째로 바꿔 넣기, <b>삭제</b>는 빨간 줄 지우기예요. diff 조각은 초록 줄을 넣고 빨간 줄을 지워요. 단계마다 끝의 <b>여기까지</b> 상자대로 빌드하고 실행해 보세요.</p>
 		<ol class="steps">
 
 			<li class="step" id="step-tools">
@@ -637,8 +635,6 @@ namespace Return
 						</ul>
 					</details>
 					<p>실패는 <code>FLog</code> 가 받아 Visual Studio 출력 창과 콘솔 창에 찍어요. 콘솔 창은 디버그 빌드에서만 열려요. <code>FLog</code> 는 <code>TSingleton</code> 을 상속한 싱글톤이고 로그 함수가 <code>static</code> 이라 어디서든 <code>FLog::Info(...)</code> 한 줄로 불러요.</p>
-					<details class="fold must">
-						<summary>칠 코드 · <code>FLog</code>·<code>TSingleton</code>·<code>Check.cpp</code></summary>
 					<figure class="code">
 						<figcaption><span class="path">Source/Utility/FLog.h</span><span class="badge new">신규</span><span class="badge">파일 전체</span></figcaption>
 <pre class="src" data-lang="cpp">#pragma once
@@ -846,46 +842,20 @@ void FLog::Write(std::wstring_view Prefix, std::wstring_view Message)
 	}
 }</pre>
 					</figure>
-					<ul class="walk">
-						<li class="entry"><code>static void Info(std::wstring_view Message);</code> <code>wstring_view</code> 는 문자열을 복사하지 않고 주소와 길이만 받음. 실제 출력은 <code>FLog.cpp</code> 의 <code>OutputDebugStringW</code> 와 <code>WriteConsoleW</code>. <code>W</code> 로 끝나는 함수라 한글이 깨지지 않음</li>
-						<li class="entry"><code>namespace { ... }</code> 이름 없는 네임스페이스. 안의 변수와 함수는 이 파일에서만 보임</li>
-						<li class="entry"><code>bFatal = true;</code> 상자가 떠 있는 동안에도 창 메시지는 계속 옴. <code>IsFatal</code> 이 이 값을 돌려줌</li>
-						<li class="entry"><code>MB_TASKMODAL</code> 부모 창을 넘기지 않아도 상자가 떠 있는 동안 이 스레드의 창이 입력을 받지 않음</li>
-						<li class="entry"><code>std::_Exit(1)</code> 표준 함수. <code>exit</code> 와 달리 <code>atexit</code> 로 등록한 함수도 부르지 않음</li>
-					</ul>
-					</details>
-					<p>새 <code>.cpp</code> 둘을 빌드에 등록해요. CMake 는 소스 목록을 여러 줄로 풀고 <code>Source/</code> 를 include 기준으로 더해요.</p>
-					<figure class="code">
-						<figcaption><span class="path">CMakeLists.txt</span><span class="badge mod">수정</span><span class="badge">소스 목록과 include 경로</span></figcaption>
-<pre class="diff" data-lang="cmake">@@ -1,9 +1,14 @@
- cmake_minimum_required(VERSION 3.25)
- project(DxRenderDojo LANGUAGES CXX)
- 
--add_executable(DxRenderDojo WIN32 Source/Main.cpp)
-+add_executable(DxRenderDojo WIN32
-+	Source/Main.cpp
-+	Source/Utility/Check.cpp
-+	Source/Utility/FLog.cpp
-+)
-+target_include_directories(DxRenderDojo PRIVATE Source)
- target_compile_features(DxRenderDojo PRIVATE cxx_std_20)
--target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE)
-+target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN)
- 
- if(MSVC)
- 	target_compile_options(DxRenderDojo PRIVATE /W3 /utf-8)</pre>
-					</figure>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
-							<li class="entry"><code>target_include_directories(DxRenderDojo PRIVATE Source)</code> <code>#include "Utility/Check.h"</code> 처럼 <code>Source/</code> 기준으로 폴더까지 적을 수 있게 함</li>
-							<li class="entry"><code>WIN32_LEAN_AND_MEAN</code> <code>Windows.h</code> 가 잘 쓰지 않는 헤더를 빼고 읽게 함</li>
+							<li class="entry"><code>static void Info(std::wstring_view Message);</code> <code>wstring_view</code> 는 문자열을 복사하지 않고 주소와 길이만 받음. 실제 출력은 <code>FLog.cpp</code> 의 <code>OutputDebugStringW</code> 와 <code>WriteConsoleW</code>. <code>W</code> 로 끝나는 함수라 한글이 깨지지 않음</li>
+							<li class="entry"><code>namespace { ... }</code> 이름 없는 네임스페이스. 안의 변수와 함수는 이 파일에서만 보임</li>
+							<li class="entry"><code>bFatal = true;</code> 상자가 떠 있는 동안에도 창 메시지는 계속 옴. <code>IsFatal</code> 이 이 값을 돌려줌</li>
+							<li class="entry"><code>MB_TASKMODAL</code> 부모 창을 넘기지 않아도 상자가 떠 있는 동안 이 스레드의 창이 입력을 받지 않음</li>
+							<li class="entry"><code>std::_Exit(1)</code> 표준 함수. <code>exit</code> 와 달리 <code>atexit</code> 로 등록한 함수도 부르지 않음</li>
 						</ul>
 					</details>
 					<p>Visual Studio 에서는 솔루션 탐색기에 <code>Utility</code> 필터를 만들고 새 <code>.h</code>·<code>.cpp</code> 를 기존 항목 추가로 넣어요. <code>Main.cpp</code> 는 필터에 넣지 않고 그대로 둬요. 프로젝트 속성은 아래 둘을 고쳐요. 이 조작들이 <code>DxRenderDojo.vcxproj</code> 와 <code>DxRenderDojo.vcxproj.filters</code> 를 바꿔요.</p>
 					<ul class="walk">
-						<li>모든 구성 · C/C++ › 일반 › 추가 포함 디렉터리 : <code>$(ProjectDir)Source</code></li>
-						<li>Debug·Release 각각 · C/C++ › 전처리기 › 전처리기 정의 : <code>WIN32_LEAN_AND_MEAN</code> 추가</li>
+						<li>모든 구성 · C/C++ › 일반 › 추가 포함 디렉터리 : <code>$(ProjectDir)Source</code>. <code>#include "Utility/Check.h"</code> 처럼 <code>Source/</code> 기준으로 폴더까지 적을 수 있게 함</li>
+						<li>Debug·Release 각각 · C/C++ › 전처리기 › 전처리기 정의 : <code>WIN32_LEAN_AND_MEAN</code> 추가. <code>Windows.h</code> 가 잘 쓰지 않는 헤더를 빼고 읽게 함</li>
 					</ul>
 					<details class="fold">
 						<summary>참고 : 위 조작이 프로젝트 파일에 남기는 diff · 따로 치지 않음</summary>
@@ -930,6 +900,24 @@ void FLog::Write(std::wstring_view Prefix, std::wstring_view Message)
    &lt;/ItemGroup&gt;
    &lt;Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" /&gt;
  &lt;/Project&gt;</pre>
+					</figure>
+					</details>
+					<details class="fold">
+						<summary>CMake · 맥 빌드와 검사용, VS 만 쓰면 건너뜀</summary>
+						<p>CMake 는 <code>Source/</code> 아래의 <code>.cpp</code> 를 모두 모아 빌드하니 새 파일은 적지 않아요. 프로젝트 속성에서 고친 두 값만 옮겨요.</p>
+					<figure class="code">
+						<figcaption><span class="path">CMakeLists.txt</span><span class="badge mod">수정</span><span class="badge">include 경로와 전처리기 정의</span></figcaption>
+<pre class="diff" data-lang="cmake">@@ -3,8 +3,9 @@
+ 
+ file(GLOB_RECURSE SourceFiles CONFIGURE_DEPENDS Source/*.cpp)
+ add_executable(DxRenderDojo WIN32 ${SourceFiles})
++target_include_directories(DxRenderDojo PRIVATE Source)
+ target_compile_features(DxRenderDojo PRIVATE cxx_std_20)
+-target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE)
++target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN)
+ 
+ if(MSVC)
+ 	target_compile_options(DxRenderDojo PRIVATE /W3 /utf-8)</pre>
 					</figure>
 					</details>
 					<div class="checkpoint">
@@ -1230,19 +1218,7 @@ int WINAPI wWinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _I
 						<summary>원문과 비교</summary>
 						<p>원문의 <code>WinMain</code> 은 <code>new SystemClass</code> 로 만들고 <code>Shutdown()</code> 을 부른 다음 <code>delete</code> 해요. <code>new</code> 가 있던 곳에 <code>Prepare</code>, <code>Shutdown()</code> 과 <code>delete</code> 가 있던 곳에 <code>Release</code> 가 있고 정리 자체는 소멸자가 해요.</p>
 					</details>
-					<p>새 <code>.cpp</code> 둘을 빌드에 등록해요. Visual Studio 에서는 <code>Core</code> 필터를 만들고 새 <code>.h</code>·<code>.cpp</code> 를 기존 항목 추가로 넣어요.</p>
-					<figure class="code">
-						<figcaption><span class="path">CMakeLists.txt</span><span class="badge mod">수정</span><span class="badge">소스 목록</span></figcaption>
-<pre class="diff" data-lang="cmake">@@ -3,6 +3,8 @@
- 
- add_executable(DxRenderDojo WIN32
- 	Source/Main.cpp
-+	Source/Core/FSystem.cpp
-+	Source/Core/FWindow.cpp
- 	Source/Utility/Check.cpp
- 	Source/Utility/FLog.cpp
- )</pre>
-					</figure>
+					<p>Visual Studio 에서는 솔루션 탐색기에 <code>Core</code> 필터를 만들고 새 <code>.h</code>·<code>.cpp</code> 를 기존 항목 추가로 넣어요.</p>
 					<details class="fold">
 						<summary>참고 : 위 조작이 프로젝트 파일에 남기는 diff · 따로 치지 않음</summary>
 					<figure class="code">
@@ -1702,19 +1678,7 @@ void FApplication::Render()
 +}</pre>
 					</figure>
 					<p><code>Run</code> 은 큐가 비었을 때만 <code>Frame</code> 을 불러요. 그래서 프레임 하나가 시작될 때는 그동안 쌓인 입력이 전부 <code>FInput</code> 에 반영돼 있어요. <code>FWindow</code> 가 <code>FInput</code> 을 직접 부르지 않고 <code>FSystem</code> 을 거치면 받는 객체가 늘어나도 누가 어떤 순서로 받는지가 <code>OnWindowMessage</code> 의 <code>switch</code> 하나에 모여요.</p>
-					<p>새 <code>.cpp</code> 둘을 빌드에 등록해요. Visual Studio 에서는 <code>App</code> 필터를 만들어 <code>FApplication</code> 두 파일을 넣고, <code>FInput</code> 두 파일은 <code>Core</code> 필터에 넣어요.</p>
-					<figure class="code">
-						<figcaption><span class="path">CMakeLists.txt</span><span class="badge new">신규</span><span class="badge">소스 목록</span></figcaption>
-<pre class="diff" data-lang="cmake">@@ -3,6 +3,8 @@
- 
- add_executable(DxRenderDojo WIN32
- 	Source/Main.cpp
-+	Source/App/FApplication.cpp
-+	Source/Core/FInput.cpp
- 	Source/Core/FSystem.cpp
- 	Source/Core/FWindow.cpp
- 	Source/Utility/Check.cpp</pre>
-					</figure>
+					<p>Visual Studio 에서는 <code>App</code> 필터를 만들어 <code>FApplication</code> 두 파일을 넣고, <code>FInput</code> 두 파일은 <code>Core</code> 필터에 넣어요.</p>
 					<details class="fold">
 						<summary>참고 : 위 조작이 프로젝트 파일에 남기는 diff · 따로 치지 않음</summary>
 					<figure class="code">
@@ -1841,8 +1805,6 @@ void FApplication::Render()
 	}
 }</pre>
 					</figure>
-					<details class="fold must">
-						<summary>칠 코드 · 크기 콜백을 거는 함수와 소멸자</summary>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">신규</span><span class="badge">FWindow::SetResizeCallback · SetMessageCallback 다음</span></figcaption>
 <pre class="snip" data-lang="cpp">void FWindow::SetResizeCallback(std::function&lt;void(int, int)&gt; Callback)
@@ -1861,7 +1823,6 @@ void FApplication::Render()
  	if (bCursorHidden)
  	{</pre>
 					</figure>
-					</details>
 					<p>알림은 <code>FSystem::OnResize</code> 가 받아 로그를 남겨요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FSystem.h</span><span class="badge new">신규</span><span class="badge">OnResize</span></figcaption>
@@ -1930,32 +1891,6 @@ void FApplication::Render()
 // 1 = CREATEPROCESS_MANIFEST_RESOURCE_ID, 24 = RT_MANIFEST
 1 24 "DxRenderDojo.manifest"</pre>
 					</figure>
-					<figure class="code">
-						<figcaption><span class="path">CMakeLists.txt</span><span class="badge new">신규</span><span class="badge">매니페스트와 mingw 대상 버전</span></figcaption>
-<pre class="diff" data-lang="cmake">@@ -16,10 +16,14 @@
- 
- if(MSVC)
- 	target_compile_options(DxRenderDojo PRIVATE /W3 /utf-8)
-+	target_sources(DxRenderDojo PRIVATE DxRenderDojo.manifest)
- else()
- 	target_compile_options(DxRenderDojo PRIVATE -Wall)
- endif()
- 
- if(MINGW)
-+	enable_language(RC)
-+	target_sources(DxRenderDojo PRIVATE DxRenderDojo.rc)
-+	target_compile_definitions(DxRenderDojo PRIVATE _WIN32_WINNT=0x0A00 WINVER=0x0A00)
- 	target_link_options(DxRenderDojo PRIVATE -municode -static -static-libgcc -static-libstdc++)
- endif()</pre>
-					</figure>
-					<details class="fold">
-						<summary>줄 단위 풀이</summary>
-						<ul class="walk">
-							<li class="entry"><code>target_sources(DxRenderDojo PRIVATE DxRenderDojo.manifest)</code> MSVC 빌드에서 매니페스트를 exe 에 넣게 함</li>
-							<li class="entry"><code>target_sources(DxRenderDojo PRIVATE DxRenderDojo.rc)</code> mingw 빌드에만 넣음</li>
-							<li class="entry"><code>_WIN32_WINNT=0x0A00 WINVER=0x0A00</code> mingw 빌드에서 <code>GetDpiForWindow</code> 같은 Windows 10 함수 선언이 보이게 대상 버전을 정함</li>
-						</ul>
-					</details>
 					<p>Visual Studio 에서는 두 파일을 기존 항목 추가로 넣고 아래를 고쳐요.</p>
 					<ul class="walk">
 						<li>모든 구성 · 매니페스트 도구 › 입력 및 출력 › 추가 매니페스트 파일 : <code>$(ProjectDir)DxRenderDojo.manifest</code>. 같은 곳의 DPI 인식은 없음으로 고름(vcxproj 에는 <code>EnableDpiAwareness</code> 가 <code>false</code> 로 남음). 매니페스트 파일이 직접 선언함</li>
@@ -1989,6 +1924,32 @@ void FApplication::Render()
 					</figure>
 					</details>
 					<details class="fold">
+						<summary>CMake · 맥 빌드와 검사용, VS 만 쓰면 건너뜀</summary>
+					<figure class="code">
+						<figcaption><span class="path">CMakeLists.txt</span><span class="badge mod">수정</span><span class="badge">매니페스트와 mingw 대상 버전</span></figcaption>
+<pre class="diff" data-lang="cmake">@@ -9,10 +9,14 @@
+ 
+ if(MSVC)
+ 	target_compile_options(DxRenderDojo PRIVATE /W3 /utf-8)
++	target_sources(DxRenderDojo PRIVATE DxRenderDojo.manifest)
+ else()
+ 	target_compile_options(DxRenderDojo PRIVATE -Wall)
+ endif()
+ 
+ if(MINGW)
++	enable_language(RC)
++	target_sources(DxRenderDojo PRIVATE DxRenderDojo.rc)
++	target_compile_definitions(DxRenderDojo PRIVATE _WIN32_WINNT=0x0A00 WINVER=0x0A00)
+ 	target_link_options(DxRenderDojo PRIVATE -municode -static -static-libgcc -static-libstdc++)
+ endif()</pre>
+					</figure>
+						<ul class="walk">
+							<li class="entry"><code>target_sources(DxRenderDojo PRIVATE DxRenderDojo.manifest)</code> MSVC 빌드에서 매니페스트를 exe 에 넣게 함</li>
+							<li class="entry"><code>target_sources(DxRenderDojo PRIVATE DxRenderDojo.rc)</code> mingw 빌드에만 넣음</li>
+							<li class="entry"><code>_WIN32_WINNT=0x0A00 WINVER=0x0A00</code> mingw 빌드에서 <code>GetDpiForWindow</code> 같은 Windows 10 함수 선언이 보이게 대상 버전을 정함</li>
+						</ul>
+					</details>
+					<details class="fold">
 						<summary>Win32 개념 · 배율과 DPI</summary>
 						<aside class="concept">
 							<ul class="walk">
@@ -2000,8 +1961,6 @@ void FApplication::Render()
 						</aside>
 					</details>
 					<p><code>FWindow::Initialize</code> 는 통째로 바꿔요. 배율은 창이 생긴 뒤에야 알 수 있어서, 창을 먼저 만들고 DPI 를 읽은 다음 크기와 위치를 다시 맞춰요. 시작 설정이 전체 화면이면 <code>WS_POPUP</code> 창을 만드는 대신 Alt+Enter 와 같은 <code>ToggleFullScreen</code> 을 불러요.</p>
-					<details class="fold must">
-						<summary>칠 코드 · 배율 처리</summary>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FWindow.h</span><span class="badge new">신규</span><span class="badge">배율 · 전체 화면 멤버도 함께</span></figcaption>
 <pre class="diff" data-lang="cpp">@@ -21,6 +21,7 @@
@@ -2175,12 +2134,14 @@ void FApplication::Render()
 	return MulDiv(Value, static_cast&lt;int&gt;(Dpi), USER_DEFAULT_SCREEN_DPI);
 }</pre>
 					</figure>
-					<ul class="walk">
-						<li class="entry"><code>ScaleForDpi(Settings.Width)</code> 배율 100% 기준 값을 지금 배율로 바꿈. <code>WM_GETMINMAXINFO</code> 의 최소 크기 320×240 에도 곱함</li>
-						<li class="entry"><code>if (Settings.bFullScreen)</code> 창은 늘 창 모드로 만들고, 시작 설정이 전체 화면이면 만든 직후 <code>ToggleFullScreen</code> 을 부름</li>
-						<li class="entry"><code>case WM_GETDPISCALEDSIZE:</code> 이 처리가 없으면 배율 175% 에서 200% 로 바꿀 때 <code>1601x1202</code>, 이어서 100% 로 바꿀 때 <code>798x598</code> 처럼 1~2 픽셀씩 어긋나고 쌓임</li>
-						<li class="entry"><code>Suggested</code> 윈도우가 보낸 새 창 사각형. <code>WM_GETDPISCALEDSIZE</code> 에서 돌려준 크기가 반영돼 있음</li>
-					</ul>
+					<details class="fold">
+						<summary>줄 단위 풀이</summary>
+						<ul class="walk">
+							<li class="entry"><code>ScaleForDpi(Settings.Width)</code> 배율 100% 기준 값을 지금 배율로 바꿈. <code>WM_GETMINMAXINFO</code> 의 최소 크기 320×240 에도 곱함</li>
+							<li class="entry"><code>if (Settings.bFullScreen)</code> 창은 늘 창 모드로 만들고, 시작 설정이 전체 화면이면 만든 직후 <code>ToggleFullScreen</code> 을 부름</li>
+							<li class="entry"><code>case WM_GETDPISCALEDSIZE:</code> 이 처리가 없으면 배율 175% 에서 200% 로 바꿀 때 <code>1601x1202</code>, 이어서 100% 로 바꿀 때 <code>798x598</code> 처럼 1~2 픽셀씩 어긋나고 쌓임</li>
+							<li class="entry"><code>Suggested</code> 윈도우가 보낸 새 창 사각형. <code>WM_GETDPISCALEDSIZE</code> 에서 돌려준 크기가 반영돼 있음</li>
+						</ul>
 					</details>
 					<p>창을 만든 로그도 배율을 함께 찍어요.</p>
 					<figure class="code">
@@ -2198,8 +2159,6 @@ void FApplication::Render()
  	                          { OnWindowMessage(Message, WParam, LParam); });</pre>
 					</figure>
 					<p>Alt+Enter 의 전체 화면은 제목 표시줄과 테두리를 빼고 창이 있는 모니터를 채울 뿐이라 해상도는 그대로예요. 다시 누르면 원래 위치와 크기로 돌아와요.</p>
-					<details class="fold must">
-						<summary>칠 코드 · 전체 화면</summary>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">신규</span><span class="badge">HandleMessage 의 switch 안, case WM_GETMINMAXINFO 다음</span></figcaption>
 <pre class="snip" data-lang="cpp">	// Alt 와 함께 누른 키에 맞는 메뉴가 없으면 윈도우가 경고음을 낸다. Alt+Enter 마다 소리가 나지 않게 한다.
@@ -2266,12 +2225,14 @@ void FWindow::ToggleFullScreen()
 	             SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
 }</pre>
 					</figure>
-					<ul class="walk">
-						<li class="entry"><code>case WM_SYSKEYDOWN:</code> Alt 와 함께 누른 키는 <code>WM_KEYDOWN</code> 대신 이 메시지로 옴</li>
-						<li class="entry"><code>Style &amp; ~WS_OVERLAPPEDWINDOW</code> 제목 표시줄·테두리·최소화와 최대화 단추의 스타일 비트를 끔</li>
-						<li class="entry"><code>SWP_FRAMECHANGED</code> 스타일을 바꾼 뒤 테두리를 다시 계산하게 함</li>
-						<li class="entry"><code>rcMonitor</code> 작업 표시줄까지 포함한 모니터 전체 사각형</li>
-					</ul>
+					<details class="fold">
+						<summary>줄 단위 풀이</summary>
+						<ul class="walk">
+							<li class="entry"><code>case WM_SYSKEYDOWN:</code> Alt 와 함께 누른 키는 <code>WM_KEYDOWN</code> 대신 이 메시지로 옴</li>
+							<li class="entry"><code>Style &amp; ~WS_OVERLAPPEDWINDOW</code> 제목 표시줄·테두리·최소화와 최대화 단추의 스타일 비트를 끔</li>
+							<li class="entry"><code>SWP_FRAMECHANGED</code> 스타일을 바꾼 뒤 테두리를 다시 계산하게 함</li>
+							<li class="entry"><code>rcMonitor</code> 작업 표시줄까지 포함한 모니터 전체 사각형</li>
+						</ul>
 					</details>
 					<details class="fold">
 						<summary>원문과 비교</summary>
@@ -2352,7 +2313,7 @@ void FWindow::ToggleFullScreen()
 			<li><span class="mark a">+</span><span class="name">Source/Core/FSystem.h</span><span class="note">+34</span></li>
 			<li><span class="mark a">+</span><span class="name">Source/Core/FSystem.cpp</span><span class="note">+67</span></li>
 			<li><span class="mark m">~</span><span class="name">Source/Main.cpp</span><span class="note">+9 −1</span></li>
-			<li><span class="mark m">~</span><span class="name">CMakeLists.txt</span><span class="note">+15 −2</span></li>
+			<li><span class="mark m">~</span><span class="name">CMakeLists.txt</span><span class="note">+6 −1</span></li>
 			<li><span class="mark m">~</span><span class="name">DxRenderDojo.vcxproj</span><span class="note">+27 −2</span></li>
 			<li><span class="mark a">+</span><span class="name">DxRenderDojo.manifest</span><span class="note">+15 · DPI 인식과 OS 호환 선언</span></li>
 			<li><span class="mark a">+</span><span class="name">DxRenderDojo.rc</span><span class="note">+3 · mingw 빌드에만 들어감</span></li>
@@ -3214,21 +3175,11 @@ void FApplication::Render()
  }</pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">CMakeLists.txt</span><span class="stat"><span class="plus">+15</span> <span class="minus">−2</span></span><span class="why">새 소스, include 경로, 매니페스트, mingw 대상 버전</span></summary>
-<pre class="diff" data-lang="cmake">@@ -1,16 +1,29 @@
- cmake_minimum_required(VERSION 3.25)
- project(DxRenderDojo LANGUAGES CXX)
+				<summary><span class="path">CMakeLists.txt</span><span class="stat"><span class="plus">+6</span> <span class="minus">−1</span></span><span class="why">include 경로, 매니페스트, mingw 대상 버전</span></summary>
+<pre class="diff" data-lang="cmake">@@ -3,15 +3,20 @@
  
--add_executable(DxRenderDojo WIN32 Source/Main.cpp)
-+add_executable(DxRenderDojo WIN32
-+	Source/Main.cpp
-+	Source/App/FApplication.cpp
-+	Source/Core/FInput.cpp
-+	Source/Core/FSystem.cpp
-+	Source/Core/FWindow.cpp
-+	Source/Utility/Check.cpp
-+	Source/Utility/FLog.cpp
-+)
+ file(GLOB_RECURSE SourceFiles CONFIGURE_DEPENDS Source/*.cpp)
+ add_executable(DxRenderDojo WIN32 ${SourceFiles})
 +target_include_directories(DxRenderDojo PRIVATE Source)
  target_compile_features(DxRenderDojo PRIVATE cxx_std_20)
 -target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE)

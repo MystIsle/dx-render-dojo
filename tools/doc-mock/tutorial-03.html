@@ -250,8 +250,6 @@ details.fold[open] > summary::before { content: "▾"; }
 details.fold > *:not(summary) { margin: 0 1.15rem 0.95rem; }
 details.fold > summary + * { margin-top: 0.3rem; }
 details.fold .walk { padding-left: 2.4rem; }
-details.fold.must { border-style: dashed; border-color: var(--accent); }
-details.fold.must > summary { color: var(--accent); }
 .checkpoint { display: grid; gap: 0.35rem; margin: 0; padding: 0.85rem 1.15rem; border: 1px solid var(--code-add); border-radius: var(--radius); }
 .checkpoint .box-label { color: var(--code-add); }
 .learn { display: grid; gap: 0.45rem; margin: 0; padding: 0.95rem 1.15rem; border-radius: var(--radius); background: var(--amber-soft); }
@@ -522,7 +520,7 @@ figure.code .diff-view { border-top: 0; }
 
 	<section id="steps" data-block="steps" data-source="직접">
 		<h2>따라 하기</h2>
-		<p class="section-note">코드 조각의 배지는 할 일이에요. <b>신규</b>는 추가, <b>수정</b>은 있던 함수나 파일을 통째로 바꿔 넣기, <b>삭제</b>는 빨간 줄 지우기예요. diff 조각은 초록 줄을 넣고 빨간 줄을 지워요. 점선 접기 안의 코드도 쳐야 해요. 단계마다 끝의 <b>여기까지</b> 상자대로 빌드하고 실행해 보세요.</p>
+		<p class="section-note">코드 조각의 배지는 할 일이에요. <b>신규</b>는 추가, <b>수정</b>은 있던 함수나 파일을 통째로 바꿔 넣기, <b>삭제</b>는 빨간 줄 지우기예요. diff 조각은 초록 줄을 넣고 빨간 줄을 지워요. 단계마다 끝의 <b>여기까지</b> 상자대로 빌드하고 실행해 보세요.</p>
 		<ol class="steps">
 
 			<li class="step" id="step-device">
@@ -681,32 +679,7 @@ using Microsoft::WRL::ComPtr;</pre>
 							<li class="entry"><code>FD3D11Graphics Graphics;</code> <code>FWindow</code> 뒤에 선언해서 먼저 소멸함. 다음 단계의 스왑체인이 창에 그림을 내보내서 창보다 먼저 해제돼야 함</li>
 						</ul>
 					</details>
-					<p>새 파일을 빌드에 등록해요. CMake 빌드는 <code>CMakeLists.txt</code> 에 <code>FD3D11Graphics.cpp</code> 를 적고 D3D 라이브러리 <code>d3d11</code>·<code>dxgi</code> 를 링크에 더해요.</p>
-					<figure class="code">
-						<figcaption><span class="path">CMakeLists.txt</span><span class="badge mod">수정</span><span class="badge">소스 목록과 링크</span></figcaption>
-<pre class="diff" data-lang="cmake">@@ -7,12 +7,14 @@
- 	Source/Core/FInput.cpp
- 	Source/Core/FSystem.cpp
- 	Source/Core/FWindow.cpp
-+	Source/Graphics/FD3D11Graphics.cpp
- 	Source/Utility/Check.cpp
- 	Source/Utility/FLog.cpp
- )
- target_include_directories(DxRenderDojo PRIVATE Source)
- target_compile_features(DxRenderDojo PRIVATE cxx_std_20)
- target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN)
-+target_link_libraries(DxRenderDojo PRIVATE d3d11 dxgi)
- 
- if(MSVC)
- 	target_compile_options(DxRenderDojo PRIVATE /W3 /utf-8)</pre>
-					</figure>
-					<details class="fold">
-						<summary>줄 단위 풀이</summary>
-						<ul class="walk">
-							<li class="entry"><code>target_link_libraries(DxRenderDojo PRIVATE d3d11 dxgi)</code> 원문은 헤더의 <code>#pragma comment(lib, ...)</code> 로 링크함. mingw 빌드와 맞추려고 빌드 파일에 적음</li>
-						</ul>
-					</details>
-					<p>Visual Studio 에서는 솔루션 탐색기에 <code>Graphics</code> 필터를 만들고 <code>FD3D11Graphics.h</code>·<code>FD3D11Graphics.cpp</code> 를 기존 항목 추가로 넣어요. 링크할 라이브러리는 프로젝트 속성에서 구성을 모든 구성으로 두고 링커 › 입력 › 추가 종속성에 <code>d3d11.lib;dxgi.lib</code> 를 더해요. 두 조작이 <code>DxRenderDojo.vcxproj</code> 와 <code>DxRenderDojo.vcxproj.filters</code> 를 바꿔요.</p>
+					<p>새 파일을 빌드에 등록해요. Visual Studio 에서는 솔루션 탐색기에 <code>Graphics</code> 필터를 만들고 <code>FD3D11Graphics.h</code>·<code>FD3D11Graphics.cpp</code> 를 기존 항목 추가로 넣어요. 링크할 라이브러리는 프로젝트 속성에서 구성을 모든 구성으로 두고 링커 › 입력 › 추가 종속성에 <code>d3d11.lib;dxgi.lib</code> 를 더해요. 두 조작이 <code>DxRenderDojo.vcxproj</code> 와 <code>DxRenderDojo.vcxproj.filters</code> 를 바꿔요.</p>
 					<details class="fold">
 						<summary>참고 : 위 조작이 프로젝트 파일에 남기는 diff · 따로 치지 않음</summary>
 					<figure class="code">
@@ -736,6 +709,23 @@ using Microsoft::WRL::ComPtr;</pre>
      &lt;ClInclude Include="Source\Utility\FLog.h" /&gt;
      &lt;ClInclude Include="Source\Utility\TSingleton.h" /&gt;</pre>
 					</figure>
+					</details>
+					<details class="fold">
+						<summary>CMake · 맥 빌드와 검사용, VS 만 쓰면 건너뜀</summary>
+					<figure class="code">
+						<figcaption><span class="path">CMakeLists.txt</span><span class="badge mod">수정</span><span class="badge">링크할 라이브러리</span></figcaption>
+<pre class="diff" data-lang="cmake">@@ -6,6 +6,7 @@
+ target_include_directories(DxRenderDojo PRIVATE Source)
+ target_compile_features(DxRenderDojo PRIVATE cxx_std_20)
+ target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN)
++target_link_libraries(DxRenderDojo PRIVATE d3d11 dxgi)
+ 
+ if(MSVC)
+ 	target_compile_options(DxRenderDojo PRIVATE /W3 /utf-8)</pre>
+					</figure>
+						<ul class="walk">
+							<li class="entry"><code>target_link_libraries(DxRenderDojo PRIVATE d3d11 dxgi)</code> 원문은 헤더의 <code>#pragma comment(lib, ...)</code> 로 링크함. mingw 빌드와 맞추려고 빌드 파일에 적음</li>
+						</ul>
 					</details>
 					<details class="fold">
 						<summary>원문과 비교</summary>
@@ -1493,7 +1483,7 @@ using Microsoft::WRL::ComPtr;</pre>
 			<li><span class="mark m">~</span><span class="name">Source/Core/FWindow.cpp</span><span class="note">+11 −2</span></li>
 			<li><span class="mark m">~</span><span class="name">Source/Utility/Check.h</span><span class="note">+4</span></li>
 			<li><span class="mark m">~</span><span class="name">Source/Utility/Check.cpp</span><span class="note">+14</span></li>
-			<li><span class="mark m">~</span><span class="name">CMakeLists.txt</span><span class="note">+2</span></li>
+			<li><span class="mark m">~</span><span class="name">CMakeLists.txt</span><span class="note">+1</span></li>
 			<li><span class="mark m">~</span><span class="name">DxRenderDojo.vcxproj</span><span class="note">+3</span></li>
 			<li><span class="mark m">~</span><span class="name">DxRenderDojo.vcxproj.filters</span><span class="note">VS 폴더 표시. 본문 생략</span></li>
 		</ul>
@@ -1919,15 +1909,8 @@ void FD3D11Graphics::FlushDebugMessages()
 		<div class="file-group">
 			<h3>빌드</h3>
 			<details class="diff-file">
-				<summary><span class="path">CMakeLists.txt</span><span class="stat"><span class="plus">+2</span></span><span class="why">새 소스, d3d11·dxgi 링크</span></summary>
-<pre class="diff" data-lang="cmake">@@ -7,12 +7,14 @@
- 	Source/Core/FInput.cpp
- 	Source/Core/FSystem.cpp
- 	Source/Core/FWindow.cpp
-+	Source/Graphics/FD3D11Graphics.cpp
- 	Source/Utility/Check.cpp
- 	Source/Utility/FLog.cpp
- )
+				<summary><span class="path">CMakeLists.txt</span><span class="stat"><span class="plus">+1</span></span><span class="why">d3d11·dxgi 링크</span></summary>
+<pre class="diff" data-lang="cmake">@@ -6,6 +6,7 @@
  target_include_directories(DxRenderDojo PRIVATE Source)
  target_compile_features(DxRenderDojo PRIVATE cxx_std_20)
  target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN)
