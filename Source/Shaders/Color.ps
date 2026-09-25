@@ -1,0 +1,11 @@
+// 정점 셰이더의 출력이 픽셀 셰이더의 입력이 된다. 두 파일의 FPixelInput 이 같아야 한다.
+struct FPixelInput
+{
+	float4 Position : SV_POSITION;
+	float4 Color : COLOR;
+};
+
+float4 ColorPixelShader(FPixelInput Input) : SV_TARGET
+{
+	return Input.Color;
+}

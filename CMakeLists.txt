@@ -9,6 +9,13 @@ target_compile_features(DxRenderDojo PRIVATE cxx_std_20)
 target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN)
 target_link_libraries(DxRenderDojo PRIVATE d3d11 dxgi)
 
+# 셰이더는 실행 중에 컴파일한다. exe 옆 Shaders 폴더로 복사하고, configure_file 은 원본이 바뀌면 다시 복사한다.
+file(GLOB ShaderFiles CONFIGURE_DEPENDS Source/Shaders/*.vs Source/Shaders/*.ps)
+foreach(Shader ${ShaderFiles})
+	cmake_path(GET Shader FILENAME ShaderName)
+	configure_file(${Shader} Shaders/${ShaderName} COPYONLY)
+endforeach()
+
 if(MSVC)
 	target_compile_options(DxRenderDojo PRIVATE /W3 /utf-8)
 	target_sources(DxRenderDojo PRIVATE DxRenderDojo.manifest)
