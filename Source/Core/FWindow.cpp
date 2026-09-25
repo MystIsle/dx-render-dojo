@@ -4,6 +4,12 @@
 
 LRESULT CALLBACK FWindow::WndProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam)
 {
+	// 치명 실패 상자가 떠 있는 동안 창 메시지가 실패한 객체에 닿지 않게 한다.
+	if (::Return::IsFatal())
+	{
+		return DefWindowProcW(WindowHandle, Message, WParam, LParam);
+	}
+
 	if (Message == WM_NCCREATE)
 	{
 		const CREATESTRUCTW* CreateInfo = reinterpret_cast<const CREATESTRUCTW*>(LParam);
@@ -17,6 +23,19 @@ LRESULT CALLBACK FWindow::WndProc(HWND WindowHandle, UINT Message, WPARAM WParam
 	}
 
 	return Window->HandleMessage(WindowHandle, Message, WParam, LParam);
+}
+
+FWindow::~FWindow()
+{
+	if (bCursorHidden)
+	{
+		ShowCursor(TRUE);
+	}
+
+	if (Handle != nullptr)
+	{
+		DestroyWindow(Handle);
+	}
 }
 
 void FWindow::Initialize(const FDisplaySettings& Settings, int ShowCmd)
@@ -88,5 +107,22 @@ void FWindow::Initialize(const FDisplaySettings& Settings, int ShowCmd)
 
 LRESULT FWindow::HandleMessage(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam)
 {
-	return DefWindowProcW(WindowHandle, Message, WParam, LParam);
+	switch (Message)
+	{
+	case WM_CLOSE:
+		PostQuitMessage(0);
+		return 0;
+
+	// 윈도우가 꺼질 때는 WM_CLOSE 가 오지 않는다. 종료 신호를 같은 길로 모은다.
+	// WParam 이 FALSE 면 다른 앱이 종료를 거부한 것이라 그대로 둔다.
+	case WM_ENDSESSION:
+		if (WParam == TRUE)
+		{
+			PostQuitMessage(0);
+		}
+		return 0;
+
+	default:
+		return DefWindowProcW(WindowHandle, Message, WParam, LParam);
+	}
 }

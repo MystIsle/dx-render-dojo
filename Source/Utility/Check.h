@@ -39,6 +39,7 @@ namespace Return
 	                              std::wstring_view Detail,
 	                              std::wstring_view File,
 	                              int Line);
+	bool IsFatal();
 
 	void ReportResurrection(std::string_view TypeName);
 } // namespace Return

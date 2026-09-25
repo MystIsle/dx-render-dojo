@@ -9,6 +9,8 @@
 
 namespace
 {
+	bool bFatal = false;
+
 	std::wstring FormatFailure(std::wstring_view Prefix,
 	                           std::wstring_view Expression,
 	                           std::wstring_view Detail,
@@ -39,6 +41,8 @@ namespace Return
 
 	void ReportFatal(std::wstring_view Expression, std::wstring_view Detail, std::wstring_view File, int Line)
 	{
+		bFatal = true;
+
 		const std::wstring Message = FormatFailure(L"[CHECK FATAL] ", Expression, Detail, File, Line);
 		FLog::Error(Message);
 
@@ -46,6 +50,11 @@ namespace Return
 
 		// 소멸자를 거치지 않고 끝낸다. 실패한 상태에서 정리 코드가 다시 실패할 수 있다.
 		std::_Exit(1);
+	}
+
+	bool IsFatal()
+	{
+		return bFatal;
 	}
 
 	void ReportResurrection(std::string_view TypeName)
