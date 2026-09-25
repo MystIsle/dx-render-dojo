@@ -1,3 +1,11 @@
+// FColorShader::FMatrixBuffer 와 멤버 순서가 같아야 한다. b0 은 VSSetConstantBuffers 의 슬롯 0 이다.
+cbuffer MatrixBuffer : register(b0)
+{
+	matrix World;
+	matrix View;
+	matrix Projection;
+};
+
 struct FVertexInput
 {
 	float3 Position : POSITION;
@@ -14,7 +22,9 @@ struct FPixelInput
 FPixelInput ColorVertexShader(FVertexInput Input)
 {
 	FPixelInput Output;
-	Output.Position = float4(Input.Position, 1.0f);
+	Output.Position = mul(float4(Input.Position, 1.0f), World);
+	Output.Position = mul(Output.Position, View);
+	Output.Position = mul(Output.Position, Projection);
 	Output.Color = Input.Color;
 	return Output;
 }
