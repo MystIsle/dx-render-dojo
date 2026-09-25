@@ -521,7 +521,7 @@ figure.code .diff-view { border-top: 0; }
 					<h3>실패하면 그 자리에서 멈춘다</h3>
 					<p>이 편부터 계속할 수 없는 실패는 발견한 줄에서 멈춰요. 02편은 실패를 <code>bool</code> 로 돌려주며 <code>wWinMain</code> 까지 올라갔고, 상자에는 가장 바깥의 검사만 떴어요. D3D 초기화는 호출마다 실패할 수 있어서 어느 호출이 실패했는지는 그 줄에서 멈춰야 바로 보여요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/Check.h</span><span class="badge mod">바꿈</span><span class="badge">파일 전체</span></figcaption>
+						<figcaption><span class="path">Source/Utility/Check.h</span><span class="badge mod">바꿈</span><span class="badge">파일 전체</span></figcaption>
 <pre class="src" data-lang="cpp">#pragma once
 
 #include &lt;Windows.h&gt;
@@ -612,7 +612,7 @@ namespace Return
 					</details>
 					<p>실패하면 멈추니 <code>wWinMain</code> 의 실패 분기와 상자가 없어지고, 상자에 띄우던 <code>FLog</code> 의 마지막 에러 문구도 지워요. <code>void</code> 가 되는 <code>FSystem::Initialize</code> 와 <code>FWindow::Initialize</code> 는 각각 2단계와 6단계에서 통째로 바꿔 넣어요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FLog.h</span><span class="badge del">지움</span><span class="badge">tut02 → tut03</span></figcaption>
+						<figcaption><span class="path">Source/Utility/FLog.h</span><span class="badge del">지움</span><span class="badge">tut02 → tut03</span></figcaption>
 <pre class="diff" data-lang="cpp">@@ -1,7 +1,6 @@
  #pragma once
  
@@ -620,7 +620,7 @@ namespace Return
 -#include &lt;string&gt;
  #include &lt;string_view&gt;
  
- #include "Core/TSingleton.h"
+ #include "Utility/TSingleton.h"
 @@ -9,8 +8,6 @@
  class FLog : public TSingleton&lt;FLog&gt;
  {
@@ -640,8 +640,8 @@ namespace Return
 					<details class="fold">
 						<summary>멈추는 쪽 코드</summary>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/Check.cpp</span><span class="badge mod">바꿈</span><span class="badge">파일 전체</span></figcaption>
-<pre class="src" data-lang="cpp">#include "Core/Check.h"
+						<figcaption><span class="path">Source/Utility/Check.cpp</span><span class="badge mod">바꿈</span><span class="badge">파일 전체</span></figcaption>
+<pre class="src" data-lang="cpp">#include "Utility/Check.h"
 
 #include &lt;cstdint&gt;
 #include &lt;cstdlib&gt;
@@ -649,7 +649,7 @@ namespace Return
 #include &lt;string&gt;
 #include &lt;utility&gt;
 
-#include "Core/FLog.h"
+#include "Utility/FLog.h"
 
 namespace
 {
@@ -744,9 +744,9 @@ namespace Return
 					</ul>
 					</details>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FLog.cpp</span><span class="badge mod">바꿈</span><span class="badge">tut02 → tut03</span></figcaption>
+						<figcaption><span class="path">Source/Utility/FLog.cpp</span><span class="badge mod">바꿈</span><span class="badge">tut02 → tut03</span></figcaption>
 <pre class="diff" data-lang="cpp">@@ -1,9 +1,6 @@
- #include "Core/FLog.h"
+ #include "Utility/FLog.h"
  
 -const std::wstring&amp; FLog::GetLastErrorMessage()
 -{
@@ -773,8 +773,8 @@ namespace Return
 <pre class="diff" data-lang="cpp">@@ -1,18 +1,12 @@
  #include &lt;Windows.h&gt;
  
--#include "Core/FLog.h"
  #include "Core/FSystem.h"
+-#include "Utility/FLog.h"
  
  int WINAPI wWinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _In_ PWSTR CmdLine, _In_ int ShowCmd)
  {
@@ -864,11 +864,12 @@ private:
 					<p><code>FD3D11Graphics</code> 는 <code>FSystem</code> 의 멤버예요. <code>FSystem::Initialize</code> 가 창을 만든 다음 <code>Graphics.Initialize</code> 를 불러요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FSystem.h</span><span class="badge mod">바꿈</span><span class="badge">tut02 → tut03</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -7,11 +7,12 @@
+<pre class="diff" data-lang="cpp">@@ -6,12 +6,13 @@
+ #include "Core/FDisplaySettings.h"
  #include "Core/FInput.h"
  #include "Core/FWindow.h"
- #include "Core/TSingleton.h"
 +#include "Graphics/FD3D11Graphics.h"
+ #include "Utility/TSingleton.h"
  
  class FSystem : public TSingleton&lt;FSystem&gt;
  {
@@ -897,8 +898,8 @@ private:
  
  #include &lt;format&gt;
  
--#include "Core/Check.h"
- #include "Core/FLog.h"</pre>
+-#include "Utility/Check.h"
+ #include "Utility/FLog.h"</pre>
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge mod">바꿈</span><span class="badge">FSystem::Initialize</span></figcaption>
@@ -941,10 +942,10 @@ private:
 #include &lt;string_view&gt;
 #include &lt;vector&gt;
 
-#include "Core/Check.h"
 #include "Core/FDisplaySettings.h"
-#include "Core/FLog.h"
 #include "Core/FWindow.h"
+#include "Utility/Check.h"
+#include "Utility/FLog.h"
 
 using Microsoft::WRL::ComPtr;</pre>
 					</figure>
@@ -1395,8 +1396,8 @@ using Microsoft::WRL::ComPtr;</pre>
 +#include &lt;format&gt;
  #include &lt;utility&gt;
  
- #include "Core/Check.h"
-+#include "Core/FLog.h"</pre>
+ #include "Utility/Check.h"
++#include "Utility/FLog.h"</pre>
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge mod">바꿈</span><span class="badge">FWindow::Initialize</span></figcaption>
@@ -1702,11 +1703,13 @@ void FWindow::ToggleFullScreen()
 					<p>CMake 빌드는 <code>CMakeLists.txt</code> 에 새 파일 <code>FD3D11Graphics.cpp</code> 를 등록하고 D3D 라이브러리 <code>d3d11</code>·<code>dxgi</code> 를 링크에 더해요.</p>
 					<figure class="code">
 						<figcaption><span class="path">CMakeLists.txt</span><span class="badge new">새로</span><span class="badge">tut02 → tut03</span></figcaption>
-<pre class="diff" data-lang="cmake">@@ -9,10 +9,12 @@ add_executable(DxRenderDojo WIN32
- 	Source/Core/FLog.cpp
+<pre class="diff" data-lang="cmake">@@ -7,12 +7,14 @@ add_executable(DxRenderDojo WIN32
+ 	Source/Core/FInput.cpp
  	Source/Core/FSystem.cpp
  	Source/Core/FWindow.cpp
 +	Source/Graphics/FD3D11Graphics.cpp
+ 	Source/Utility/Check.cpp
+ 	Source/Utility/FLog.cpp
  )
  target_include_directories(DxRenderDojo PRIVATE Source)
  target_compile_features(DxRenderDojo PRIVATE cxx_std_20)
@@ -1743,22 +1746,22 @@ void FWindow::ToggleFullScreen()
      &lt;/Link&gt;
      &lt;Manifest&gt;
        &lt;EnableDpiAwareness&gt;false&lt;/EnableDpiAwareness&gt;
-@@ -77,6 +78,7 @@
-     &lt;ClCompile Include="Source\Core\FLog.cpp" /&gt;
+@@ -75,6 +76,7 @@
+     &lt;ClCompile Include="Source\Core\FInput.cpp" /&gt;
      &lt;ClCompile Include="Source\Core\FSystem.cpp" /&gt;
      &lt;ClCompile Include="Source\Core\FWindow.cpp" /&gt;
 +    &lt;ClCompile Include="Source\Graphics\FD3D11Graphics.cpp" /&gt;
+     &lt;ClCompile Include="Source\Utility\Check.cpp" /&gt;
+     &lt;ClCompile Include="Source\Utility\FLog.cpp" /&gt;
    &lt;/ItemGroup&gt;
-   &lt;ItemGroup&gt;
-     &lt;ClInclude Include="Source\App\FApplication.h" /&gt;
-@@ -87,6 +89,7 @@
+@@ -84,6 +86,7 @@
+     &lt;ClInclude Include="Source\Core\FInput.h" /&gt;
      &lt;ClInclude Include="Source\Core\FSystem.h" /&gt;
      &lt;ClInclude Include="Source\Core\FWindow.h" /&gt;
-     &lt;ClInclude Include="Source\Core\TSingleton.h" /&gt;
 +    &lt;ClInclude Include="Source\Graphics\FD3D11Graphics.h" /&gt;
-   &lt;/ItemGroup&gt;
-   &lt;ItemGroup&gt;
-     &lt;None Include="DxRenderDojo.manifest" /&gt;</pre>
+     &lt;ClInclude Include="Source\Utility\Check.h" /&gt;
+     &lt;ClInclude Include="Source\Utility\FLog.h" /&gt;
+     &lt;ClInclude Include="Source\Utility\TSingleton.h" /&gt;</pre>
 					</figure>
 					</details>
 					<p>이제 F5 로 실행하고 <a href="#check">다 됐는지 확인</a> 목록과 맞춰 보세요.</p>
@@ -1806,12 +1809,12 @@ void FWindow::ToggleFullScreen()
 		<h2>이 편에서 바뀐 파일</h2>
 		<p class="section-note">새 파일은 전체 코드, 바뀐 파일은 diff 예요. 전부 접어 뒀으니 필요한 것만 펼쳐 보세요. 묶음은 파일이 맡은 일로 나눴어요.</p>
 		<ul class="file-list">
-			<li><span class="mark a">+</span><span class="name">Source/Graphics/FD3D11Graphics.h</span><span class="note">+37</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/Graphics/FD3D11Graphics.h</span><span class="note">+38</span></li>
 			<li><span class="mark a">+</span><span class="name">Source/Graphics/FD3D11Graphics.cpp</span><span class="note">+191</span></li>
-			<li><span class="mark m">~</span><span class="name">Source/Core/Check.h</span><span class="note">+42 −3</span></li>
-			<li><span class="mark m">~</span><span class="name">Source/Core/Check.cpp</span><span class="note">+61 −2</span></li>
-			<li><span class="mark m">~</span><span class="name">Source/Core/FLog.h</span><span class="note">−4</span></li>
-			<li><span class="mark m">~</span><span class="name">Source/Core/FLog.cpp</span><span class="note">+3 −8</span></li>
+			<li><span class="mark m">~</span><span class="name">Source/Utility/Check.h</span><span class="note">+42 −3</span></li>
+			<li><span class="mark m">~</span><span class="name">Source/Utility/Check.cpp</span><span class="note">+61 −2</span></li>
+			<li><span class="mark m">~</span><span class="name">Source/Utility/FLog.h</span><span class="note">−4</span></li>
+			<li><span class="mark m">~</span><span class="name">Source/Utility/FLog.cpp</span><span class="note">+2 −7</span></li>
 			<li><span class="mark m">~</span><span class="name">Source/Main.cpp</span><span class="note">+1 −7</span></li>
 			<li><span class="mark m">~</span><span class="name">Source/Core/FWindow.h</span><span class="note">+8 −1</span></li>
 			<li><span class="mark m">~</span><span class="name">Source/Core/FWindow.cpp</span><span class="note">+156 −37</span></li>
@@ -1882,10 +1885,10 @@ private:
 #include &lt;string_view&gt;
 #include &lt;vector&gt;
 
-#include "Core/Check.h"
 #include "Core/FDisplaySettings.h"
-#include "Core/FLog.h"
 #include "Core/FWindow.h"
+#include "Utility/Check.h"
+#include "Utility/FLog.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -2066,7 +2069,7 @@ void FD3D11Graphics::FlushDebugMessages()
 		<div class="file-group">
 			<h3>실패 처리</h3>
 			<details class="diff-file">
-				<summary><span class="path">Source/Core/Check.h</span><span class="stat"><span class="plus">+42</span> <span class="minus">−3</span></span><span class="why">CHECK_FATAL 과 HRESULT 값 붙이기</span></summary>
+				<summary><span class="path">Source/Utility/Check.h</span><span class="stat"><span class="plus">+42</span> <span class="minus">−3</span></span><span class="why">CHECK_FATAL 과 HRESULT 값 붙이기</span></summary>
 <pre class="diff" data-lang="cpp">@@ -1,6 +1,8 @@
  #pragma once
  
@@ -2136,9 +2139,9 @@ void FD3D11Graphics::FlushDebugMessages()
 +	} while (false)</pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">Source/Core/Check.cpp</span><span class="stat"><span class="plus">+61</span> <span class="minus">−2</span></span><span class="why">치명 실패 처리와 훅</span></summary>
+				<summary><span class="path">Source/Utility/Check.cpp</span><span class="stat"><span class="plus">+61</span> <span class="minus">−2</span></span><span class="why">치명 실패 처리와 훅</span></summary>
 <pre class="diff" data-lang="cpp">@@ -1,15 +1,74 @@
- #include "Core/Check.h"
+ #include "Utility/Check.h"
  
 +#include &lt;cstdint&gt;
 +#include &lt;cstdlib&gt;
@@ -2146,7 +2149,7 @@ void FD3D11Graphics::FlushDebugMessages()
  #include &lt;string&gt;
 +#include &lt;utility&gt;
  
- #include "Core/FLog.h"
+ #include "Utility/FLog.h"
  
 +namespace
 +{
@@ -2216,7 +2219,7 @@ void FD3D11Graphics::FlushDebugMessages()
  	void ReportResurrection(std::string_view TypeName)</pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">Source/Core/FLog.h</span><span class="stat"><span class="minus">−4</span></span><span class="why">마지막 에러 문구를 뺌</span></summary>
+				<summary><span class="path">Source/Utility/FLog.h</span><span class="stat"><span class="minus">−4</span></span><span class="why">마지막 에러 문구를 뺌</span></summary>
 <pre class="diff" data-lang="cpp">@@ -1,7 +1,6 @@
  #pragma once
  
@@ -2224,7 +2227,7 @@ void FD3D11Graphics::FlushDebugMessages()
 -#include &lt;string&gt;
  #include &lt;string_view&gt;
  
- #include "Core/TSingleton.h"
+ #include "Utility/TSingleton.h"
 @@ -9,8 +8,6 @@
  class FLog : public TSingleton&lt;FLog&gt;
  {
@@ -2242,9 +2245,9 @@ void FD3D11Graphics::FlushDebugMessages()
  };</pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">Source/Core/FLog.cpp</span><span class="stat"><span class="plus">+2</span> <span class="minus">−7</span></span><span class="why">같은 변경</span></summary>
+				<summary><span class="path">Source/Utility/FLog.cpp</span><span class="stat"><span class="plus">+2</span> <span class="minus">−7</span></span><span class="why">같은 변경</span></summary>
 <pre class="diff" data-lang="cpp">@@ -1,9 +1,6 @@
- #include "Core/FLog.h"
+ #include "Utility/FLog.h"
  
 -const std::wstring&amp; FLog::GetLastErrorMessage()
 -{
@@ -2271,8 +2274,8 @@ void FD3D11Graphics::FlushDebugMessages()
 <pre class="diff" data-lang="cpp">@@ -1,18 +1,12 @@
  #include &lt;Windows.h&gt;
  
--#include "Core/FLog.h"
  #include "Core/FSystem.h"
+-#include "Utility/FLog.h"
  
  int WINAPI wWinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _In_ PWSTR CmdLine, _In_ int ShowCmd)
  {
@@ -2337,8 +2340,8 @@ void FD3D11Graphics::FlushDebugMessages()
 +#include &lt;format&gt;
  #include &lt;utility&gt;
  
- #include "Core/Check.h"
-+#include "Core/FLog.h"
+ #include "Utility/Check.h"
++#include "Utility/FLog.h"
  
  LRESULT CALLBACK FWindow::WndProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam)
  {
@@ -2596,11 +2599,12 @@ void FD3D11Graphics::FlushDebugMessages()
 			<h3>프레임과 설정</h3>
 			<details class="diff-file">
 				<summary><span class="path">Source/Core/FSystem.h</span><span class="stat"><span class="plus">+4</span> <span class="minus">−2</span></span><span class="why">Graphics 멤버와 선언 순서</span></summary>
-<pre class="diff" data-lang="cpp">@@ -7,11 +7,12 @@
+<pre class="diff" data-lang="cpp">@@ -6,12 +6,13 @@
+ #include "Core/FDisplaySettings.h"
  #include "Core/FInput.h"
  #include "Core/FWindow.h"
- #include "Core/TSingleton.h"
 +#include "Graphics/FD3D11Graphics.h"
+ #include "Utility/TSingleton.h"
  
  class FSystem : public TSingleton&lt;FSystem&gt;
  {
@@ -2629,8 +2633,8 @@ void FD3D11Graphics::FlushDebugMessages()
  
  #include &lt;format&gt;
  
--#include "Core/Check.h"
- #include "Core/FLog.h"
+-#include "Utility/Check.h"
+ #include "Utility/FLog.h"
  
 -bool FSystem::Initialize(int ShowCmd)
 +void FSystem::Initialize(int ShowCmd)
@@ -2708,11 +2712,13 @@ void FD3D11Graphics::FlushDebugMessages()
 			<h3>빌드</h3>
 			<details class="diff-file">
 				<summary><span class="path">CMakeLists.txt</span><span class="stat"><span class="plus">+3</span></span><span class="why">새 소스, d3d11·dxgi 링크, mingw 대상 버전</span></summary>
-<pre class="diff" data-lang="cmake">@@ -9,10 +9,12 @@ add_executable(DxRenderDojo WIN32
- 	Source/Core/FLog.cpp
+<pre class="diff" data-lang="cmake">@@ -7,12 +7,14 @@ add_executable(DxRenderDojo WIN32
+ 	Source/Core/FInput.cpp
  	Source/Core/FSystem.cpp
  	Source/Core/FWindow.cpp
 +	Source/Graphics/FD3D11Graphics.cpp
+ 	Source/Utility/Check.cpp
+ 	Source/Utility/FLog.cpp
  )
  target_include_directories(DxRenderDojo PRIVATE Source)
  target_compile_features(DxRenderDojo PRIVATE cxx_std_20)
@@ -2739,22 +2745,22 @@ void FD3D11Graphics::FlushDebugMessages()
      &lt;/Link&gt;
      &lt;Manifest&gt;
        &lt;EnableDpiAwareness&gt;false&lt;/EnableDpiAwareness&gt;
-@@ -77,6 +78,7 @@
-     &lt;ClCompile Include="Source\Core\FLog.cpp" /&gt;
+@@ -75,6 +76,7 @@
+     &lt;ClCompile Include="Source\Core\FInput.cpp" /&gt;
      &lt;ClCompile Include="Source\Core\FSystem.cpp" /&gt;
      &lt;ClCompile Include="Source\Core\FWindow.cpp" /&gt;
 +    &lt;ClCompile Include="Source\Graphics\FD3D11Graphics.cpp" /&gt;
+     &lt;ClCompile Include="Source\Utility\Check.cpp" /&gt;
+     &lt;ClCompile Include="Source\Utility\FLog.cpp" /&gt;
    &lt;/ItemGroup&gt;
-   &lt;ItemGroup&gt;
-     &lt;ClInclude Include="Source\App\FApplication.h" /&gt;
-@@ -87,6 +89,7 @@
+@@ -84,6 +86,7 @@
+     &lt;ClInclude Include="Source\Core\FInput.h" /&gt;
      &lt;ClInclude Include="Source\Core\FSystem.h" /&gt;
      &lt;ClInclude Include="Source\Core\FWindow.h" /&gt;
-     &lt;ClInclude Include="Source\Core\TSingleton.h" /&gt;
 +    &lt;ClInclude Include="Source\Graphics\FD3D11Graphics.h" /&gt;
-   &lt;/ItemGroup&gt;
-   &lt;ItemGroup&gt;
-     &lt;None Include="DxRenderDojo.manifest" /&gt;</pre>
+     &lt;ClInclude Include="Source\Utility\Check.h" /&gt;
+     &lt;ClInclude Include="Source\Utility\FLog.h" /&gt;
+     &lt;ClInclude Include="Source\Utility\TSingleton.h" /&gt;</pre>
 			</details>
 		</div>
 	</section>
