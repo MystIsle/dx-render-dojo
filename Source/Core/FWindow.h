@@ -21,6 +21,8 @@ public:
 	int GetHeight() const { return Height; }
 
 private:
+	LRESULT HandleMessage(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam);
+
 	HWND Handle = nullptr;
 	int Width = 0;
 	int Height = 0;
