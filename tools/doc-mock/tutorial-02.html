@@ -1517,15 +1517,15 @@ endif()</pre>
 // 1 = CREATEPROCESS_MANIFEST_RESOURCE_ID, 24 = RT_MANIFEST
 1 24 "DxRenderDojo.manifest"</pre>
 					</figure>
-					<p>Visual Studio 에서는 솔루션 탐색기에 <code>App</code>·<code>Core</code> 필터를 만들고 새 <code>.h</code>·<code>.cpp</code> 를 기존 항목 추가로 넣어요. 프로젝트 속성은 아래를 고쳐요. 이 조작들이 <code>DxRenderDojo.vcxproj</code> 와 <code>DxRenderDojo.vcxproj.filters</code> 를 바꿔요.</p>
+					<p>Visual Studio 에서는 솔루션 탐색기에 <code>App</code>·<code>Core</code> 필터를 만들고 새 <code>.h</code>·<code>.cpp</code> 를 기존 항목 추가로 넣어요. <code>Main.cpp</code> 는 필터에 넣지 않고 그대로 둬요. 프로젝트 속성은 아래를 고쳐요. 이 조작들이 <code>DxRenderDojo.vcxproj</code> 와 <code>DxRenderDojo.vcxproj.filters</code> 를 바꿔요.</p>
 					<ul class="walk">
 						<li>모든 구성 · C/C++ › 일반 › 추가 포함 디렉터리 : <code>$(ProjectDir)Source</code></li>
 						<li>모든 구성 · 매니페스트 도구 › 입력 및 출력 › 추가 매니페스트 파일 : <code>$(ProjectDir)DxRenderDojo.manifest</code>. 같은 곳의 DPI 인식은 없음으로 고름(vcxproj 에는 <code>EnableDpiAwareness</code> 가 <code>false</code> 로 남음). 매니페스트 파일이 직접 선언함</li>
 						<li>Debug·Release 각각 · C/C++ › 전처리기 › 전처리기 정의 : <code>WIN32_LEAN_AND_MEAN</code> 추가</li>
-						<li><code>DxRenderDojo.rc</code> 는 Visual Studio 프로젝트에 빌드 항목으로 넣지 않음. 넣으면 <a href="#pitfalls">흔한 실수</a> 3번의 <code>CVT1100</code></li>
+						<li><code>DxRenderDojo.manifest</code>·<code>DxRenderDojo.rc</code> : 기존 항목 추가로 넣고, 파일 속성의 구성 속성 › 일반 › 항목 형식을 빌드에 참여 안 함으로 바꿈. <code>.rc</code> 가 기본값인 리소스 컴파일러로 남으면 <a href="#pitfalls">흔한 실수</a> 3번의 <code>CVT1100</code></li>
 					</ul>
 					<details class="fold">
-						<summary>프로젝트 파일을 직접 고칠 때의 diff</summary>
+						<summary>참고 : 위 조작이 프로젝트 파일에 남기는 diff · 따로 치지 않음</summary>
 					<figure class="code">
 						<figcaption><span class="path">DxRenderDojo.vcxproj</span><span class="badge mod">바꿈</span><span class="badge">tut01 → tut02</span></figcaption>
 <pre class="diff" data-lang="xml">@@ -42,22 +42,27 @@
