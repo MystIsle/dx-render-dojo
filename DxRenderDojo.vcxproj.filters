@@ -7,6 +7,9 @@
     <Filter Include="Core">
       <UniqueIdentifier>{2F8B6A43-1E5D-4C79-A3B1-7E4D2C9F6A18}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{7C4E1A9B-5D3F-4B28-9E6A-1F8D3C5B7A42}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Utility">
       <UniqueIdentifier>{C3E81B5A-2F6D-4A97-8B14-6D9E0A7C5F32}</UniqueIdentifier>
     </Filter>
@@ -24,6 +27,9 @@
     </ClCompile>
     <ClCompile Include="Source\Core\FWindow.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\FD3D11Graphics.cpp">
+      <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Source\Utility\Check.cpp">
       <Filter>Utility</Filter>
@@ -47,6 +53,9 @@
     </ClInclude>
     <ClInclude Include="Source\Core\FWindow.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\FD3D11Graphics.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Source\Utility\Check.h">
       <Filter>Utility</Filter>

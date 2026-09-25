@@ -47,6 +47,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Manifest>
       <EnableDpiAwareness>false</EnableDpiAwareness>
@@ -75,6 +76,7 @@
     <ClCompile Include="Source\Core\FInput.cpp" />
     <ClCompile Include="Source\Core\FSystem.cpp" />
     <ClCompile Include="Source\Core\FWindow.cpp" />
+    <ClCompile Include="Source\Graphics\FD3D11Graphics.cpp" />
     <ClCompile Include="Source\Utility\Check.cpp" />
     <ClCompile Include="Source\Utility\FLog.cpp" />
   </ItemGroup>
@@ -84,6 +86,7 @@
     <ClInclude Include="Source\Core\FInput.h" />
     <ClInclude Include="Source\Core\FSystem.h" />
     <ClInclude Include="Source\Core\FWindow.h" />
+    <ClInclude Include="Source\Graphics\FD3D11Graphics.h" />
     <ClInclude Include="Source\Utility\Check.h" />
     <ClInclude Include="Source\Utility\FLog.h" />
     <ClInclude Include="Source\Utility\TSingleton.h" />

@@ -6,6 +6,7 @@
 #include "Core/FDisplaySettings.h"
 #include "Core/FInput.h"
 #include "Core/FWindow.h"
+#include "Graphics/FD3D11Graphics.h"
 #include "Utility/TSingleton.h"
 
 class FSystem : public TSingleton<FSystem>
@@ -29,5 +30,6 @@ private:
 	FDisplaySettings Display;
 	FWindow Window;
 	FInput Input;
+	FD3D11Graphics Graphics;
 	FApplication Application;
 };
