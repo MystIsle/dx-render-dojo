@@ -1,0 +1,256 @@
+		<ol class="steps">
+
+			<li class="step">
+				<div class="step-body">
+					<h3>설정과 입력 : <code>FDisplaySettings</code>, <code>FInput</code></h3>
+					<p class="what">창 크기·전체 화면 설정과 키 상태를 담을 작은 타입 두 개를 만듭니다.</p>
+					<p class="sub">왜 필요한가</p>
+					<p>원문은 <code>FULL_SCREEN</code>, <code>VSYNC_ENABLED</code> 같은 상수를 <code>applicationclass.h</code> 전역에 둡니다.<br>전역 상수는 어느 파일에서든 읽을 수 있어서, 값이 어디서 쓰이는지 따라가기 어렵습니다.<br>그래서 설정을 구조체로 묶고, 쓰는 클래스인 <code>FSystem</code> 이 멤버로 들고 있게 합니다.</p>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/FDisplaySettings.h</span><span class="badge">3–8줄</span></figcaption>
+<pre class="snip" data-lang="cpp" data-start="3"><!--LINES:Source/Core/FDisplaySettings.h:3-8--></pre>
+					</figure>
+					<ul class="walk">
+						<li><code>int Width = 800;</code> : 멤버를 선언하면서 바로 기본값을 줍니다. 생성자에서 값을 넣을 필요가 없습니다</li>
+						<li><code>bFullScreen</code> : bool 변수라 <code>b</code> 접두를 붙입니다</li>
+					</ul>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/FInput.h</span><span class="badge">5–18줄</span></figcaption>
+<pre class="snip" data-lang="cpp" data-start="5"><!--LINES:Source/Core/FInput.h:5-18--></pre>
+					</figure>
+					<ul class="walk">
+						<li><code>std::array&lt;bool, 256&gt; Keys = {};</code> : 가상 키 코드(0~255)마다 눌림 여부를 담습니다. <code>= {}</code> 로 전부 <code>false</code> 가 됩니다</li>
+						<li><code>IsKeyDown</code> : 한 줄 게터라 헤더에 인라인 <code>const</code> 로 둡니다</li>
+						<li><code>FInput() = default;</code> : 바로 아래에서 복사를 막으면 컴파일러가 기본 생성자를 만들지 않으므로 되살립니다</li>
+					</ul>
+					<p class="sub">원문과 비교</p>
+					<p>원문 <code>InputClass</code> 는 <code>bool m_keys[256]</code> 배열을 <code>Initialize</code> 에서 반복문으로 <code>false</code> 로 채웁니다.<br>헤더의 초기화 한 줄이 그 일을 대신합니다.</p>
+					<aside class="ue">
+						<p class="box-label">언리얼로 치면</p>
+						<p><code>FDisplaySettings</code> 는 <code>UGameUserSettings</code> 가 들고 있는 해상도·전체 화면 설정의 아주 작은 버전입니다.<br><code>FInput</code> 은 <code>UPlayerInput</code> 이 키 상태를 추적하는 일을 가장 단순하게 줄인 것입니다.</p>
+					</aside>
+				</div>
+			</li>
+
+			<li class="step">
+				<div class="step-body">
+					<h3>실패 검사 : <code>CHECK_RETURN</code></h3>
+					<p class="what">실패하면 로그를 남기고 바로 반환하는 매크로를 만듭니다.</p>
+					<p class="sub">왜 필요한가</p>
+					<p>Win32 와 D3D 함수는 대부분 실패를 반환값으로 알립니다.<br>매번 <code>if</code> 문으로 확인하면 코드가 길어지고, 로그를 빠뜨리기 쉽습니다.</p>
+					<aside class="concept">
+						<p class="box-label">Win32 개념 · 실패를 알리는 방식</p>
+						<ul class="walk">
+							<li><code>HRESULT</code> : 32비트 결과 코드. 최상위 비트가 1 이면 실패라 음수로 읽힘. D3D 함수 대부분</li>
+							<li><code>BOOL</code>·<code>ATOM</code> : 0 이면 실패. <code>RegisterClassExW</code> 등</li>
+							<li>핸들(<code>HWND</code> 등) : <code>nullptr</code> 이면 실패. <code>CreateWindowExW</code> 등</li>
+						</ul>
+					</aside>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/Check.h</span><span class="badge">9–28줄</span></figcaption>
+<pre class="snip" data-lang="cpp" data-start="9"><!--LINES:Source/Core/Check.h:9-28--></pre>
+					</figure>
+					<ul class="walk">
+						<li><code>Succeeded</code> 오버로드 세 개 : 넘긴 값의 타입에 따라 판정 방식을 고릅니다</li>
+						<li><code>BOOL</code>·<code>ATOM</code> 을 그대로 넘기면 : 딱 맞는 오버로드가 없어 컴파일 에러가 납니다. 0 이 성공인 정수를 실수로 성공 처리하지 않게 하려는 것입니다</li>
+						<li><code>ReportFailure</code> : 실패한 식·파일·줄 번호를 <code>OutputDebugStringA</code> 로 Visual Studio 출력 창에 남깁니다</li>
+					</ul>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/Check.h</span><span class="badge">31–39줄</span></figcaption>
+<pre class="snip" data-lang="cpp" data-start="31"><!--LINES:Source/Core/Check.h:31-39--></pre>
+					</figure>
+					<ul class="walk">
+						<li><code>#Expression</code> : 식을 문자열로 바꿔 로그에 그대로 찍습니다</li>
+						<li><code>__VA_ARGS__</code> : 반환값 자리. <code>CHECK_RETURN(식)</code> 처럼 비우면 <code>return;</code> 이 되어 void 함수에서도 씁니다</li>
+						<li><code>do { ... } while (false)</code> : 매크로가 <code>if</code>·<code>else</code> 사이에서도 문장 하나처럼 동작하게 하는 관용구입니다</li>
+					</ul>
+					<aside class="ue">
+						<p class="box-label">언리얼로 치면</p>
+						<p><code>if (!ensureMsgf(식, ...)) { return false; }</code> 를 한 줄로 줄인 것에 가깝습니다.<br><code>ensure</code> 처럼 로그를 남기고 프로그램을 멈추지 않지만, 콜스택은 남기지 않고 그 자리에서 반환합니다.<br>실패하면 멈추는 <code>check</code> 와는 다릅니다.</p>
+					</aside>
+				</div>
+			</li>
+
+			<li class="step">
+				<div class="step-body">
+					<h3>누가 무엇을 들고 있나 : <code>FSystem</code> 선언</h3>
+					<p class="what">창과 메시지 루프를 맡는 <code>FSystem</code> 의 모양을 정합니다.</p>
+					<p class="sub">왜 필요한가</p>
+					<p>누가 무엇을 만들고 지우는지가 헤더에 드러나면, 이후 편에서 클래스가 늘어나도 수명을 따라가기 쉽습니다.</p>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/FSystem.h</span><span class="badge">11–35줄</span></figcaption>
+<pre class="snip" data-lang="cpp" data-start="11"><!--LINES:Source/Core/FSystem.h:11-35--></pre>
+					</figure>
+					<ul class="walk">
+						<li><code>static ... WndProc</code> : 창 메시지를 받는 함수입니다. <code>static</code> 멤버라 규약대로 맨 위에 둡니다. 왜 <code>static</code> 이어야 하는지는 5단계에서 봅니다</li>
+						<li><code>FSystem(const FSystem &amp;Other) = delete;</code> : 복사를 막습니다. 창에 이 객체의 주소를 저장하므로, 복사본이 생기면 창이 엉뚱한 객체를 가리킵니다</li>
+						<li><code>FSystem() = default;</code> : 복사 생성자를 선언하면 컴파일러가 기본 생성자를 만들지 않으므로 되살립니다</li>
+						<li><code>~FSystem();</code> : 창·창 클래스·해상도는 스마트 포인터가 정리하지 못해 소멸자에서 돌려놓습니다</li>
+						<li><code>ApplicationName</code> : 창 클래스 이름과 창 제목으로 함께 씁니다</li>
+						<li><code>Instance</code>, <code>Window</code> : 이 exe 와 만든 창을 가리키는 핸들</li>
+						<li><code>Input</code>, <code>Application</code> : <code>unique_ptr</code> 로 소유합니다. <code>FSystem</code> 이 지워질 때 함께 지워집니다</li>
+					</ul>
+					<aside class="ue">
+						<p class="box-label">언리얼로 치면</p>
+						<p><code>FSystem</code> 은 <code>FEngineLoop</code> 자리입니다.<br><code>Initialize</code> 가 <code>PreInit</code>·<code>Init</code> 에, <code>Run</code> 이 매 프레임 <code>Tick</code> 을 부르는 바깥 루프에 해당합니다.<br><code>std::unique_ptr</code> 는 <code>TUniquePtr</code> 이고, 복사를 막는 두 줄은 <code>UE_NONCOPYABLE</code> 매크로가 하는 일과 비슷합니다.</p>
+					</aside>
+				</div>
+			</li>
+
+			<li class="step">
+				<div class="step-body">
+					<h3>창 만들기 : <code>Initialize</code></h3>
+					<p class="what">창 클래스를 등록하고, 그 클래스로 창을 하나 만듭니다.</p>
+					<aside class="concept">
+						<p class="box-label">Win32 개념 · 창 클래스와 창</p>
+						<p>창 클래스는 "이 창들은 메시지를 이 함수로 보내고, 커서와 배경은 이것을 쓴다" 같은 공통 설정에 이름을 붙여 OS 에 등록한 것입니다.<br>창은 <code>CreateWindowExW</code> 에 그 이름을 넘겨서 만듭니다.<br>같은 클래스로 창을 여러 개 만들 수 있습니다.</p>
+					</aside>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge">39–56줄</span></figcaption>
+<pre class="snip" data-lang="cpp" data-start="39"><!--LINES:Source/Core/FSystem.cpp:39-56--></pre>
+					</figure>
+					<ul class="walk">
+						<li><code>std::make_unique</code> : 입력과 앱 객체를 먼저 만듭니다. 창이 생기는 순간부터 메시지가 들어오기 때문입니다</li>
+						<li><code>GetModuleHandleW(nullptr)</code> : 지금 실행 중인 exe 의 인스턴스 핸들입니다. <code>WinMain</code> 이 받는 <code>Instance</code> 와 같은 값입니다</li>
+						<li><code>CS_HREDRAW | CS_VREDRAW</code> : 창 크기가 바뀌면 전체를 다시 그립니다</li>
+						<li><code>CS_OWNDC</code> : 창마다 전용 그리기 컨텍스트(DC)를 둡니다</li>
+						<li><code>lpfnWndProc</code> : 이 클래스의 창이 받는 메시지를 넘길 함수입니다</li>
+						<li><code>hbrBackground</code> : 창 배경을 칠할 브러시. 검은색입니다</li>
+						<li><code>RegisterClassExW(...) != 0</code> : <code>ATOM</code> 을 돌려주고 0 이면 실패라 비교식으로 넘깁니다</li>
+					</ul>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge">58–80줄</span></figcaption>
+<pre class="snip" data-lang="cpp" data-start="58"><!--LINES:Source/Core/FSystem.cpp:58-80--></pre>
+					</figure>
+					<ul class="walk">
+						<li>창 모드 : 화면 크기에서 창 크기를 빼고 반으로 나눠 가운데 위치를 구합니다</li>
+						<li>전체 화면 : <code>ChangeDisplaySettingsW</code> 로 해상도를 바꾸고, 창 크기를 화면 크기에 맞춥니다. 02편 기본값은 창 모드입니다</li>
+					</ul>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge">82–100줄</span></figcaption>
+<pre class="snip" data-lang="cpp" data-start="82"><!--LINES:Source/Core/FSystem.cpp:82-100--></pre>
+					</figure>
+					<ul class="walk">
+						<li><code>WS_EX_APPWINDOW</code> : 작업 표시줄에 버튼을 표시합니다</li>
+						<li><code>WS_POPUP</code> : 제목 표시줄과 테두리가 없는 창입니다</li>
+						<li><code>WS_CLIPSIBLINGS | WS_CLIPCHILDREN</code> : 겹친 형제 창과 자식 창의 영역에는 그리지 않습니다</li>
+						<li>부모 창·메뉴 자리의 <code>nullptr</code> : 최상위 창이고 메뉴가 없습니다</li>
+						<li>마지막 인자 <code>this</code> : 창을 만드는 동안 <code>WM_NCCREATE</code> 메시지에 실려 돌아옵니다. 다음 단계에서 이 값을 씁니다</li>
+						<li><code>ShowCursor(FALSE)</code> : 커서 표시 카운터를 하나 줄여 이 창 위에서 커서를 숨깁니다. 소멸자의 <code>ShowCursor(TRUE)</code> 와 짝입니다</li>
+					</ul>
+					<p class="sub">원문과 비교</p>
+					<p>원문은 이 코드를 <code>InitializeWindows</code> 로 따로 뺍니다.<br>규약상 <code>Initialize</code> 가 직접 일하므로 한 함수에 둡니다.</p>
+					<aside class="ue">
+						<p class="box-label">언리얼로 치면</p>
+						<p><code>FWindowsWindow::Initialize</code> 가 같은 일을 합니다.<br>창 스타일을 고르고 <code>CreateWindowEx</code> 로 창을 만듭니다.</p>
+					</aside>
+				</div>
+			</li>
+
+			<li class="step">
+				<div class="step-body">
+					<h3>메시지를 객체로 보내기 : <code>WndProc</code>, <code>HandleMessage</code></h3>
+					<p class="what">OS 가 부르는 <code>static</code> 함수에서, 이 창을 만든 <code>FSystem</code> 객체를 찾아 멤버 함수로 넘깁니다.</p>
+					<aside class="concept">
+						<p class="box-label">Win32 개념 · 창 프로시저와 메시지</p>
+						<p>키 입력이나 창 닫기 같은 사건은 메시지(<code>WM_KEYDOWN</code>, <code>WM_CLOSE</code> 등)로 전달됩니다.<br>메시지를 받는 함수가 창 프로시저이고, 창 클래스를 등록할 때 지정합니다.<br>메시지마다 뜻이 다른 값 두 개가 <code>WPARAM</code>·<code>LPARAM</code> 으로 따라옵니다. <code>WM_KEYDOWN</code> 이면 <code>WPARAM</code> 이 가상 키 코드(<code>VK_ESCAPE</code> 등)입니다.</p>
+					</aside>
+					<p class="sub">왜 static 이어야 하나</p>
+					<p>OS 는 창 프로시저를 일반 함수로 부르므로 <code>this</code> 를 넘겨주지 않습니다.<br>그래서 멤버 함수를 바로 지정할 수 없고, <code>static</code> 함수가 먼저 받아 객체를 찾아야 합니다.</p>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge">5–20줄</span></figcaption>
+<pre class="snip" data-lang="cpp" data-start="5"><!--LINES:Source/Core/FSystem.cpp:5-20--></pre>
+					</figure>
+					<ul class="walk">
+						<li><code>WM_NCCREATE</code> : 창을 만드는 도중, <code>CreateWindowExW</code> 가 돌아오기 전에 오는 메시지입니다. <code>LParam</code> 이 <code>CREATESTRUCTW</code> 를 가리키고, 그 <code>lpCreateParams</code> 가 <code>CreateWindowExW</code> 에 넘긴 <code>this</code> 입니다</li>
+						<li><code>SetWindowLongPtrW(..., GWLP_USERDATA, ...)</code> : 창마다 앱이 자유롭게 쓰는 칸 하나에 주소를 저장합니다</li>
+						<li><code>GetWindowLongPtrW</code> : 이후 메시지마다 그 주소를 꺼냅니다</li>
+						<li><code>System == nullptr</code> : <code>WM_NCCREATE</code> 보다 먼저 오는 메시지가 있습니다. 그때는 저장한 주소가 없으므로 기본 처리 <code>DefWindowProcW</code> 로 넘깁니다</li>
+					</ul>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge">132–149줄</span></figcaption>
+<pre class="snip" data-lang="cpp" data-start="132"><!--LINES:Source/Core/FSystem.cpp:132-149--></pre>
+					</figure>
+					<ul class="walk">
+						<li><code>WM_KEYDOWN</code>·<code>WM_KEYUP</code> : 키 상태를 <code>FInput</code> 에 기록합니다</li>
+						<li><code>WM_CLOSE</code>·<code>WM_DESTROY</code> : <code>PostQuitMessage(0)</code> 으로 메시지 큐에 종료 신호 <code>WM_QUIT</code> 을 넣습니다</li>
+						<li><code>DefWindowProcW</code> : 직접 처리하지 않는 메시지는 OS 기본 동작(창 이동, 크기 조절 등)에 맡깁니다</li>
+					</ul>
+					<p class="sub">원문과 비교</p>
+					<p>원문은 전역 포인터 <code>ApplicationHandle</code> 에 객체 주소를 넣고, 창 프로시저에서 꺼냅니다.<br>이 리포는 전역을 두지 않으므로 창 자체에 저장합니다.</p>
+					<aside class="ue">
+						<p class="box-label">언리얼로 치면</p>
+						<p><code>FWindowsApplication::AppWndProc</code> 가 <code>static</code> 창 프로시저이고, 받은 메시지를 <code>ProcessMessage</code> 멤버 함수로 넘깁니다. 구조가 같습니다.<br>언리얼은 앱 객체가 하나뿐이라 원문처럼 전역 포인터로 객체를 찾습니다.</p>
+					</aside>
+				</div>
+			</li>
+
+			<li class="step">
+				<div class="step-body">
+					<h3>메시지 루프와 종료 : <code>Run</code>, <code>Frame</code>, 소멸자</h3>
+					<p class="what">메시지를 처리하면서 매 프레임 일을 하고, 끝나면 OS 자원을 돌려놓습니다.</p>
+					<aside class="concept">
+						<p class="box-label">Win32 개념 · 메시지 큐와 PeekMessage</p>
+						<p>OS 는 스레드마다 메시지 큐를 두고 키 입력 같은 메시지를 쌓습니다.<br><code>GetMessageW</code> 는 메시지가 올 때까지 기다리므로, 입력이 없으면 프레임도 멈춥니다.<br><code>PeekMessageW</code> 는 메시지가 없으면 바로 돌아오므로 그 틈에 프레임을 돌 수 있습니다. 게임 루프가 <code>PeekMessageW</code> 를 쓰는 이유입니다.</p>
+					</aside>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge">103–130줄</span></figcaption>
+<pre class="snip" data-lang="cpp" data-start="103"><!--LINES:Source/Core/FSystem.cpp:103-130--></pre>
+					</figure>
+					<ul class="walk">
+						<li><code>PM_REMOVE</code> : 꺼낸 메시지를 큐에서 지웁니다</li>
+						<li><code>TranslateMessage</code> : 키 입력 메시지에서 문자 입력 메시지(<code>WM_CHAR</code>)를 만들어 큐에 더합니다</li>
+						<li><code>DispatchMessageW</code> : 메시지를 그 창의 창 프로시저로 보냅니다</li>
+						<li><code>continue</code> : 큐가 빌 때까지 메시지부터 처리하고, 비면 <code>Frame</code> 을 돕니다</li>
+						<li><code>Message.message != WM_QUIT</code> : <code>PostQuitMessage</code> 가 넣은 종료 신호를 꺼내면 루프가 끝납니다</li>
+						<li><code>Frame</code> : ESC 가 눌렸으면 <code>false</code> 로 루프를 끝내고, 아니면 <code>FApplication::Frame</code> 에 맡깁니다. 02편에서는 늘 <code>true</code> 이고, 03편부터 여기서 그립니다</li>
+					</ul>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge">22–37줄</span></figcaption>
+<pre class="snip" data-lang="cpp" data-start="22"><!--LINES:Source/Core/FSystem.cpp:22-37--></pre>
+					</figure>
+					<ul class="walk">
+						<li><code>ShowCursor(TRUE)</code> : 숨겼던 커서를 되돌립니다</li>
+						<li><code>ChangeDisplaySettingsW(nullptr, 0)</code> : 전체 화면으로 바꿨던 해상도를 원래대로 돌립니다</li>
+						<li><code>DestroyWindow</code>, <code>UnregisterClassW</code> : 만든 순서의 반대로 창과 창 클래스를 정리합니다</li>
+					</ul>
+					<p class="sub">원문과 비교</p>
+					<p>원문은 프레임마다 메시지를 하나만 처리합니다.<br>메시지가 몰리면 입력 반영이 늦어질 수 있어, 쌓인 메시지를 먼저 비우도록 바꿨습니다.</p>
+					<aside class="ue">
+						<p class="box-label">언리얼로 치면</p>
+						<p><code>FWindowsPlatformApplicationMisc::PumpMessages</code> 가 같은 <code>PeekMessage</code> 루프로 메시지를 비웁니다.<br><code>Run</code> 의 바깥 루프는 <code>GuardedMain</code> 에서 <code>IsEngineExitRequested()</code> 가 참이 될 때까지 매 프레임 <code>EngineTick</code> 을 부르는 부분에 해당합니다.</p>
+					</aside>
+				</div>
+			</li>
+
+			<li class="step">
+				<div class="step-body">
+					<h3><code>WinMain</code> 과 빌드 등록</h3>
+					<p class="what"><code>WinMain</code> 에서 <code>FSystem</code> 을 만들어 돌리고, 새 소스를 두 빌드에 등록합니다.</p>
+					<figure class="code">
+						<figcaption><span class="path">Source/Main.cpp</span><span class="badge">7–14줄</span></figcaption>
+<pre class="snip" data-lang="cpp" data-start="7"><!--LINES:Source/Main.cpp:7-14--></pre>
+					</figure>
+					<ul class="walk">
+						<li><code>std::make_unique&lt;FSystem&gt;()</code> : 규약상 <code>new</code> 를 직접 쓰지 않습니다</li>
+						<li><code>CHECK_RETURN(System-&gt;Initialize(), 1)</code> : 초기화에 실패하면 종료 코드 1 로 끝냅니다</li>
+						<li><code>WinMain</code> 이 끝나면 <code>System</code> 이 지워지면서 소멸자가 불립니다</li>
+					</ul>
+					<figure class="code">
+						<figcaption><span class="path">CMakeLists.txt</span><span class="badge">4–12줄</span></figcaption>
+<pre class="snip" data-lang="cmake" data-start="4"><!--LINES:CMakeLists.txt:4-12--></pre>
+					</figure>
+					<ul class="walk">
+						<li><code>WIN32</code> : 콘솔이 아닌 창 프로그램(<code>/SUBSYSTEM:WINDOWS</code>)으로 링크합니다</li>
+						<li><code>target_include_directories(... Source)</code> : <code>#include "Core/FSystem.h"</code> 처럼 <code>Source/</code> 기준 경로로 include 합니다</li>
+						<li><code>WIN32_LEAN_AND_MEAN</code> : <code>Windows.h</code> 에서 잘 쓰지 않는 헤더(암호화, RPC, 셸 등)를 빼서 컴파일을 가볍게 합니다. 원문은 헤더에서 <code>#define</code> 합니다</li>
+						<li><code>DxRenderDojo.vcxproj</code> 에도 같은 내용이 들어갔습니다. 아래 "바뀐 파일" 의 diff 에서 확인합니다</li>
+					</ul>
+					<aside class="ue">
+						<p class="box-label">언리얼로 치면</p>
+						<p>언리얼은 UBT 가 모듈 폴더의 소스를 알아서 모읍니다.<br>이 리포는 빌드가 두 벌이라 새 파일을 직접 등록합니다.</p>
+					</aside>
+				</div>
+			</li>
+
+		</ol>
