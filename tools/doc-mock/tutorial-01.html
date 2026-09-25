@@ -439,7 +439,7 @@ details.diff-file summary .why { color: var(--slate); }
 		</div>
 		<div class="learn">
 			<p class="box-label">2 · 빈 프로그램을 실행하면 무엇이 보일까요</p>
-			<p>이 편의 <code>WinMain</code> 은 곧바로 <code>0</code> 을 돌려줘요. F5 로 실행하면 화면에 무엇이 보일까요? 콘솔 창은 뜰까요?</p>
+			<p>이 편의 <code>wWinMain</code> 은 곧바로 <code>0</code> 을 돌려줘요. F5 로 실행하면 화면에 무엇이 보일까요? 콘솔 창은 뜰까요?</p>
 			<details class="fold">
 				<summary>답 보기</summary>
 				<p>아무것도 보이지 않아요. 하위 시스템이 Windows 라서 콘솔 창도 붙지 않고, Visual Studio 출력 창에 코드 0 으로 끝났다는 줄만 남아요. (<a href="#step-settings">3단계</a>)</p>
@@ -482,7 +482,7 @@ git switch --detach tut01</pre>
 			<li class="step" id="step-settings">
 				<div class="step-body">
 					<h3>프로젝트 설정을 확인한다</h3>
-					<p>하위 시스템이 Windows 라서 이 프로그램은 <code>main</code> 대신 <code>WinMain</code> 에서 시작하고, 실행해도 콘솔 창이 붙지 않아요. 02편부터 창을 직접 만들기 때문에 쓰는 설정이에요.</p>
+					<p>하위 시스템이 Windows 라서 이 프로그램은 <code>main</code> 대신 <code>wWinMain</code> 에서 시작하고, 실행해도 콘솔 창이 붙지 않아요. 02편부터 창을 직접 만들기 때문에 쓰는 설정이에요.</p>
 					<p>프로젝트 속성에서 아래 다섯 값을 확인해요. 리포의 프로젝트 파일에 이미 들어 있어서 고칠 곳은 없어요.</p>
 					<ul class="labeled">
 						<li><span class="label">플랫폼</span><span>도구 모음의 솔루션 플랫폼 · x64. 원문도 행렬 같은 타입의 정렬 때문에 x64 로 빌드함</span></li>
@@ -501,13 +501,13 @@ git switch --detach tut01</pre>
 			<li class="step" id="step-run">
 				<div class="step-body">
 					<h3>빌드하고 실행한다</h3>
-					<p>구성을 Debug · x64 로 두고 F5 로 실행해요. <code>WinMain</code> 이 곧바로 <code>0</code> 을 돌려주니 창 없이 끝나고, 출력 창에 코드 0 으로 종료했다는 줄이 남아요.</p>
+					<p>구성을 Debug · x64 로 두고 F5 로 실행해요. <code>wWinMain</code> 이 곧바로 <code>0</code> 을 돌려주니 창 없이 끝나고, 출력 창에 코드 0 으로 종료했다는 줄이 남아요.</p>
 					<p>코드 위에 적힌 경로는 리포 루트 기준이에요. 폴더 없이 이름만 있으면 <code>DxRenderDojo.vcxproj</code> 옆이에요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Main.cpp</span><span class="badge">전체</span></figcaption>
 <pre class="src" data-lang="cpp">#include &lt;Windows.h&gt;
 
-int WINAPI WinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _In_ PSTR CmdLine, _In_ int ShowCmd)
+int WINAPI wWinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _In_ PWSTR CmdLine, _In_ int ShowCmd)
 {
 	return 0;
 }</pre>
@@ -515,11 +515,11 @@ int WINAPI WinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _In
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
-							<li class="entry"><code>int WINAPI WinMain</code> 하위 시스템이 Windows 인 프로그램의 진입점. <code>WINAPI</code> 는 Windows 가 부르는 함수의 호출 규약</li>
+							<li class="entry"><code>int WINAPI wWinMain</code> 하위 시스템이 Windows 인 프로그램의 진입점. 앞의 <code>w</code> 는 와이드 문자(UTF-16) 버전이라는 뜻이고, 프로젝트가 <code>UNICODE</code> 를 정의하니 진입점도 이쪽으로 맞춤. <code>WINAPI</code> 는 Windows 가 부르는 함수의 호출 규약. MSVC 는 링커가 이 함수를 진입점으로 알아서 고르고, mingw 빌드는 <code>CMakeLists.txt</code> 의 <code>-municode</code> 가 있어야 찾음</li>
 							<li class="entry"><code>_In_</code> · <code>_In_opt_</code> 코드 분석 도구가 읽는 표시(SAL). 컴파일 결과에는 영향이 없음</li>
 							<li class="entry"><code>HINSTANCE Instance</code> 실행 중인 exe 를 가리키는 핸들</li>
 							<li class="entry"><code>HINSTANCE PrevInstance</code> 16비트 Windows 시절의 흔적. 지금은 항상 <code>nullptr</code></li>
-							<li class="entry"><code>PSTR CmdLine</code> 명령줄 문자열. 02편에서 <code>wWinMain</code> 으로 바꾸면 와이드 문자열(<code>PWSTR</code>)로 받음</li>
+							<li class="entry"><code>PWSTR CmdLine</code> 명령줄 문자열. 와이드 문자열이라 한글 경로가 깨지지 않음</li>
 							<li class="entry"><code>int ShowCmd</code> 창을 처음 어떻게 보일지(보통, 최소화 등). 02편에서 <code>ShowWindow</code> 에 넘김</li>
 							<li class="entry"><code>return 0;</code> 프로세스의 종료 코드</li>
 						</ul>
@@ -569,8 +569,8 @@ brew install --cask game-porting-toolkit</pre>
 				<p class="row"><b>본문</b><span><a href="#step-settings">3단계</a> : <code>/utf-8</code> 이 하는 일</span></p>
 			</div>
 			<div class="pitfall">
-				<p class="symptom">콘솔 앱 템플릿으로 만든 프로젝트에 <code>WinMain</code> 을 쓰면 <code>error LNK2019</code> : <code>main</code> 을 확인할 수 없음</p>
-				<p class="row"><b>원인</b><span>하위 시스템이 콘솔이면 링커가 진입점으로 <code>main</code> 을 찾아요. 코드에는 <code>WinMain</code> 만 있어서 링크가 실패하고 <code>LNK1120</code> 이 뒤따라요.</span></p>
+				<p class="symptom">콘솔 앱 템플릿으로 만든 프로젝트에 <code>wWinMain</code> 을 쓰면 <code>error LNK2019</code> : <code>main</code> 을 확인할 수 없음</p>
+				<p class="row"><b>원인</b><span>하위 시스템이 콘솔이면 링커가 진입점으로 <code>main</code> 을 찾아요. 코드에는 <code>wWinMain</code> 만 있어서 링크가 실패하고 <code>LNK1120</code> 이 뒤따라요.</span></p>
 				<p class="row"><b>해결</b><span>링커 › 시스템 › 하위 시스템을 <code>/SUBSYSTEM:WINDOWS</code> 로 바꿔요.</span></p>
 				<p class="row"><b>본문</b><span><a href="#step-settings">3단계</a> : 하위 시스템과 진입점</span></p>
 			</div>
@@ -696,7 +696,7 @@ else()
 endif()
 
 if(MINGW)
-	target_link_options(DxRenderDojo PRIVATE -static -static-libgcc -static-libstdc++)
+	target_link_options(DxRenderDojo PRIVATE -municode -static -static-libgcc -static-libstdc++)
 endif()</pre>
 			</details>
 			<details class="diff-file">
@@ -804,7 +804,7 @@ end_of_line = lf</pre>
 			<p>이 프로젝트의 하위 시스템을 콘솔로 바꾸면 빌드가 실패해요. 어느 단계에서 왜 실패하나요?</p>
 			<details class="fold">
 				<summary>답 보기</summary>
-				<p>링크 단계에서 실패해요. 하위 시스템이 콘솔이면 링커가 진입점으로 <code>main</code> 을 찾는데, 코드에는 <code>WinMain</code> 만 있어서 <code>LNK2019</code> 가 나요. 컴파일은 통과해요.</p>
+				<p>링크 단계에서 실패해요. 하위 시스템이 콘솔이면 링커가 진입점으로 <code>main</code> 을 찾는데, 코드에는 <code>wWinMain</code> 만 있어서 <code>LNK2019</code> 가 나요. 컴파일은 통과해요.</p>
 			</details>
 		</div>
 		<div class="learn">
@@ -829,7 +829,7 @@ end_of_line = lf</pre>
 	<section id="preview" data-block="preview" data-source="직접">
 		<h2>다음 편 미리 생각하기</h2>
 		<div class="learn">
-			<p>02편에서는 창을 띄워요. 지금처럼 <code>WinMain</code> 이 창을 만든 직후 곧바로 돌아오면 그 창은 어떻게 될까요?</p>
+			<p>02편에서는 창을 띄워요. 지금처럼 <code>wWinMain</code> 이 창을 만든 직후 곧바로 돌아오면 그 창은 어떻게 될까요?</p>
 			<p class="box-label">답은 02편에서</p>
 		</div>
 	</section>

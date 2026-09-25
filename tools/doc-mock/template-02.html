@@ -734,7 +734,7 @@ details.diff-file summary .why { color: var(--slate); }
 							<li class="entry"><code>return static_cast&lt;int&gt;(Message.wParam);</code> <code>WM_QUIT</code> 의 <code>wParam</code> 은 끝내기를 요청한 쪽이 넘긴 값. 진입점이 이 값을 프로세스 종료 코드로 돌려줌</li>
 						</ul>
 					</details>
-					<p>01편의 <code>WinMain</code> 을 <code>wWinMain</code> 으로 바꾸고 <code>FSystem</code> 을 만들어 돌려요.</p>
+					<p>01편의 <code>wWinMain</code> 이 <code>FSystem</code> 을 만들어 돌려요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Main.cpp</span><span class="badge mod">수정</span><span class="badge">파일 전체</span></figcaption>
 <pre class="src" data-lang="cpp"><!--FILE@2:Source/Main.cpp--></pre>
@@ -743,17 +743,16 @@ details.diff-file summary .why { color: var(--slate); }
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
-							<li class="entry"><code>wWinMain</code> <code>WinMain</code> 의 와이드 문자 버전. 명령줄이 <code>PWSTR</code> 로 와서 한글 경로가 깨지지 않음</li>
-							<li class="entry"><code>FSystem::Prepare();</code> <a href="#step-tools">1단계</a>에서 친 <code>TSingleton</code> 의 함수. <code>Release</code> 도 같은 곳에 있음</li>
+														<li class="entry"><code>FSystem::Prepare();</code> <a href="#step-tools">1단계</a>에서 친 <code>TSingleton</code> 의 함수. <code>Release</code> 도 같은 곳에 있음</li>
 						</ul>
 					</details>
 					<details class="fold">
 						<summary>원문과 비교</summary>
 						<p>원문의 <code>WinMain</code> 은 <code>new SystemClass</code> 로 만들고 <code>Shutdown()</code> 을 부른 다음 <code>delete</code> 해요. <code>new</code> 가 있던 곳에 <code>Prepare</code>, <code>Shutdown()</code> 과 <code>delete</code> 가 있던 곳에 <code>Release</code> 가 있고 정리 자체는 소멸자가 해요.</p>
 					</details>
-					<p>새 <code>.cpp</code> 둘을 빌드에 등록해요. mingw 빌드는 <code>-municode</code> 가 있어야 <code>wWinMain</code> 을 진입점으로 찾아요. Visual Studio 에서는 <code>Core</code> 필터를 만들고 새 <code>.h</code>·<code>.cpp</code> 를 기존 항목 추가로 넣어요. 링커가 진입점을 알아서 골라요.</p>
+					<p>새 <code>.cpp</code> 둘을 빌드에 등록해요. Visual Studio 에서는 <code>Core</code> 필터를 만들고 새 <code>.h</code>·<code>.cpp</code> 를 기존 항목 추가로 넣어요.</p>
 					<figure class="code">
-						<figcaption><span class="path">CMakeLists.txt</span><span class="badge mod">수정</span><span class="badge">소스 목록과 -municode</span></figcaption>
+						<figcaption><span class="path">CMakeLists.txt</span><span class="badge mod">수정</span><span class="badge">소스 목록</span></figcaption>
 <pre class="diff" data-lang="cmake"><!--DIFF@2:CMakeLists.txt--></pre>
 					</figure>
 					<details class="fold">
@@ -1209,8 +1208,8 @@ details.diff-file summary .why { color: var(--slate); }
 			<li><span class="mark a">+</span><span class="name">Source/Core/FWindow.cpp</span><span class="note">+294</span></li>
 			<li><span class="mark a">+</span><span class="name">Source/Core/FSystem.h</span><span class="note">+34</span></li>
 			<li><span class="mark a">+</span><span class="name">Source/Core/FSystem.cpp</span><span class="note">+67</span></li>
-			<li><span class="mark m">~</span><span class="name">Source/Main.cpp</span><span class="note">+10 −2</span></li>
-			<li><span class="mark m">~</span><span class="name">CMakeLists.txt</span><span class="note">+16 −3</span></li>
+			<li><span class="mark m">~</span><span class="name">Source/Main.cpp</span><span class="note">+9 −1</span></li>
+			<li><span class="mark m">~</span><span class="name">CMakeLists.txt</span><span class="note">+15 −2</span></li>
 			<li><span class="mark m">~</span><span class="name">DxRenderDojo.vcxproj</span><span class="note">+27 −2</span></li>
 			<li><span class="mark a">+</span><span class="name">DxRenderDojo.manifest</span><span class="note">+15 · DPI 인식과 OS 호환 선언</span></li>
 			<li><span class="mark a">+</span><span class="name">DxRenderDojo.rc</span><span class="note">+3 · mingw 빌드에만 들어감</span></li>
@@ -1292,11 +1291,11 @@ details.diff-file summary .why { color: var(--slate); }
 		<div class="file-group">
 			<h3>호출부와 빌드</h3>
 			<details class="diff-file">
-				<summary><span class="path">Source/Main.cpp</span><span class="stat"><span class="plus">+10</span> <span class="minus">−2</span></span><span class="why">wWinMain 으로 바꾸고 FSystem 을 돌림</span></summary>
+				<summary><span class="path">Source/Main.cpp</span><span class="stat"><span class="plus">+9</span> <span class="minus">−1</span></span><span class="why">FSystem 을 만들어 돌림</span></summary>
 <pre class="diff" data-lang="cpp"><!--DIFF:Source/Main.cpp--></pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">CMakeLists.txt</span><span class="stat"><span class="plus">+16</span> <span class="minus">−3</span></span><span class="why">새 소스, include 경로, 매니페스트, -municode, mingw 대상 버전</span></summary>
+				<summary><span class="path">CMakeLists.txt</span><span class="stat"><span class="plus">+15</span> <span class="minus">−2</span></span><span class="why">새 소스, include 경로, 매니페스트, mingw 대상 버전</span></summary>
 <pre class="diff" data-lang="cmake"><!--DIFF:CMakeLists.txt--></pre>
 			</details>
 			<details class="diff-file">
