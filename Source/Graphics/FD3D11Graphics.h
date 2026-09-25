@@ -1,7 +1,10 @@
 #pragma once
 
 #include <d3d11.h>
+#include <dxgi1_2.h>
 #include <wrl/client.h>
+
+class FWindow;
 
 class FD3D11Graphics
 {
@@ -10,9 +13,13 @@ public:
 	FD3D11Graphics(const FD3D11Graphics& Other) = delete;
 	FD3D11Graphics& operator=(const FD3D11Graphics& Other) = delete;
 
-	void Initialize();
+	void Initialize(const FWindow& Window);
 
 private:
+	void CreateSizeDependentResources();
+
 	Microsoft::WRL::ComPtr<ID3D11Device> Device;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> Context;
+	Microsoft::WRL::ComPtr<IDXGISwapChain1> SwapChain;
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> RenderTargetView;
 };
