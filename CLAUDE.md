@@ -27,7 +27,7 @@
 
 ## 코드 구조
 
-`Source/` 를 include 기준으로 두고, include 는 항상 폴더까지 적음 (`#include "Core/FSystem.h"`)
+`Source/` 를 include 기준으로 두고, include 는 항상 폴더까지 적음 (`#include "Core/FSystem.h"`). 짝 헤더도 같음. 근거는 `docs/CODING_STYLE.md` 7절
 
 - `Source/Main.cpp` : `wWinMain`
 - `Source/Core/` : 창·메시지 루프·입력·설정. D3D 를 부르는 곳은 `FSystem` 이 프레임 앞뒤와 크기 변경에서 `FD3D11Graphics` 를 부르는 자리뿐
