@@ -539,6 +539,7 @@ brew install --cask game-porting-toolkit</pre>
 ./scripts/mac-run.sh</pre>
 					</figure>
 					<p><code>mac-build.sh</code> 가 <code>build-mac/DxRenderDojo.exe</code> 를 만들고 <code>mac-run.sh</code> 가 그 exe 를 Wine 으로 실행해요. Windows 에서처럼 창 없이 곧바로 끝나면 정상이에요.</p>
+					<p>CMake 빌드는 <code>Source/</code> 아래의 <code>.cpp</code> 를 모두 모아 빌드해요. 뒤 편에서 파일을 더할 때 <code>CMakeLists.txt</code> 에 적지 않아도 돼요.</p>
 				</div>
 			</li>
 
@@ -587,7 +588,7 @@ brew install --cask game-porting-toolkit</pre>
 			<li><span class="mark a">+</span><span class="name">DxRenderDojo.sln</span><span class="note">+25 · VS 가 관리. 본문 생략</span></li>
 			<li><span class="mark a">+</span><span class="name">DxRenderDojo.sln.DotSettings</span><span class="note">+61 · Rider 이름 규칙. Rider 가 관리. 본문 생략</span></li>
 			<li><span class="mark a">+</span><span class="name">DxRenderDojo.vcxproj</span><span class="note">+71 · 3단계의 설정</span></li>
-			<li><span class="mark a">+</span><span class="name">CMakeLists.txt</span><span class="note">+16</span></li>
+			<li><span class="mark a">+</span><span class="name">CMakeLists.txt</span><span class="note">+17</span></li>
 			<li><span class="mark a">+</span><span class="name">cmake/toolchain-mingw-x86_64.cmake</span><span class="note">+13 · macOS 빌드용</span></li>
 			<li><span class="mark a">+</span><span class="name">scripts/mac-build.sh</span><span class="note">+13 · macOS 빌드용</span></li>
 			<li><span class="mark a">+</span><span class="name">scripts/mac-run.sh</span><span class="note">+15 · macOS 빌드용</span></li>
@@ -606,7 +607,7 @@ brew install --cask game-porting-toolkit</pre>
 		<div class="file-group">
 			<h3>CMake 와 macOS</h3>
 			<details class="diff-file">
-				<summary><span class="path">CMakeLists.txt</span><span class="stat"><span class="plus">+16</span></span><span class="why">MSVC 와 mingw 공통 빌드 설정</span></summary>
+				<summary><span class="path">CMakeLists.txt</span><span class="stat"><span class="plus">+17</span></span><span class="why">MSVC 와 mingw 공통 빌드 설정, Source 아래 .cpp 를 모두 모음</span></summary>
 <pre class="src" data-lang="cmake"><!--FILE:CMakeLists.txt--></pre>
 			</details>
 			<details class="diff-file">
