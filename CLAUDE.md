@@ -18,14 +18,19 @@
 - `.clang-format` : 서식
 - `.clang-tidy` : 네이밍. 도구가 못 잡는 항목은 CODING_STYLE.md 6절에 있음
 
+## 교재 문서를 쓰기 전에
+
+- `docs/DOC_STYLE.md` : 교재 문서 규약의 원본. 규약을 바꿀 때는 이 문서를 고침
+- 원고는 편마다 `tools/doc-mock/template-NN.html`. `build.ps1 -Lesson NN` 이 태그 코드를 채워 `tutorial-NN.html` 을 만들고, 셀 수 있는 규칙은 `tools/doc-mock/check_prose.py` 가 봄
+
 ## 코드 구조
 
 `Source/` 를 include 기준으로 두고, include 는 항상 폴더까지 적음 (`#include "Core/FSystem.h"`)
 
 - `Source/Main.cpp` : `WinMain`
-- `Source/Core/` : D3D 를 모르는 층. 창·메시지 루프·입력·설정·`Check.h`
+- `Source/Core/` : 창·메시지 루프·입력·설정. D3D 를 부르는 곳은 `FSystem` 이 프레임 앞뒤와 크기 변경에서 `FD3D11Graphics` 를 부르는 자리뿐
 - `Source/App/` : 편마다 바뀌는 장면 코드 (`FApplication`)
-- `Source/Graphics/` : 03편부터. 디바이스·카메라·모델
+- `Source/Graphics/` : 03편부터. `FD3D11Graphics`(디바이스·스왑체인·파이프라인 전역 상태)·카메라·모델
 - `Source/Shaders/` : 04편부터. HLSL 을 감싸는 C++ 클래스
 - `Source/Utility/` : 02편부터. 공통 도구. 로그(`FLog`)·검사 매크로(`Check.h`)·싱글톤 틀(`TSingleton`)
 
