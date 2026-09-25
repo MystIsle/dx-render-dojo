@@ -48,7 +48,7 @@ MARKER = re.compile(r"<!--(INCLUDE|FILE|SYMBOL|DIFF|SLICE):(.*?)-->", re.S)
 # 빠짐없음을 세는 파일. 프로젝트 파일은 솔루션 탐색기로 바뀌는 것이라 본문이 언급하는지만 본다.
 CODE_PATH = re.compile(r"^(Source/|CMakeLists\.txt$|[^/]+\.(manifest|rc)$)")
 PROJECT_FILE = re.compile(r"\.vcxproj(\.filters)?$")
-ACTION_BADGES = ("새로", "바꿈", "지움")
+ACTION_BADGES = ("신규", "수정", "삭제")
 
 
 class Report:
@@ -272,7 +272,7 @@ def check_follow_along(source, tag, report):
 
     unbadged = sum(1 for piece in pieces if piece[4] is None)
     if unbadged:
-        report.warn(f"배지(새로·바꿈·지움)가 없는 코드 조각 {unbadged}개")
+        report.warn(f"배지(신규·수정·삭제)가 없는 코드 조각 {unbadged}개")
 
     names = [name for name in (git_run("diff", "-M", "--name-only", base, ref) or "").split("\n") if name]
     renames = renamed_paths(base, ref)
@@ -293,8 +293,8 @@ def check_follow_along(source, tag, report):
             if piece_path != path:
                 continue
             covered.update(range(first, last + 1))
-            # 지운 줄은 diff 조각이나 바꿈 배지를 단 통째 조각만 덮는다. 통째로 보이기만 해서는 무엇을 지웠는지 드러나지 않는다.
-            if kind in ("DIFF", "DIFF범위") or action == "바꿈":
+            # 지운 줄은 diff 조각이나 수정 배지를 단 통째 조각만 덮는다. 통째로 보이기만 해서는 무엇을 지웠는지 드러나지 않는다.
+            if kind in ("DIFF", "DIFF범위") or action == "수정":
                 removal_covered.update(range(first, last + 2))
         added, removed = changed_lines(base, ref, path, renames.get(path))
         added = {i for i in added if i < len(lines) and lines[i].strip() != ""}
