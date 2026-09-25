@@ -252,6 +252,24 @@ details.fold > summary + * { margin-top: 0.3rem; }
 details.fold .walk { padding-left: 2.4rem; }
 .checkpoint { display: grid; gap: 0.35rem; margin: 0; padding: 0.85rem 1.15rem; border: 1px solid var(--code-add); border-radius: var(--radius); }
 .checkpoint .box-label { color: var(--code-add); }
+figure.diagram { margin: 0; padding: 1rem 1.1rem 0.9rem; background: var(--raised); border-radius: var(--radius); }
+figure.diagram svg { display: block; width: 100%; height: auto; }
+figure.diagram figcaption { margin-top: 0.7rem; font-size: 0.9375rem; line-height: 1.6; color: var(--slate); }
+.dg-box { fill: var(--paper); stroke: var(--rule); stroke-width: 1.5; }
+.dg-box.accent { fill: var(--accent-soft); stroke: var(--accent); }
+.dg-box.amber { fill: var(--amber-soft); stroke: var(--amber); }
+.dg-frame { fill: none; stroke: var(--slate); stroke-width: 1.2; stroke-dasharray: 5 4; }
+.dg-t { fill: var(--ink); font-family: var(--font-body); font-size: 15px; font-weight: 600; }
+.dg-s { fill: var(--slate); font-family: var(--font-body); font-size: 13px; }
+.dg-m { fill: var(--ink); font-family: var(--font-mono); font-size: 13px; }
+.dg-ms { fill: var(--slate); font-family: var(--font-mono); font-size: 12px; }
+.dg-line { stroke: var(--slate); stroke-width: 1.5; fill: none; }
+.dg-line.accent { stroke: var(--accent); }
+.dg-head { fill: var(--slate); }
+.dg-head.accent { fill: var(--accent); }
+.dg-step { fill: var(--accent); }
+.dg-step-n { fill: var(--paper); font-family: var(--font-body); font-size: 12px; font-weight: 700; }
+@media (max-width: 40rem) { figure.diagram { overflow-x: auto; } figure.diagram svg { min-width: 560px; } }
 .learn { display: grid; gap: 0.45rem; margin: 0; padding: 0.95rem 1.15rem; border-radius: var(--radius); background: var(--amber-soft); }
 .learn .box-label { color: var(--amber); }
 .learn details.fold { border-color: var(--amber); background: var(--paper); }
@@ -392,7 +410,7 @@ figure.code .diff-view { border-top: 0; }
 			<span class="num" aria-hidden="true">04</span>
 			<h1>버퍼·셰이더·HLSL</h1>
 		</div>
-		<p class="lede">정점 버퍼와 HLSL 셰이더로 초록 삼각형 하나를 그려요. 정점을 GPU 버퍼에 올리고, 셰이더가 화면 위치와 색을 정하고, 그리기 전에 파이프라인에 그림을 받을 곳을 묶는 순서를 처음부터 끝까지 따라가요.</p>
+		<p class="lede">정점 버퍼와 HLSL 셰이더로 초록 삼각형 하나를 그려요. 그림을 받을 곳을 묶고, 정점을 GPU 버퍼에 올리고, 셰이더가 화면 위치와 색을 정하는 순서를 처음부터 끝까지 따라가요.</p>
 		<ul class="meta">
 			<li><b>태그</b><code>tut04</code></li>
 			<li><b>원문</b><a href="https://www.rastertek.com/dx11win10tut04.html">Tutorial 4</a></li>
@@ -412,7 +430,7 @@ figure.code .diff-view { border-top: 0; }
 	<section id="goal" data-block="goal" data-source="직접">
 		<h2>이 편을 마치면</h2>
 		<ul class="labeled">
-			<li><span class="label">실행</span><span>검은 창 가운데에 초록 삼각형이 그려짐. 창 비율을 바꿔도 삼각형은 늘어나지 않음</span></li>
+			<li><span class="label">실행</span><span>검은 창 가운데에 초록 삼각형이 그려짐. 창을 가로로 넓혀도 삼각형이 옆으로 늘어나지 않음</span></li>
 			<li><span class="label">버퍼</span><span>정점과 인덱스를 GPU 버퍼에 담고 입력 조립기에 묶는 순서</span></li>
 			<li><span class="label">셰이더</span><span>HLSL 정점·픽셀 셰이더를 실행 중에 컴파일하고 입력 레이아웃으로 C++ 정점 구조체와 잇는 법</span></li>
 			<li><span class="label">행렬</span><span>월드·뷰·투영 행렬을 상수 버퍼로 셰이더에 넘겨 정점을 화면에 놓는 법</span></li>
@@ -474,17 +492,64 @@ figure.code .diff-view { border-top: 0; }
 					<span class="node">EndScene (Present)</span>
 				</div>
 			</div>
-			<div class="flow-row">
-				<span class="label">정점</span>
-				<div class="flow-steps">
-					<span class="node">입력 조립기 (IA)</span><span class="arrow">→</span>
-					<span class="node">정점 셰이더 (월드·뷰·투영)</span><span class="arrow">→</span>
-					<span class="node">래스터라이저 (뷰포트)</span><span class="arrow">→</span>
-					<span class="node">픽셀 셰이더 (색)</span><span class="arrow">→</span>
-					<span class="node">출력 병합기 (RTV)</span>
-				</div>
-			</div>
 		</div>
+		<figure class="diagram">
+			<svg viewBox="0 0 820 432" role="img" aria-label="입력 조립기, 정점 셰이더, 래스터라이저, 픽셀 셰이더, 출력 병합기 순서로 정점이 흐르고, 단계마다 묶는 상태와 그 함수, 따라 하기 단계 번호를 적은 그림">
+				<defs><marker id="d4m-h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path class="dg-head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+				<rect class="dg-box accent" x="0" y="0" width="170" height="112" rx="8"/>
+				<text class="dg-t" x="16" y="50">입력 조립기</text>
+				<text class="dg-ms" x="16" y="72">IA</text>
+				<rect class="dg-box" x="190" y="0" width="305" height="50" rx="6"/>
+				<text class="dg-s" x="204" y="20">정점 버퍼 · 인덱스 버퍼</text>
+				<text class="dg-ms" x="204" y="40">IASetVertexBuffers · IASetIndexBuffer</text>
+				<circle class="dg-step" cx="478" cy="17" r="10"/><text class="dg-step-n" x="474" y="21">3</text>
+				<rect class="dg-box" x="515" y="0" width="305" height="50" rx="6"/>
+				<text class="dg-s" x="529" y="20">토폴로지</text>
+				<text class="dg-ms" x="529" y="40">IASetPrimitiveTopology</text>
+				<circle class="dg-step" cx="803" cy="17" r="10"/><text class="dg-step-n" x="799" y="21">3</text>
+				<rect class="dg-box" x="190" y="62" width="305" height="50" rx="6"/>
+				<text class="dg-s" x="204" y="82">입력 레이아웃</text>
+				<text class="dg-ms" x="204" y="102">IASetInputLayout</text>
+				<circle class="dg-step" cx="478" cy="79" r="10"/><text class="dg-step-n" x="474" y="83">6</text>
+				<path class="dg-line" d="M85,112 L85,138" marker-end="url(#d4m-h)"/>
+				<rect class="dg-box accent" x="0" y="142" width="170" height="50" rx="8"/>
+				<text class="dg-t" x="16" y="165">정점 셰이더</text>
+				<text class="dg-ms" x="16" y="183">VS</text>
+				<rect class="dg-box" x="190" y="142" width="305" height="50" rx="6"/>
+				<text class="dg-s" x="204" y="162">셰이더</text>
+				<text class="dg-ms" x="204" y="182">VSSetShader</text>
+				<circle class="dg-step" cx="478" cy="159" r="10"/><text class="dg-step-n" x="474" y="163">6</text>
+				<rect class="dg-box" x="515" y="142" width="305" height="50" rx="6"/>
+				<text class="dg-s" x="529" y="162">상수 버퍼 · 행렬 셋</text>
+				<text class="dg-ms" x="529" y="182">VSSetConstantBuffers</text>
+				<circle class="dg-step" cx="803" cy="159" r="10"/><text class="dg-step-n" x="799" y="163">7</text>
+				<path class="dg-line" d="M85,192 L85,218" marker-end="url(#d4m-h)"/>
+				<rect class="dg-box accent" x="0" y="222" width="170" height="50" rx="8"/>
+				<text class="dg-t" x="16" y="245">래스터라이저</text>
+				<text class="dg-ms" x="16" y="263">RS</text>
+				<rect class="dg-box" x="190" y="222" width="305" height="50" rx="6"/>
+				<text class="dg-s" x="204" y="242">뷰포트</text>
+				<text class="dg-ms" x="204" y="262">RSSetViewports</text>
+				<circle class="dg-step" cx="478" cy="239" r="10"/><text class="dg-step-n" x="474" y="243">2</text>
+				<path class="dg-line" d="M85,272 L85,298" marker-end="url(#d4m-h)"/>
+				<rect class="dg-box accent" x="0" y="302" width="170" height="50" rx="8"/>
+				<text class="dg-t" x="16" y="325">픽셀 셰이더</text>
+				<text class="dg-ms" x="16" y="343">PS</text>
+				<rect class="dg-box" x="190" y="302" width="305" height="50" rx="6"/>
+				<text class="dg-s" x="204" y="322">셰이더</text>
+				<text class="dg-ms" x="204" y="342">PSSetShader</text>
+				<circle class="dg-step" cx="478" cy="319" r="10"/><text class="dg-step-n" x="474" y="323">6</text>
+				<path class="dg-line" d="M85,352 L85,378" marker-end="url(#d4m-h)"/>
+				<rect class="dg-box accent" x="0" y="382" width="170" height="50" rx="8"/>
+				<text class="dg-t" x="16" y="405">출력 병합기</text>
+				<text class="dg-ms" x="16" y="423">OM</text>
+				<rect class="dg-box" x="190" y="382" width="305" height="50" rx="6"/>
+				<text class="dg-s" x="204" y="402">렌더 타깃</text>
+				<text class="dg-ms" x="204" y="422">OMSetRenderTargets</text>
+				<circle class="dg-step" cx="478" cy="399" r="10"/><text class="dg-step-n" x="474" y="403">2</text>
+			</svg>
+			<figcaption><code>DrawIndexed</code> 를 부르면 정점이 위에서 아래로 흘러요. 파란 원의 숫자는 그 상태를 묶는 따라 하기 단계예요.</figcaption>
+		</figure>
 	</section>
 
 	<section id="predict" data-block="predict" data-source="직접">
@@ -503,14 +568,14 @@ figure.code .diff-view { border-top: 0; }
 			<p>800×600 창 가운데에 삼각형이 떠 있어요. 창을 1200×600 으로 넓히면 삼각형도 옆으로 늘어날까요?</p>
 			<details class="fold">
 				<summary>답 보기</summary>
-				<p>늘어나지 않아요. 800×600 에서도 1200×600 에서도 삼각형을 감싸는 상자는 약 290×290 픽셀이에요. 투영 행렬이 매 프레임 창의 가로세로 비율을 받아 넓어진 만큼 가로를 줄여요. (<a href="#step-camera">7단계</a>)</p>
+				<p>늘어나지 않아요. 800×600 에서도 1200×600 에서도 삼각형을 감싸는 상자는 약 290×290 픽셀이에요. 투영 행렬이 매 프레임 창의 가로세로 비율을 받아 넓어진 만큼 가로를 줄여요. (<a href="#step-camera">8단계</a>)</p>
 			</details>
 		</div>
 	</section>
 
 	<section id="steps" data-block="steps" data-source="직접">
 		<h2>따라 하기</h2>
-		<p class="section-note">코드 조각의 배지는 할 일이에요. <b>신규</b>는 추가, <b>수정</b>은 있던 함수나 파일을 통째로 바꿔 넣기, <b>삭제</b>는 빨간 줄 지우기예요. diff 조각은 초록 줄을 넣고 빨간 줄을 지워요. 단계마다 끝의 <b>여기까지</b> 상자대로 빌드하고 실행해 보세요.</p>
+		<p class="section-note">코드 조각 위의 경로는 리포 루트 기준이에요. 새 파일은 그 폴더에 만들어요. Visual Studio 의 새 항목 추가는 기본 위치가 프로젝트 파일 옆이라 위치를 그 폴더로 바꿔야 해요. 배지는 할 일이에요. <b>신규</b>는 새 파일이나 새 함수를 넣기, <b>수정</b>은 있던 것을 고치기, <b>삭제</b>는 지우기예요. 통째로 보이는 조각은 그대로 넣거나 바꿔 넣고, diff 조각은 초록 줄을 넣고 빨간 줄을 지워요. 단계마다 끝의 <b>여기까지</b> 상자대로 빌드하고 실행해 보세요.</p>
 		<ol class="steps">
 
 			<li class="step" id="step-math">
@@ -529,7 +594,10 @@ figure.code .diff-view { border-top: 0; }
 							<li class="entry"><code>#include "Utility/Check.h"</code> <code>CHECK_FATAL</code> 을 쓰려고 넣음</li>
 						</ul>
 					</details>
-					<p>Visual Studio 에서는 프로젝트 속성에서 구성을 모든 구성으로 두고 C/C++ › 일반 › 추가 포함 디렉터리에 <code>$(ProjectDir)external\DirectXMath\Inc</code> 를 더해요. 이 조작이 <code>DxRenderDojo.vcxproj</code> 를 바꿔요.</p>
+					<p>Visual Studio 에서는 프로젝트 속성을 아래처럼 고쳐요. 이 조작이 <code>DxRenderDojo.vcxproj</code> 를 바꿔요.</p>
+					<ul class="walk">
+						<li>모든 구성 · C/C++ › 일반 › 추가 포함 디렉터리 : <code>$(ProjectDir)external\DirectXMath\Inc</code> 를 더함</li>
+					</ul>
 					<details class="fold">
 						<summary>참고 : 위 조작이 프로젝트 파일에 남기는 diff · 따로 치지 않음</summary>
 					<figure class="code">
@@ -553,7 +621,7 @@ figure.code .diff-view { border-top: 0; }
 					</details>
 					<div class="checkpoint">
 						<p class="box-label">여기까지</p>
-						<p>빌드하고 실행하면 03편과 같은 회색 창이 뜨고 로그도 같아요.</p>
+						<p>빌드하고 실행하면 03편과 같은 회색 창이 뜨고 로그도 같아요. 포함 경로를 빠뜨려도 Windows SDK 의 <code>DirectXMath.h</code> 로 빌드가 돼요. <code>Main.cpp</code> 의 <code>&lt;DirectXMath.h&gt;</code> 에 커서를 두고 Ctrl+Shift+G 로 열었을 때 경로가 <code>external\DirectXMath\Inc</code> 이면 돼요.</p>
 					</div>
 				</div>
 			</li>
@@ -561,12 +629,12 @@ figure.code .diff-view { border-top: 0; }
 			<li class="step" id="step-bind">
 				<div class="step-body">
 					<h3>그리기 전에 RTV 와 뷰포트를 묶는다</h3>
-					<p>삼각형을 그리려면 그림을 받을 곳과 펼칠 사각형을 파이프라인에 알려 줘야 해요. 그림을 받을 곳은 출력 병합기에 묶는 RTV 이고, 펼칠 사각형은 래스터라이저에 넣는 뷰포트예요.</p>
+					<p>그리기 전에 그림을 받을 RTV 를 출력 병합기에, 그림을 펼칠 사각형인 뷰포트를 래스터라이저에 묶어요. 플립 모델에서는 <code>Present</code> 가 RTV 를 파이프라인에서 떼므로 <code>BeginScene</code> 에서 매 프레임 묶어요.</p>
 					<details class="fold" open>
 						<summary>D3D 개념 · 래스터라이저와 출력 병합기</summary>
 						<aside class="concept">
 							<ul class="walk">
-								<li><strong>래스터라이저</strong>(RS) : 삼각형이 덮는 픽셀을 찾는 단계. 뷰포트로 -1~1 좌표를 창의 픽셀 좌표로 바꿈</li>
+								<li><strong>래스터라이저</strong>(RS) : 삼각형이 덮는 픽셀을 찾는 단계. 정점 셰이더가 내보낸 x·y 는 -1~1 이 화면 안이고, 뷰포트로 이 좌표를 창의 픽셀 좌표로 바꿈</li>
 								<li><strong>뷰포트</strong>(<code>D3D11_VIEWPORT</code>) : 그림을 펼칠 사각형과 깊이 범위(0~1)</li>
 								<li><strong>출력 병합기</strong>(OM) : 픽셀 셰이더가 낸 색을 렌더 타깃에 쓰는 마지막 단계. <code>OMSetRenderTargets</code> 로 RTV 를 묶음</li>
 							</ul>
@@ -581,7 +649,15 @@ figure.code .diff-view { border-top: 0; }
 						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge mod">수정</span><span class="badge">FD3D11Graphics::CreateSizeDependentResources</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SYMBOL@2:Source/Graphics/FD3D11Graphics.cpp:void FD3D11Graphics::CreateSizeDependentResources--></pre>
 					</figure>
-					<p>플립 모델에서는 <code>Present</code> 가 성공할 때마다 백 버퍼를 파이프라인에서 떼요. 초기화 때 한 번만 묶어 두면 두 번째 프레임부터는 그린 것이 버려져요. <code>BeginScene</code> 이 매 프레임 RTV 를 다시 묶는 이유예요. 뷰포트는 <code>Present</code> 가 떼지 않지만 RTV 와 짝이라 같은 자리에서 넣어요.</p>
+					<details class="fold">
+						<summary>줄 단위 풀이</summary>
+						<ul class="walk">
+							<li class="entry"><code>D3D11_VIEWPORT Viewport = {};</code> <code>TopLeftX</code>·<code>TopLeftY</code>·<code>MinDepth</code> 를 0 으로 둠</li>
+							<li class="entry"><code>BackBuffer-&gt;GetDesc(&amp;BackBufferDesc)</code> 백 버퍼의 너비와 높이를 읽음. 창 크기를 따로 넘겨받지 않아도 됨</li>
+							<li class="entry"><code>Viewport.MaxDepth = 1.0f</code> 깊이 범위 0~1</li>
+						</ul>
+					</details>
+					<p>초기화 때 한 번만 묶어 두면 두 번째 프레임부터는 그린 것이 버려져요. 뷰포트는 <code>Present</code> 가 떼지 않지만 RTV 와 짝이라 같은 곳에서 넣어요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge mod">수정</span><span class="badge">FD3D11Graphics::BeginScene</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SYMBOL@2:Source/Graphics/FD3D11Graphics.cpp:void FD3D11Graphics::BeginScene--></pre>
@@ -589,9 +665,6 @@ figure.code .diff-view { border-top: 0; }
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
-							<li class="entry"><code>D3D11_VIEWPORT Viewport = {};</code> <code>TopLeftX</code>·<code>TopLeftY</code>·<code>MinDepth</code> 를 0 으로 둠</li>
-							<li class="entry"><code>BackBuffer-&gt;GetDesc(&amp;BackBufferDesc)</code> 백 버퍼의 너비와 높이를 읽음. 창 크기를 따로 넘겨받지 않아도 됨</li>
-							<li class="entry"><code>Viewport.MaxDepth = 1.0f</code> 깊이 범위 0~1</li>
 							<li class="entry"><code>OMSetRenderTargets(1, RenderTargetView.GetAddressOf(), nullptr)</code> RTV 하나를 묶음. 세 번째 인자는 깊이 버퍼 뷰. 이 편에는 깊이 버퍼가 없음</li>
 							<li class="entry"><code>RSSetViewports(1, &amp;Viewport)</code> 뷰포트 하나를 넣음</li>
 						</ul>
@@ -646,7 +719,7 @@ figure.code .diff-view { border-top: 0; }
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
-							<li class="entry"><code>struct FVertex</code> 정점 하나. 위치 <code>XMFLOAT3</code>(12바이트) 다음에 색 <code>XMFLOAT4</code>(16바이트). <a href="#step-shader">4단계</a>의 입력 레이아웃이 이 배치를 그대로 적음</li>
+							<li class="entry"><code>struct FVertex</code> 정점 하나. 위치 <code>XMFLOAT3</code>(12바이트) 다음에 색 <code>XMFLOAT4</code>(16바이트). <a href="#step-compile">5단계</a>의 입력 레이아웃이 이 배치를 그대로 적음</li>
 						</ul>
 					</details>
 					<figure class="code">
@@ -657,7 +730,27 @@ figure.code .diff-view { border-top: 0; }
 						<figcaption><span class="path">Source/Graphics/FModel.cpp</span><span class="badge new">신규</span><span class="badge">FModel::Initialize · using 다음</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SYMBOL@3:Source/Graphics/FModel.cpp:void FModel::Initialize--></pre>
 					</figure>
-					<p>정점은 왼쪽 아래, 가운데 위, 오른쪽 아래 순서로 적어요. 카메라에서 보면 시계 방향이에요. 기본 래스터라이저 상태는 시계 방향으로 도는 삼각형을 앞면으로 보고 뒷면은 그리지 않아요.</p>
+					<p>정점은 왼쪽 아래, 가운데 위, 오른쪽 아래 순서로 적어요. 화면에서 보면 시계 방향이에요. 기본 래스터라이저 상태는 시계 방향으로 도는 삼각형을 앞면으로 보고 뒷면은 그리지 않아요.</p>
+					<figure class="diagram">
+						<svg viewBox="0 0 820 250" role="img" aria-label="정점 0 은 왼쪽 아래, 1 은 가운데 위, 2 는 오른쪽 아래. 0, 1, 2 순서로 돌면 화면에서 시계 방향">
+							<defs><marker id="d43-h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path class="dg-head accent" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+							<polygon class="dg-box accent" points="60,220 200,20 340,220"/>
+							<path class="dg-line accent" d="M96,196 L186,68" marker-end="url(#d43-h)"/>
+							<path class="dg-line accent" d="M214,68 L304,196" marker-end="url(#d43-h)"/>
+							<path class="dg-line accent" d="M300,206 L100,206" marker-end="url(#d43-h)"/>
+							<circle class="dg-step" cx="60" cy="220" r="11"/><text class="dg-step-n" x="56" y="224">0</text>
+							<circle class="dg-step" cx="200" cy="20" r="11"/><text class="dg-step-n" x="196" y="24">1</text>
+							<circle class="dg-step" cx="340" cy="220" r="11"/><text class="dg-step-n" x="336" y="224">2</text>
+							<text class="dg-ms" x="0" y="246">(-1, -1)</text>
+							<text class="dg-ms" x="218" y="24">(0, 1)</text>
+							<text class="dg-ms" x="316" y="246">(1, -1)</text>
+							<text class="dg-t" x="420" y="80">인덱스 버퍼 <tspan class="dg-m">{0, 1, 2}</tspan></text>
+							<text class="dg-s" x="420" y="112">세 개씩 삼각형 하나로 읽음</text>
+							<text class="dg-s" x="420" y="150">화면에서 시계 방향으로 돌면 앞면</text>
+							<text class="dg-s" x="420" y="176">반대로 돌면 뒷면이라 그리지 않음</text>
+						</svg>
+						<figcaption>정점 번호는 버퍼에 적은 순서예요. 인덱스를 <code>{0, 2, 1}</code> 로 적으면 반시계 방향이 돼서 삼각형이 보이지 않아요.</figcaption>
+					</figure>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
@@ -691,22 +784,22 @@ figure.code .diff-view { border-top: 0; }
 						<figcaption><span class="path">Source/App/FApplication.h</span><span class="badge mod">수정</span><span class="badge">Initialize, Render 인자, 모델 멤버</span></figcaption>
 <pre class="diff" data-lang="cpp"><!--DIFF@3:Source/App/FApplication.h--></pre>
 					</figure>
-					<figure class="code">
-						<figcaption><span class="path">Source/App/FApplication.cpp</span><span class="badge mod">수정</span><span class="badge">Initialize 와 Render</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF@3:Source/App/FApplication.cpp--></pre>
-					</figure>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
 							<li class="entry"><code>class FD3D11Graphics;</code> 헤더에서는 참조로만 받아 전방 선언으로 충분함</li>
 						</ul>
 					</details>
+					<figure class="code">
+						<figcaption><span class="path">Source/App/FApplication.cpp</span><span class="badge mod">수정</span><span class="badge">Initialize 와 Render</span></figcaption>
+<pre class="diff" data-lang="cpp"><!--DIFF@3:Source/App/FApplication.cpp--></pre>
+					</figure>
 					<p><code>FSystem</code> 은 <code>Graphics</code> 를 초기화한 다음 <code>Application.Initialize</code> 를 불러요. 디바이스가 있어야 버퍼를 만들 수 있어요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge mod">수정</span><span class="badge">FSystem::Initialize 와 FSystem::Frame</span></figcaption>
 <pre class="diff" data-lang="cpp"><!--DIFF@3:Source/Core/FSystem.cpp--></pre>
 					</figure>
-					<p>Visual Studio 에서는 <code>Graphics</code> 필터에 <code>FModel.h</code>·<code>FModel.cpp</code> 를 기존 항목 추가로 넣어요. 이 조작이 <code>DxRenderDojo.vcxproj</code> 와 <code>DxRenderDojo.vcxproj.filters</code> 를 바꿔요.</p>
+					<p>Visual Studio 에서는 <code>Graphics</code> 필터에 <code>FModel.h</code>·<code>FModel.cpp</code> 를 넣어요. 이 조작이 <code>DxRenderDojo.vcxproj</code> 와 <code>DxRenderDojo.vcxproj.filters</code> 를 바꿔요.</p>
 					<details class="fold">
 						<summary>참고 : 위 조작이 프로젝트 파일에 남기는 diff · 따로 치지 않음</summary>
 					<figure class="code">
@@ -737,22 +830,22 @@ figure.code .diff-view { border-top: 0; }
 				</div>
 			</li>
 
-			<li class="step" id="step-shader">
+			<li class="step" id="step-hlsl">
 				<div class="step-body">
-					<h3>셰이더를 쓰고 컴파일한다</h3>
-					<p>셰이더는 GPU 에서 도는 작은 프로그램이에요. 정점 셰이더는 정점마다 한 번 돌아 화면 위치를 정하고, 픽셀 셰이더는 삼각형이 덮는 픽셀마다 한 번 돌아 색을 정해요. 둘 다 HLSL 로 쓰고 실행 중에 컴파일해요.</p>
+					<h3>셰이더 파일을 쓰고 exe 옆에 둔다</h3>
+					<p>셰이더는 GPU 에서 도는 작은 프로그램이에요. 정점 셰이더는 정점마다 한 번 돌아 화면 위치를 정하고, 픽셀 셰이더는 삼각형이 덮는 픽셀마다 한 번 돌아 색을 정해요. 둘 다 HLSL 로 쓰고 실행 중에 컴파일해서, 파일이 exe 옆에 있어야 해요.</p>
 					<details class="fold" open>
 						<summary>D3D 개념 · 시맨틱</summary>
 						<aside class="concept">
 							<ul class="walk">
 								<li><strong>시맨틱</strong> : 변수 뒤에 붙는 <code>: POSITION</code> 같은 이름. 파이프라인 단계 사이에서 값을 이 이름으로 짝지음</li>
-								<li class="entry"><code>POSITION</code>·<code>COLOR</code> 정점 버퍼에서 읽는 값. 이 단계의 입력 레이아웃이 적는 이름과 같아야 함</li>
+								<li class="entry"><code>POSITION</code>·<code>COLOR</code> 정점 버퍼에서 읽는 값. 다음 단계의 입력 레이아웃이 적는 이름과 같아야 함</li>
 								<li class="entry"><code>SV_POSITION</code> 정점 셰이더가 내보내는 위치. <code>SV_</code> 는 파이프라인이 직접 쓰는 시스템 값이라는 표시</li>
 								<li class="entry"><code>SV_TARGET</code> 픽셀 셰이더의 출력. 0번 렌더 타깃에 씀</li>
 							</ul>
 						</aside>
 					</details>
-					<p>두 파일을 <code>Source/Shaders</code> 에 새로 만들어요. 인코딩은 BOM 없는 UTF-8 이어야 해요. BOM 이 있으면 컴파일이 첫 글자에서 실패해요(<a href="#pitfalls">흔한 실수</a> 3번).</p>
+					<p>두 파일을 <code>Source/Shaders</code> 에 새로 만들어요. 인코딩은 BOM 없는 UTF-8 이어야 해요. BOM 이 있으면 컴파일이 첫 글자에서 실패해요(<a href="#pitfalls">흔한 실수</a> 3번). Visual Studio 에서는 저장할 때 파일 › 다른 이름으로 저장의 저장 단추 옆 ▾ › 인코딩하여 저장에서 "유니코드(서명 없는 UTF-8)" 을 골라요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Shaders/Color.vs</span><span class="badge new">신규</span><span class="badge">파일 전체</span></figcaption>
 <pre class="src" data-lang="cpp"><!--FILE@4:Source/Shaders/Color.vs--></pre>
@@ -761,8 +854,7 @@ figure.code .diff-view { border-top: 0; }
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
 							<li class="entry"><code>float3 Position : POSITION</code> 정점 버퍼의 <code>XMFLOAT3</code> 를 받음</li>
-							<li class="entry"><code>Output.Position = float4(Input.Position, 1.0f);</code> 위치에 w = 1 을 붙여 네 성분으로 만들고 그대로 내보냄. 행렬은 <a href="#step-cbuffer">6단계</a>에서 곱함</li>
-							<li class="entry"><code>Output.Color = Input.Color;</code> 색은 그대로 넘김</li>
+							<li class="entry"><code>Output.Position = float4(Input.Position, 1.0f);</code> 위치에 w = 1 을 붙여 네 성분으로 만들고 그대로 내보냄. 행렬은 <a href="#step-cbuffer">7단계</a>에서 곱함</li>
 						</ul>
 					</details>
 					<figure class="code">
@@ -770,24 +862,51 @@ figure.code .diff-view { border-top: 0; }
 <pre class="src" data-lang="cpp"><!--FILE@4:Source/Shaders/Color.ps--></pre>
 					</figure>
 					<p>픽셀 셰이더가 받는 <code>Input.Color</code> 는 정점 셰이더가 내보낸 색이에요. 래스터라이저가 삼각형 안쪽 픽셀마다 세 정점의 값을 섞어서 넘겨요.</p>
-					<p>셰이더 파일은 exe 옆 <code>Shaders</code> 폴더에서 읽어요. 작업 디렉터리는 Visual Studio 에서 실행할 때와 exe 를 더블클릭할 때가 달라서 exe 가 있는 폴더를 기준으로 삼아요. 그 폴더를 돌려주는 <code>FPaths</code> 를 <code>Source/Utility</code> 에 만들어요.</p>
-					<figure class="code">
-						<figcaption><span class="path">Source/Utility/FPaths.h</span><span class="badge new">신규</span><span class="badge">파일 전체</span></figcaption>
-<pre class="src" data-lang="cpp"><!--FILE@4:Source/Utility/FPaths.h--></pre>
-					</figure>
-					<figure class="code">
-						<figcaption><span class="path">Source/Utility/FPaths.cpp</span><span class="badge new">신규</span><span class="badge">파일 전체</span></figcaption>
-<pre class="src" data-lang="cpp"><!--FILE@4:Source/Utility/FPaths.cpp--></pre>
-					</figure>
+					<p>셰이더 파일은 빌드할 때 exe 옆 <code>Shaders</code> 폴더로 복사해요. Visual Studio 에서는 새 <code>Shaders</code> 필터에 두 파일을 넣고 아래처럼 고쳐요. 이 조작들이 <code>DxRenderDojo.vcxproj</code> 와 <code>DxRenderDojo.vcxproj.filters</code> 를 바꿔요.</p>
+					<ul class="walk">
+						<li><code>Color.vs</code>·<code>Color.ps</code> 를 함께 골라 속성을 열고 구성을 모든 구성으로 둠</li>
+						<li>구성 속성 › 일반 › 항목 형식 : 파일 복사. 적용을 누르면 왼쪽에 파일 복사 항목이 생김</li>
+						<li>파일 복사 › 일반 › 대상 디렉터리 : <code>$(OutDir)Shaders</code></li>
+					</ul>
+					<p>빌드할 때마다 exe 옆 <code>Shaders</code> 폴더로 복사되고 셰이더만 고쳐도 다시 복사돼요.</p>
 					<details class="fold">
-						<summary>줄 단위 풀이</summary>
+						<summary>참고 : 위 조작이 프로젝트 파일에 남기는 diff · 따로 치지 않음</summary>
+					<figure class="code">
+						<figcaption><span class="path">DxRenderDojo.vcxproj</span><span class="badge mod">수정</span><span class="badge">셰이더 복사</span></figcaption>
+<pre class="diff" data-lang="xml"><!--DIFF@4:DxRenderDojo.vcxproj--></pre>
+					</figure>
+					</details>
+					<details class="fold">
+						<summary>CMake · 맥 빌드와 검사용, VS 만 쓰면 건너뜀</summary>
+					<figure class="code">
+						<figcaption><span class="path">CMakeLists.txt</span><span class="badge mod">수정</span><span class="badge">셰이더 복사</span></figcaption>
+<pre class="diff" data-lang="cmake"><!--DIFF@4:CMakeLists.txt--></pre>
+					</figure>
 						<ul class="walk">
-							<li class="entry"><code>static std::filesystem::path GetExecutableDirectory();</code> 상태가 없어 객체를 만들지 않고 <code>FPaths::</code> 로 부름</li>
-							<li class="entry"><code>GetModuleFileNameW(nullptr, ...)</code> 실행 중인 exe 의 전체 경로. 버퍼가 모자라면 잘린 길이를 돌려줘서 <code>Length &lt; Buffer.size()</code> 로 확인함</li>
-							<li class="entry"><code>parent_path()</code> 경로에서 파일 이름을 뗌</li>
+							<li class="entry"><code>file(GLOB ShaderFiles CONFIGURE_DEPENDS ...)</code> <code>Source/Shaders</code> 의 <code>.vs</code>·<code>.ps</code> 를 모음. 셰이더 파일을 더해도 목록에 적지 않음</li>
+							<li class="entry"><code>configure_file(... COPYONLY)</code> 설정 단계에서 파일을 복사함. 원본을 고치면 다음 빌드 때 CMake 가 다시 돌아 새로 복사함</li>
 						</ul>
 					</details>
-					<p>HLSL 파일은 <code>D3DCompileFromFile</code> 로 컴파일해요. 컴파일 결과인 바이트코드로 셰이더 객체를 만들고, 정점 셰이더의 바이트코드로 입력 레이아웃도 만들어요.</p>
+					<details class="fold">
+						<summary>원문과 비교</summary>
+						<p>원문은 위치를 <code>float4</code> 로 받고 w 를 1 로 덮어써요. 정점 버퍼의 위치는 세 성분이라 이 교재는 <code>float3</code> 로 받아 w 를 붙여요. 구조체 이름은 <code>VertexInputType</code> 이 <code>FVertexInput</code>, <code>PixelInputType</code> 이 <code>FPixelInput</code> 이에요.</p>
+						<p>원문은 <code>../Engine/color.vs</code> 를 작업 디렉터리 기준으로 열어요. 작업 디렉터리는 Visual Studio 에서 실행할 때와 exe 를 더블클릭할 때가 달라서, 이 교재는 exe 옆에 두고 exe 폴더를 기준으로 읽어요.</p>
+					</details>
+					<div class="learn">
+						<p class="box-label">스스로 설명해 보기</p>
+						<p>세 정점에 빨강·초록·파랑을 하나씩 주면 삼각형 가운데는 무슨 색이 될까요? <code>Color.ps</code> 가 받는 <code>Input.Color</code> 가 어디서 오는지로 설명해 보세요.</p>
+					</div>
+					<div class="checkpoint">
+						<p class="box-label">여기까지</p>
+						<p>화면은 그대로예요. exe 가 있는 폴더(Debug 는 <code>x64\Debug</code>)에 <code>Shaders\Color.vs</code>·<code>Color.ps</code> 가 생겨요.</p>
+					</div>
+				</div>
+			</li>
+
+			<li class="step" id="step-compile">
+				<div class="step-body">
+					<h3>셰이더를 컴파일하고 입력 레이아웃을 만든다</h3>
+					<p>HLSL 파일은 실행 중에 <code>D3DCompileFromFile</code> 로 컴파일해요. 컴파일 결과인 바이트코드로 셰이더 객체를 만들고, 정점 셰이더의 바이트코드로 입력 레이아웃도 만들어요.</p>
 					<details class="fold" open>
 						<summary>D3D 개념 · 바이트코드와 입력 레이아웃</summary>
 						<aside class="concept">
@@ -798,14 +917,32 @@ figure.code .diff-view { border-top: 0; }
 							</ul>
 						</aside>
 					</details>
+					<p>셰이더 파일은 exe 가 있는 폴더를 기준으로 찾아요. 그 폴더를 돌려주는 <code>FPaths</code> 를 <code>Source/Utility</code> 에 만들어요.</p>
+					<figure class="code">
+						<figcaption><span class="path">Source/Utility/FPaths.h</span><span class="badge new">신규</span><span class="badge">파일 전체</span></figcaption>
+<pre class="src" data-lang="cpp"><!--FILE@5:Source/Utility/FPaths.h--></pre>
+					</figure>
+					<figure class="code">
+						<figcaption><span class="path">Source/Utility/FPaths.cpp</span><span class="badge new">신규</span><span class="badge">파일 전체</span></figcaption>
+<pre class="src" data-lang="cpp"><!--FILE@5:Source/Utility/FPaths.cpp--></pre>
+					</figure>
+					<details class="fold">
+						<summary>줄 단위 풀이</summary>
+						<ul class="walk">
+							<li class="entry"><code>static std::filesystem::path GetExecutableDirectory();</code> 상태가 없어 객체를 만들지 않고 <code>FPaths::</code> 로 부름</li>
+							<li class="entry"><code>GetModuleFileNameW(nullptr, ...)</code> 실행 중인 exe 의 전체 경로. 버퍼가 모자라면 잘린 길이를 돌려줘서 <code>Length &lt; Buffer.size()</code> 로 확인함</li>
+							<li class="entry"><code>parent_path()</code> 경로에서 파일 이름을 뗌</li>
+						</ul>
+					</details>
+					<p>셰이더를 맡는 새 클래스 <code>FColorShader</code> 를 <code>Source/Shaders</code> 에 만들어요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Shaders/FColorShader.h</span><span class="badge new">신규</span><span class="badge">파일 전체</span></figcaption>
-<pre class="src" data-lang="cpp"><!--FILE@4:Source/Shaders/FColorShader.h--></pre>
+<pre class="src" data-lang="cpp"><!--FILE@5:Source/Shaders/FColorShader.h--></pre>
 					</figure>
-					<p><code>CompileShader</code> 는 파일 하나를 컴파일해 바이트코드를 돌려줘요. 실패하면 경로와 컴파일러가 돌려준 오류 문자열을 로그로 남긴 뒤 <code>CHECK_FATAL</code> 로 멈춰요. 오류 문자열에는 파일 이름과 줄·열 번호가 들어 있어요.</p>
+					<p><code>CompileShader</code> 는 HLSL 파일 하나를 바이트코드로 컴파일해요. 실패하면 컴파일러가 돌려준 오류 문자열을 로그로 남기고 멈춰요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Shaders/FColorShader.cpp</span><span class="badge new">신규</span><span class="badge">파일 맨 위 include · CompileShader</span></figcaption>
-<pre class="snip" data-lang="cpp"><!--SLICE@4:Source/Shaders/FColorShader.cpp:#include "Shaders/FColorShader.h"=>void FColorShader::Initialize--></pre>
+<pre class="snip" data-lang="cpp"><!--SLICE@5:Source/Shaders/FColorShader.cpp:#include "Shaders/FColorShader.h"=>void FColorShader::Initialize--></pre>
 					</figure>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
@@ -820,14 +957,46 @@ figure.code .diff-view { border-top: 0; }
 						</ul>
 					</details>
 					<p>입력 레이아웃은 C++ 의 <code>FVertex</code> 와 HLSL 의 <code>FVertexInput</code> 사이의 약속이에요. 원소마다 시맨틱 이름과 형식, 정점 안에서 몇 바이트째에 있는지를 적어요. <code>CreateInputLayout</code> 은 정점 셰이더의 바이트코드를 함께 받아 셰이더 입력과 맞는지 확인해요.</p>
+					<figure class="diagram">
+						<svg viewBox="0 0 820 268" role="img" aria-label="FVertex 28바이트 가운데 0~11 바이트는 POSITION, 12~27 바이트는 COLOR 원소로 읽혀 HLSL 입력의 Position 과 Color 로 들어가는 그림">
+							<defs><marker id="d45-h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path class="dg-head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+							<text class="dg-t" x="0" y="46">C++ <tspan class="dg-ms" dx="4">FVertex</tspan></text>
+							<text class="dg-s" x="0" y="66">28바이트</text>
+							<rect class="dg-box accent" x="180" y="26" width="240" height="46" rx="6"/>
+							<rect class="dg-box amber" x="420" y="26" width="320" height="46" rx="6"/>
+							<text class="dg-m" x="196" y="54">XMFLOAT3 Position</text>
+							<text class="dg-m" x="436" y="54">XMFLOAT4 Color</text>
+							<text class="dg-ms" x="176" y="90">0</text>
+							<text class="dg-ms" x="412" y="90">12</text>
+							<text class="dg-ms" x="732" y="90">28</text>
+							<path class="dg-line" d="M300,72 L300,112" marker-end="url(#d45-h)"/>
+							<path class="dg-line" d="M580,72 L580,112" marker-end="url(#d45-h)"/>
+							<text class="dg-t" x="0" y="140">입력 레이아웃</text>
+							<text class="dg-s" x="0" y="160">원소 2개</text>
+							<rect class="dg-box" x="180" y="116" width="236" height="56" rx="6"/>
+							<rect class="dg-box" x="424" y="116" width="316" height="56" rx="6"/>
+							<text class="dg-m" x="196" y="140">"POSITION"</text>
+							<text class="dg-ms" x="196" y="160">R32G32B32_FLOAT · 0</text>
+							<text class="dg-m" x="440" y="140">"COLOR"</text>
+							<text class="dg-ms" x="440" y="160">R32G32B32A32_FLOAT · 12</text>
+							<path class="dg-line" d="M300,172 L300,212" marker-end="url(#d45-h)"/>
+							<path class="dg-line" d="M580,172 L580,212" marker-end="url(#d45-h)"/>
+							<text class="dg-t" x="0" y="240">HLSL <tspan class="dg-ms" dx="4">FVertexInput</tspan></text>
+							<rect class="dg-box" x="180" y="216" width="236" height="44" rx="6"/>
+							<rect class="dg-box" x="424" y="216" width="316" height="44" rx="6"/>
+							<text class="dg-m" x="196" y="243">float3 Position : POSITION</text>
+							<text class="dg-m" x="440" y="243">float4 Color : COLOR</text>
+						</svg>
+						<figcaption>입력 레이아웃이 가운데에서 두 쪽을 이어요. 바이트 위치는 위의 C++ 구조체와, 시맨틱 이름은 아래의 HLSL 입력과 맞아야 해요.</figcaption>
+					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/Shaders/FColorShader.cpp</span><span class="badge new">신규</span><span class="badge">FColorShader::Initialize · 이름 없는 네임스페이스 다음</span></figcaption>
-<pre class="snip" data-lang="cpp"><!--SYMBOL@4:Source/Shaders/FColorShader.cpp:void FColorShader::Initialize--></pre>
+<pre class="snip" data-lang="cpp"><!--SYMBOL@5:Source/Shaders/FColorShader.cpp:void FColorShader::Initialize--></pre>
 					</figure>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
-							<li class="entry"><code>FPaths::GetExecutableDirectory() / L"Shaders"</code> exe 옆 <code>Shaders</code> 폴더. 이 단계 끝의 빌드 설정이 셰이더 파일을 여기로 복사함</li>
+							<li class="entry"><code>FPaths::GetExecutableDirectory() / L"Shaders"</code> exe 옆 <code>Shaders</code> 폴더. <a href="#step-hlsl">4단계</a>의 빌드 설정이 셰이더 파일을 여기로 복사함</li>
 							<li class="entry"><code>"ColorVertexShader"</code> HLSL 파일 안에서 시작할 함수 이름</li>
 							<li class="entry"><code>CreateVertexShader(..., nullptr, ...)</code> 세 번째 인자는 셰이더 클래스 연결. 쓰지 않음</li>
 							<li class="entry"><code>{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, ...}</code> 시맨틱 이름, 시맨틱 번호, 형식(<code>float</code> 셋), 입력 슬롯, 정점 안의 바이트 위치, 정점마다 읽기</li>
@@ -836,42 +1005,38 @@ figure.code .diff-view { border-top: 0; }
 					</details>
 					<p><code>FVertex</code> 위에는 짝이 되는 두 곳을 주석으로 적어 둬요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FModel.h</span><span class="badge new">신규</span><span class="badge">struct FVertex 위</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF@4:Source/Graphics/FModel.h--></pre>
+						<figcaption><span class="path">Source/Graphics/FModel.h</span><span class="badge mod">수정</span><span class="badge">struct FVertex 위</span></figcaption>
+<pre class="diff" data-lang="cpp"><!--DIFF@5:Source/Graphics/FModel.h--></pre>
 					</figure>
 					<p><code>FApplication</code> 이 셰이더를 멤버로 갖고 모델 다음에 초기화해요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/App/FApplication.h</span><span class="badge mod">수정</span><span class="badge">include 와 셰이더 멤버</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF@4:Source/App/FApplication.h--></pre>
+<pre class="diff" data-lang="cpp"><!--DIFF@5:Source/App/FApplication.h--></pre>
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/App/FApplication.cpp</span><span class="badge mod">수정</span><span class="badge">FApplication::Initialize</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF@4:Source/App/FApplication.cpp--></pre>
+<pre class="diff" data-lang="cpp"><!--DIFF@5:Source/App/FApplication.cpp--></pre>
 					</figure>
-					<p>새 파일을 빌드에 넣고 셰이더 파일은 exe 옆으로 복사되게 해요. Visual Studio 에서는 새 <code>Shaders</code> 필터에 <code>FColorShader.h</code>·<code>FColorShader.cpp</code>·<code>Color.vs</code>·<code>Color.ps</code> 를, <code>Utility</code> 필터에 <code>FPaths.h</code>·<code>FPaths.cpp</code> 를 기존 항목 추가로 넣어요. 프로젝트 속성은 구성을 모든 구성으로 두고 링커 › 입력 › 추가 종속성에 <code>d3dcompiler.lib</code> 를 더해요. <code>D3DCompileFromFile</code> 이 이 라이브러리에 있어요.</p>
-					<p><code>Color.vs</code>·<code>Color.ps</code> 는 둘을 함께 골라 속성을 열고, 구성을 모든 구성으로 둬요. 구성 속성 › 일반 › 항목 형식을 파일 복사로 바꾸고, 파일 복사 › 일반 › 대상 디렉터리에 <code>$(OutDir)Shaders</code> 를 적어요. 빌드할 때마다 exe 옆 <code>Shaders</code> 폴더로 복사되고 셰이더만 고쳐도 다시 복사돼요. 이 조작들이 <code>DxRenderDojo.vcxproj</code> 와 <code>DxRenderDojo.vcxproj.filters</code> 를 바꿔요.</p>
+					<p>Visual Studio 에서는 <code>Shaders</code> 필터에 <code>FColorShader.h</code>·<code>FColorShader.cpp</code> 를, <code>Utility</code> 필터에 <code>FPaths.h</code>·<code>FPaths.cpp</code> 를 넣고 아래를 고쳐요. 이 조작들이 <code>DxRenderDojo.vcxproj</code> 와 <code>DxRenderDojo.vcxproj.filters</code> 를 바꿔요.</p>
+					<ul class="walk">
+						<li>모든 구성 · 링커 › 입력 › 추가 종속성 : <code>d3dcompiler.lib</code> 를 더함. <code>D3DCompileFromFile</code> 이 이 라이브러리에 있음</li>
+					</ul>
 					<details class="fold">
 						<summary>참고 : 위 조작이 프로젝트 파일에 남기는 diff · 따로 치지 않음</summary>
 					<figure class="code">
-						<figcaption><span class="path">DxRenderDojo.vcxproj</span><span class="badge mod">수정</span><span class="badge">새 파일, 추가 종속성, 셰이더 복사</span></figcaption>
-<pre class="diff" data-lang="xml"><!--DIFF@4:DxRenderDojo.vcxproj--></pre>
+						<figcaption><span class="path">DxRenderDojo.vcxproj</span><span class="badge mod">수정</span><span class="badge">새 파일과 추가 종속성</span></figcaption>
+<pre class="diff" data-lang="xml"><!--DIFF@5:DxRenderDojo.vcxproj--></pre>
 					</figure>
 					</details>
 					<details class="fold">
 						<summary>CMake · 맥 빌드와 검사용, VS 만 쓰면 건너뜀</summary>
 					<figure class="code">
-						<figcaption><span class="path">CMakeLists.txt</span><span class="badge mod">수정</span><span class="badge">d3dcompiler 와 셰이더 복사</span></figcaption>
-<pre class="diff" data-lang="cmake"><!--DIFF@4:CMakeLists.txt--></pre>
+						<figcaption><span class="path">CMakeLists.txt</span><span class="badge mod">수정</span><span class="badge">d3dcompiler 링크</span></figcaption>
+<pre class="diff" data-lang="cmake"><!--DIFF@5:CMakeLists.txt--></pre>
 					</figure>
-						<ul class="walk">
-							<li class="entry"><code>file(GLOB ShaderFiles CONFIGURE_DEPENDS ...)</code> <code>Source/Shaders</code> 의 <code>.vs</code>·<code>.ps</code> 를 모음. 셰이더 파일을 더해도 목록에 적지 않음</li>
-							<li class="entry"><code>configure_file(... COPYONLY)</code> 설정 단계에서 파일을 복사함. 원본을 고치면 다음 빌드 때 CMake 가 다시 돌아 새로 복사함</li>
-						</ul>
 					</details>
 					<details class="fold">
 						<summary>원문과 비교</summary>
-						<p>원문은 위치를 <code>float4</code> 로 받고 w 를 1 로 덮어써요. 정점 버퍼의 위치는 세 성분이라 이 교재는 <code>float3</code> 로 받아 w 를 붙여요. 구조체 이름은 <code>VertexInputType</code> 이 <code>FVertexInput</code>, <code>PixelInputType</code> 이 <code>FPixelInput</code> 이에요.</p>
-						<p>원문은 <code>../Engine/color.vs</code> 를 작업 디렉터리 기준으로 열어요. 이 교재는 exe 가 있는 폴더를 기준으로 삼아요.</p>
 						<p>원문은 컴파일 오류를 <code>shader-error.txt</code> 에 쓰고 메시지 상자를 띄운 뒤 <code>false</code> 를 돌려줘요. 이 교재는 오류 문자열을 로그로 남기고 02편의 <code>CHECK_FATAL</code> 로 멈춰요.</p>
 					</details>
 					<details class="fold">
@@ -883,11 +1048,11 @@ figure.code .diff-view { border-top: 0; }
 					</details>
 					<div class="learn">
 						<p class="box-label">스스로 설명해 보기</p>
-						<p><code>FVertex</code> 에 멤버를 하나 더 넣으면 입력 레이아웃과 <code>Color.vs</code> 중 어디를 같이 고쳐야 할까요? 둘이 각각 무엇을 적고 있는지로 말해 보세요.</p>
+						<p><code>FVertex</code> 의 <code>Position</code> 을 <code>XMFLOAT4</code> 로 바꾸고 입력 레이아웃은 그대로 두면, <code>COLOR</code> 는 정점의 몇 바이트째부터 읽힐까요? <code>D3D11_APPEND_ALIGNED_ELEMENT</code> 가 무엇을 보고 자리를 정하는지로 말해 보세요.</p>
 					</div>
 					<div class="checkpoint">
 						<p class="box-label">여기까지</p>
-						<p>화면은 그대로예요. exe 가 있는 폴더(Debug 는 <code>x64\Debug</code>)에 <code>Shaders\Color.vs</code>·<code>Color.ps</code> 가 생겨요. 컴파일에 실패하면 시작할 때 상자가 떠요.</p>
+						<p>화면은 그대로예요. 컴파일이 실패하는 길도 일부러 확인해요. <code>Color.ps</code> 의 <code>Input.Color</code> 를 <code>Input.Colr</code> 로 바꾸고 실행하면 로그에 <code>Color.ps(10,9-18): error X3018: invalid subscript 'Colr'</code> 와 <code>[CHECK FATAL] CompileResult</code> 가 찍히고 상자가 떠요. F5 로 실행했다면 Visual Studio 가 먼저 멈추니 계속(F5)을 눌러요. 확인했으면 되돌려요.</p>
 					</div>
 				</div>
 			</li>
@@ -895,49 +1060,67 @@ figure.code .diff-view { border-top: 0; }
 			<li class="step" id="step-draw">
 				<div class="step-body">
 					<h3>삼각형을 그린다</h3>
-					<p>준비한 버퍼와 셰이더로 그리기 명령을 내려요. <code>FModel</code> 이 버퍼를 입력 조립기에 묶은 다음 <code>FColorShader</code> 가 입력 레이아웃과 셰이더를 묶고 <code>DrawIndexed</code> 를 불러요.</p>
+					<p>행렬 없이 그리면 정점 좌표가 곧 화면 좌표예요. x·y 의 -1~1 이 창의 네 끝이라서, 삼각형이 창을 채우고 창 비율을 따라 늘어나요.</p>
+					<figure class="diagram">
+						<svg viewBox="0 0 820 230" role="img" aria-label="-1~1 정사각형 좌표의 삼각형이 800×600 창과 가로로 넓힌 창에 각각 창 크기대로 펼쳐지는 그림">
+							<defs><marker id="d46-h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path class="dg-head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+							<rect class="dg-box" x="10" y="40" width="150" height="150"/>
+							<polygon class="dg-box accent" points="10,190 85,40 160,190"/>
+							<text class="dg-s" x="10" y="26">-1~1 좌표</text>
+							<text class="dg-ms" x="10" y="212">(-1, -1)</text>
+							<text class="dg-ms" x="118" y="212">(1, -1)</text>
+							<path class="dg-line" d="M176,115 L236,115" marker-end="url(#d46-h)"/>
+							<text class="dg-s" x="172" y="102">뷰포트</text>
+							<rect class="dg-box" x="250" y="55" width="200" height="150"/>
+							<polygon class="dg-box accent" points="250,205 350,55 450,205"/>
+							<text class="dg-s" x="250" y="41">800×600 창</text>
+							<rect class="dg-box" x="490" y="55" width="320" height="150"/>
+							<polygon class="dg-box accent" points="490,205 650,55 810,205"/>
+							<text class="dg-s" x="490" y="41">가로로 넓힌 창</text>
+						</svg>
+						<figcaption>뷰포트는 -1~1 을 창 크기로 펼쳐요. 행렬이 없으면 삼각형도 창과 같은 비율로 늘어나요.</figcaption>
+					</figure>
 					<p><code>DrawIndexed</code> 는 그릴 인덱스 개수를 받아요. <code>FModel</code> 이 버퍼를 만들 때 개수를 기억해 두고 내줘요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Graphics/FModel.h</span><span class="badge mod">수정</span><span class="badge">GetIndexCount 와 개수 멤버</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF@5:Source/Graphics/FModel.h--></pre>
+<pre class="diff" data-lang="cpp"><!--DIFF@6:Source/Graphics/FModel.h--></pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FModel.cpp</span><span class="badge new">신규</span><span class="badge">FModel::Initialize 끝</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF@5:Source/Graphics/FModel.cpp--></pre>
+						<figcaption><span class="path">Source/Graphics/FModel.cpp</span><span class="badge mod">수정</span><span class="badge">FModel::Initialize 끝</span></figcaption>
+<pre class="diff" data-lang="cpp"><!--DIFF@6:Source/Graphics/FModel.cpp--></pre>
 					</figure>
+					<p><code>FColorShader::Render</code> 가 입력 레이아웃과 두 셰이더를 묶고 <code>DrawIndexed</code> 를 불러요. 버퍼는 <code>FModel::Render</code> 가 먼저 묶어 둬요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Shaders/FColorShader.h</span><span class="badge mod">수정</span><span class="badge">Render</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF@5:Source/Shaders/FColorShader.h--></pre>
+<pre class="diff" data-lang="cpp"><!--DIFF@6:Source/Shaders/FColorShader.h--></pre>
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/Shaders/FColorShader.cpp</span><span class="badge new">신규</span><span class="badge">FColorShader::Render · Initialize 다음</span></figcaption>
-<pre class="snip" data-lang="cpp"><!--SYMBOL@5:Source/Shaders/FColorShader.cpp:void FColorShader::Render--></pre>
+<pre class="snip" data-lang="cpp"><!--SYMBOL@6:Source/Shaders/FColorShader.cpp:void FColorShader::Render--></pre>
 					</figure>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
-							<li class="entry"><code>IASetInputLayout</code> 입력 조립기가 정점 버퍼를 읽을 표. 버퍼는 <code>FModel::Render</code> 가 이미 묶었음</li>
 							<li class="entry"><code>VSSetShader(VertexShader.Get(), nullptr, 0)</code> 뒤의 두 인자는 셰이더 클래스 연결. 쓰지 않음</li>
 							<li class="entry"><code>DrawIndexed(IndexCount, 0, 0)</code> 인덱스 개수, 첫 인덱스 위치, 인덱스에 더할 값</li>
 						</ul>
 					</details>
-					<p><code>FApplication::Render</code> 가 모델 다음에 셰이더를 불러요. 지우는 색은 원문대로 검정으로 바꿔요.</p>
+					<p>지우는 색은 원문대로 검정으로 바꿔요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/App/FApplication.h</span><span class="badge mod">수정</span><span class="badge">ClearColor</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF@5:Source/App/FApplication.h--></pre>
+<pre class="diff" data-lang="cpp"><!--DIFF@6:Source/App/FApplication.h--></pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/App/FApplication.cpp</span><span class="badge new">신규</span><span class="badge">FApplication::Render 끝</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF@5:Source/App/FApplication.cpp--></pre>
+						<figcaption><span class="path">Source/App/FApplication.cpp</span><span class="badge mod">수정</span><span class="badge">FApplication::Render 끝</span></figcaption>
+<pre class="diff" data-lang="cpp"><!--DIFF@6:Source/App/FApplication.cpp--></pre>
 					</figure>
-					<p>삼각형은 창을 가득 채워요. 정점 셰이더가 위치를 그대로 내보내서 x 의 -1~1 이 창의 왼쪽 끝에서 오른쪽 끝, y 의 -1~1 이 아래 끝에서 위 끝이 돼요. 뷰포트가 이 범위를 창 크기에 맞춰 펼치므로 창을 넓히면 삼각형도 같이 넓어져요.</p>
 					<div class="learn">
 						<p class="box-label">스스로 설명해 보기</p>
-						<p><code>FColorShader::Render</code> 는 매 프레임 같은 입력 레이아웃과 셰이더를 묶어요. 이 둘을 <code>Initialize</code> 끝에서 한 번만 묶어도 삼각형이 계속 보일까요? 2단계의 RTV 와 무엇이 다른지로 말해 보세요.</p>
+						<p><code>FColorShader::Render</code> 는 매 프레임 같은 입력 레이아웃과 셰이더를 묶어요. 이 둘을 <code>FApplication::Initialize</code> 에서 한 번만 묶어도 삼각형이 계속 보일까요? 2단계의 RTV 와 무엇이 다른지로 말해 보세요.</p>
 					</div>
 					<div class="checkpoint">
 						<p class="box-label">여기까지</p>
-						<p>검은 창에 초록 삼각형이 그려져요. 아래 두 꼭짓점은 창의 아래 두 모서리에, 위 꼭짓점은 창 위쪽 가운데에 있어요. 창을 최대화하면 삼각형도 옆으로 늘어나요.</p>
+						<p>검은 창에 초록 삼각형이 그려져요. 아래 두 꼭짓점은 창의 아래 두 모서리에, 위 꼭짓점은 창 위쪽 가운데에 있어요. 테두리를 끌어 가로로만 넓히면 삼각형도 옆으로 늘어나요.</p>
 					</div>
 				</div>
 			</li>
@@ -945,7 +1128,7 @@ figure.code .diff-view { border-top: 0; }
 			<li class="step" id="step-cbuffer">
 				<div class="step-body">
 					<h3>상수 버퍼로 행렬을 넘긴다</h3>
-					<p>정점을 화면 어디에 놓을지는 행렬로 정해요. C++ 이 매 프레임 행렬을 계산해 상수 버퍼에 담고 정점 셰이더가 읽어요.</p>
+					<p>삼각형이 창 비율을 따라 늘어나지 않게 하려면 정점 셰이더가 C++ 이 계산한 행렬을 곱해야 해요. 이 단계는 행렬을 넘기는 길인 상수 버퍼를 놓아요.</p>
 					<details class="fold" open>
 						<summary>D3D 개념 · 좌표 공간과 상수 버퍼</summary>
 						<aside class="concept">
@@ -957,19 +1140,19 @@ figure.code .diff-view { border-top: 0; }
 					</details>
 					<figure class="code">
 						<figcaption><span class="path">Source/Shaders/Color.vs</span><span class="badge mod">수정</span><span class="badge">cbuffer 와 ColorVertexShader</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF@6:Source/Shaders/Color.vs--></pre>
+<pre class="diff" data-lang="cpp"><!--DIFF@7:Source/Shaders/Color.vs--></pre>
 					</figure>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
-							<li class="entry"><code>cbuffer MatrixBuffer : register(b0)</code> C++ 이 채워 넣는 값 묶음. 그리기 한 번 동안 모든 정점이 같은 값을 읽음. <code>b0</code> 은 상수 버퍼 0번 슬롯</li>
+							<li class="entry"><code>cbuffer MatrixBuffer : register(b0)</code> <code>b0</code> 은 상수 버퍼 0번 슬롯</li>
 							<li class="entry"><code>matrix</code> 4×4 <code>float</code> 행렬</li>
-							<li class="entry"><code>mul(float4(Input.Position, 1.0f), World)</code> 위치에 월드 행렬을 곱함. 이어서 뷰, 투영 순서</li>
+							<li class="entry"><code>mul(float4(Input.Position, 1.0f), World)</code> w 가 1 이라야 4×4 행렬의 이동 성분이 위치에 더해짐</li>
 						</ul>
 					</details>
 					<figure class="code">
 						<figcaption><span class="path">Source/Shaders/FColorShader.h</span><span class="badge mod">수정</span><span class="badge">Render 인자, 행렬 구조체와 상수 버퍼 멤버</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF@6:Source/Shaders/FColorShader.h--></pre>
+<pre class="diff" data-lang="cpp"><!--DIFF@7:Source/Shaders/FColorShader.h--></pre>
 					</figure>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
@@ -979,8 +1162,8 @@ figure.code .diff-view { border-top: 0; }
 					</details>
 					<p>상수 버퍼는 <code>Initialize</code> 끝에서 만들어요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Shaders/FColorShader.cpp</span><span class="badge new">신규</span><span class="badge">using 줄 · Initialize 끝, CreateInputLayout 다음</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF@6:Source/Shaders/FColorShader.cpp:using Microsoft::WRL::ComPtr;=>void FColorShader::Render--></pre>
+						<figcaption><span class="path">Source/Shaders/FColorShader.cpp</span><span class="badge mod">수정</span><span class="badge">using 줄 · Initialize 끝, CreateInputLayout 다음</span></figcaption>
+<pre class="diff" data-lang="cpp"><!--DIFF@7:Source/Shaders/FColorShader.cpp:using Microsoft::WRL::ComPtr;=>void FColorShader::Render--></pre>
 					</figure>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
@@ -994,7 +1177,7 @@ figure.code .diff-view { border-top: 0; }
 					<p>행렬은 상수 버퍼에 넣기 전에 전치해요. DirectXMath 는 행렬을 행 우선으로 메모리에 두고, HLSL 은 상수 버퍼의 행렬을 기본으로 열 우선으로 읽어요. 전치해서 넣어야 셰이더의 <code>mul(위치, 행렬)</code> 이 C++ 에서 곱한 것과 같은 결과를 내요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Shaders/FColorShader.cpp</span><span class="badge mod">수정</span><span class="badge">FColorShader::Render</span></figcaption>
-<pre class="snip" data-lang="cpp"><!--SYMBOL@6:Source/Shaders/FColorShader.cpp:void FColorShader::Render--></pre>
+<pre class="snip" data-lang="cpp"><!--SYMBOL@7:Source/Shaders/FColorShader.cpp:void FColorShader::Render--></pre>
 					</figure>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
@@ -1008,7 +1191,7 @@ figure.code .diff-view { border-top: 0; }
 					<p><code>FApplication::Render</code> 는 아직 세 행렬을 모두 항등 행렬로 넘겨요. 항등 행렬은 곱해도 위치를 바꾸지 않아요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/App/FApplication.cpp</span><span class="badge mod">수정</span><span class="badge">using 줄과 FApplication::Render</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF@6:Source/App/FApplication.cpp--></pre>
+<pre class="diff" data-lang="cpp"><!--DIFF@7:Source/App/FApplication.cpp--></pre>
 					</figure>
 					<details class="fold">
 						<summary>원문과 비교</summary>
@@ -1020,7 +1203,7 @@ figure.code .diff-view { border-top: 0; }
 					</div>
 					<div class="checkpoint">
 						<p class="box-label">여기까지</p>
-						<p>모양은 5단계와 같아요. 세 행렬이 모두 항등 행렬이라 정점이 그대로 지나가요.</p>
+						<p>모양은 6단계와 같아요. 행렬이 셰이더까지 가는지는 일부러 바꿔 보고 확인해요. <code>World</code> 를 <code>XMMatrixTranslation(0.5f, 0.0f, 0.0f)</code> 로 바꾸면 삼각형이 창 너비의 4분의 1 만큼 오른쪽으로 가요. 이 상태에서 <code>FColorShader::Render</code> 의 <code>XMMatrixTranspose(World)</code> 를 <code>World</code> 로 바꾸면 왼쪽 아래 꼭짓점이 창 밖으로 나가며 모양이 찌그러져요. 확인했으면 둘 다 되돌려요.</p>
 					</div>
 				</div>
 			</li>
@@ -1028,59 +1211,71 @@ figure.code .diff-view { border-top: 0; }
 			<li class="step" id="step-camera">
 				<div class="step-body">
 					<h3>카메라로 뷰·투영 행렬을 만든다</h3>
-					<p>뷰 행렬로 카메라를 삼각형 뒤로 물리고, 투영 행렬로 원근과 창 비율을 넣어요. 투영 행렬이 창의 가로세로 비율을 알면 창을 넓혀도 삼각형이 늘어나지 않아요.</p>
-					<details class="fold" open>
-						<summary>D3D 개념 · 왼손 좌표계</summary>
-						<aside class="concept">
-							<ul class="walk">
-								<li><strong>왼손 좌표계</strong> : +x 오른쪽, +y 위, +z 화면 안쪽. DirectXMath 에서 이름이 <code>LH</code> 로 끝나는 함수가 이 기준</li>
-							</ul>
-						</aside>
-					</details>
+					<p>뷰 행렬로 카메라를 z = -5 로 물려 삼각형을 정면에서 보게 하고, 투영 행렬로 원근과 창 비율을 넣어요. 투영 행렬이 창의 가로세로 비율을 알면 창을 가로로 넓혀도 삼각형이 옆으로 늘어나지 않아요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Graphics/FCamera.h</span><span class="badge new">신규</span><span class="badge">파일 전체</span></figcaption>
-<pre class="src" data-lang="cpp"><!--FILE@7:Source/Graphics/FCamera.h--></pre>
+<pre class="src" data-lang="cpp"><!--FILE@8:Source/Graphics/FCamera.h--></pre>
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/Graphics/FCamera.cpp</span><span class="badge new">신규</span><span class="badge">파일 전체</span></figcaption>
-<pre class="src" data-lang="cpp"><!--FILE@7:Source/Graphics/FCamera.cpp--></pre>
+<pre class="src" data-lang="cpp"><!--FILE@8:Source/Graphics/FCamera.cpp--></pre>
 					</figure>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
 							<li class="entry"><code>float FovAngleY = DirectX::XM_PIDIV4;</code> 세로 시야각 45°(π/4)</li>
 							<li class="entry"><code>NearZ = 0.3f</code>, <code>FarZ = 1000.0f</code> 카메라에서 이 거리 사이에 있는 것만 그림</li>
-							<li class="entry"><code>XMMatrixLookToLH(Eye, Forward, Up)</code> 카메라 위치에서 +z 방향을 보는 뷰 행렬. 위쪽은 +y</li>
+							<li class="entry"><code>XMMatrixLookToLH(Eye, Forward, Up)</code> 카메라 위치에서 +z 방향을 보는 뷰 행렬. 위쪽은 +y. <code>LH</code> 는 왼손 좌표계(+x 오른쪽, +y 위, +z 화면 안쪽)</li>
 							<li class="entry"><code>XMMatrixPerspectiveFovLH(FovAngleY, AspectRatio, NearZ, FarZ)</code> 세로 시야각과 종횡비(가로÷세로)로 가로 시야를 정함</li>
 						</ul>
 					</details>
-					<p><code>GetProjectionMatrix</code> 는 종횡비를 인자로 받아요. <code>FApplication::Render</code> 가 매 프레임 지금 뷰포트의 가로÷세로를 넘겨서, 창 비율이 바뀌면 투영 행렬도 그 프레임부터 바뀌어요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.h</span><span class="badge mod">수정</span><span class="badge">GetAspectRatio</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF@7:Source/Graphics/FD3D11Graphics.h--></pre>
+<pre class="diff" data-lang="cpp"><!--DIFF@8:Source/Graphics/FD3D11Graphics.h--></pre>
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/App/FApplication.h</span><span class="badge mod">수정</span><span class="badge">include 와 카메라 멤버</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF@7:Source/App/FApplication.h--></pre>
+<pre class="diff" data-lang="cpp"><!--DIFF@8:Source/App/FApplication.h--></pre>
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/App/FApplication.cpp</span><span class="badge mod">수정</span><span class="badge">Initialize 와 Render 의 뷰·투영 행렬</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF@7:Source/App/FApplication.cpp--></pre>
+<pre class="diff" data-lang="cpp"><!--DIFF@8:Source/App/FApplication.cpp--></pre>
 					</figure>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
-							<li class="entry"><code>GetAspectRatio()</code> 뷰포트 너비÷높이. 2단계에서 백 버퍼 크기로 채운 값</li>
+							<li class="entry"><code>GetAspectRatio()</code> 뷰포트 너비÷높이. 2단계에서 백 버퍼 크기로 채운 값이라 창 크기를 따라 매 프레임 바뀜</li>
 							<li class="entry"><code>XMMatrixIdentity()</code> 월드 행렬은 그대로 항등 행렬. 삼각형을 원점에 둠</li>
 						</ul>
 					</details>
-					<p>카메라는 z = -5 에서 원점을 봐요. 시야각 45° 로 거리 5 를 보면 화면 세로에 2 × 5 × tan 22.5° ≈ 4.14 만큼 담겨서 높이 2 인 삼각형은 창 높이의 약 0.48 을 차지해요. 창 높이 600 픽셀이면 약 290 픽셀이에요.</p>
-					<p>Visual Studio 에서는 <code>Graphics</code> 필터에 <code>FCamera.h</code>·<code>FCamera.cpp</code> 를 기존 항목 추가로 넣어요. 이 조작이 <code>DxRenderDojo.vcxproj</code> 와 <code>DxRenderDojo.vcxproj.filters</code> 를 바꿔요.</p>
+					<p>카메라는 z = -5 에서 원점을 봐요. 시야각 45° 로 거리 5 를 보면 화면 세로에 2 × 5 × tan 22.5° ≈ 4.14 만큼 담겨요. 높이 2 인 삼각형은 2 ÷ 4.14 ≈ 0.48 을 차지해서, 창 높이가 600 픽셀이면 약 290 픽셀이에요.</p>
+					<figure class="diagram">
+						<svg viewBox="0 0 820 280" role="img" aria-label="z = -5 의 카메라에서 세로 시야각 45° 로 z = 0 평면을 보면 높이 4.14 가 화면에 담기고, 높이 2 인 삼각형은 그 가운데 0.48 을 차지하는 옆모습">
+							<rect class="dg-box" x="40" y="126" width="40" height="28" rx="4"/>
+							<text class="dg-s" x="20" y="176">카메라 z = -5</text>
+							<path class="dg-line" d="M80,140 L380,16"/>
+							<path class="dg-line" d="M80,140 L380,264"/>
+							<path class="dg-line" d="M80,140 L380,140" stroke-dasharray="4 4"/>
+							<text class="dg-s" x="120" y="132">22.5°</text>
+							<text class="dg-s" x="120" y="162">22.5°</text>
+							<path class="dg-line" d="M380,16 L380,264"/>
+							<path class="dg-line accent" d="M380,80 L380,200" style="stroke-width: 6"/>
+							<text class="dg-s" x="388" y="262">z = 0</text>
+							<text class="dg-s" x="210" y="130">거리 5</text>
+							<text class="dg-t" x="420" y="60">보이는 높이</text>
+							<text class="dg-m" x="420" y="84">2 × 5 × tan 22.5° ≈ 4.14</text>
+							<text class="dg-t" x="420" y="150">삼각형 높이 2</text>
+							<text class="dg-m" x="420" y="174">2 ÷ 4.14 ≈ 0.48</text>
+							<text class="dg-s" x="420" y="226">창 높이 600 이면 약 290 픽셀</text>
+						</svg>
+						<figcaption>세로 시야각이 정해져 있어서 삼각형 크기는 창 높이를 따라가요. 창을 가로로만 넓히면 크기는 그대로예요.</figcaption>
+					</figure>
+					<p>Visual Studio 에서는 <code>Graphics</code> 필터에 <code>FCamera.h</code>·<code>FCamera.cpp</code> 를 넣어요. 이 조작이 <code>DxRenderDojo.vcxproj</code> 와 <code>DxRenderDojo.vcxproj.filters</code> 를 바꿔요.</p>
 					<details class="fold">
 						<summary>참고 : 위 조작이 프로젝트 파일에 남기는 diff · 따로 치지 않음</summary>
 					<figure class="code">
 						<figcaption><span class="path">DxRenderDojo.vcxproj</span><span class="badge mod">수정</span><span class="badge">새 파일</span></figcaption>
-<pre class="diff" data-lang="xml"><!--DIFF@7:DxRenderDojo.vcxproj--></pre>
+<pre class="diff" data-lang="xml"><!--DIFF@8:DxRenderDojo.vcxproj--></pre>
 					</figure>
 					</details>
 					<details class="fold">
@@ -1092,7 +1287,7 @@ figure.code .diff-view { border-top: 0; }
 						<summary>언리얼로 치면</summary>
 						<aside class="ue">
 							<p><strong>같은 점</strong> · 시야각은 카메라 컴포넌트(<code>UCameraComponent::FieldOfView</code>)가 갖고, 투영 행렬은 <code>FMinimalViewInfo::CalculateProjectionMatrix</code> 가 종횡비(<code>AspectRatio</code>)를 받아 만들어요.</p>
-							<p><strong>다른 점</strong> · 언리얼의 시야각은 가로 기준이에요. 투영 행렬(<code>FReversedZPerspectiveMatrix</code>)은 가까운 면만 받아서 먼 면이 없고, 깊이를 거꾸로 저장해요.</p>
+							<p><strong>다른 점</strong> · 언리얼의 시야각은 가로 기준이에요. <code>CalculateProjectionMatrix</code> 는 가까운 면만 넘겨 투영 행렬(<code>FReversedZPerspectiveMatrix</code>)을 만들어서 먼 면이 없고, 깊이를 거꾸로 저장해요.</p>
 						</aside>
 					</details>
 					<div class="learn">
@@ -1101,7 +1296,7 @@ figure.code .diff-view { border-top: 0; }
 					</div>
 					<div class="checkpoint">
 						<p class="box-label">여기까지</p>
-						<p>창 가운데에 삼각형이 작게 그려져요. 800×600 창에서 삼각형을 감싸는 상자가 약 290×290 픽셀이고, 창을 최대화해도 늘어나지 않아요. 이제 <a href="#check">다 됐는지 확인</a> 목록과 맞춰 보세요.</p>
+						<p>창 가운데에 삼각형이 작게 그려져요. 800×600 창에서 삼각형을 감싸는 상자가 약 290×290 픽셀이에요. 테두리를 끌어 가로로만 넓혀도 상자는 정사각형으로 남고, 크기는 창 높이를 따라 바뀌어요. 이제 <a href="#check">다 됐는지 확인</a> 목록과 맞춰 보세요.</p>
 					</div>
 				</div>
 			</li>
@@ -1115,7 +1310,7 @@ figure.code .diff-view { border-top: 0; }
 		<ul class="checks">
 			<li><label><input type="checkbox"><span class="label">실행</span><span class="what">검은 창 가운데에 초록 삼각형. 800×600 창에서 삼각형을 감싸는 상자가 약 290×290 픽셀</span></label></li>
 			<li><label><input type="checkbox"><span class="label">로그</span><span class="what">03편과 같은 시작 로그 두 줄. 디버그 빌드 콘솔에 <code>[경고]</code>·<code>[에러]</code> 줄이 없음</span></label></li>
-			<li><label><input type="checkbox"><span class="label">창 비율</span><span class="what">테두리를 끌어 가로로 넓히거나 세로로 늘려도 삼각형이 늘어나지 않고 가운데에 있음</span></label></li>
+			<li><label><input type="checkbox"><span class="label">창 비율</span><span class="what">테두리를 끌어 가로로 넓혀도 삼각형은 옆으로 늘어나지 않고 가운데에 있음. 세로로 늘리면 창 높이를 따라 커짐</span></label></li>
 			<li><label><input type="checkbox"><span class="label">전체 화면</span><span class="what">Alt+Enter 로 켜고 끈 뒤에도 같은 모양</span></label></li>
 			<li><label><input type="checkbox"><span class="label">배율</span><span class="what">실행 중에 배율을 150% 로 바꿔도 같은 모양</span></label></li>
 			<li><label><input type="checkbox"><span class="label">셰이더 파일</span><span class="what">exe 가 있는 폴더(Debug 는 <code>x64\Debug</code>)에 <code>Shaders\Color.vs</code>·<code>Color.ps</code> 가 있음. 셰이더만 고치고 빌드해도 다시 복사됨</span></label></li>
@@ -1128,8 +1323,8 @@ figure.code .diff-view { border-top: 0; }
 		<h2>흔한 실수</h2>
 		<div class="pitfalls">
 			<div class="pitfall">
-				<p class="symptom">창이 검은색뿐이고 삼각형이 없음. 디버그 빌드 콘솔에는 시작할 때와 창 크기를 바꿀 때마다 <code>[경고] [D3D] ID3D11DeviceContext::DrawIndexed: The Pixel Shader expects a Render Target View bound to slot 0, but the Render Target View was unbound during a call to Present.</code></p>
-				<p class="row"><b>원인</b><span>원문처럼 RTV 를 초기화 때 한 번만 묶었어요. 플립 모델에서는 <code>Present</code> 가 백 버퍼를 파이프라인에서 떼서 두 번째 프레임부터 그린 것이 버려져요.</span></p>
+				<p class="symptom">창이 검은색뿐이고 삼각형이 없음. 디버그 빌드 콘솔에는 시작할 때 <code>[경고] [D3D] ID3D11DeviceContext::DrawIndexed: The Pixel Shader expects a Render Target View bound to slot 0, but the Render Target View was unbound during a call to Present.</code> 와 <code>... but none is bound.</code> 두 줄이 찍힘</p>
+				<p class="row"><b>원인</b><span>원문처럼 RTV 를 초기화 때 한 번만 묶었어요. 플립 모델에서는 <code>Present</code> 가 백 버퍼를 파이프라인에서 떼서 두 번째 프레임부터 그린 것이 버려져요. 크기가 바뀔 때마다 묶는 코드라면 크기를 바꿀 때마다 두 줄이 다시 찍혀요.</span></p>
 				<p class="row"><b>해결</b><span><code>BeginScene</code> 에서 매 프레임 <code>OMSetRenderTargets</code> 를 불러요.</span></p>
 				<p class="row"><b>본문</b><span><a href="#step-bind">2단계</a> : <code>Present</code> 가 떼는 것</span></p>
 			</div>
@@ -1137,19 +1332,19 @@ figure.code .diff-view { border-top: 0; }
 				<p class="symptom">시작하자마자 상자가 뜨고 종료 코드 1. 로그에는 <code>[에러] 셰이더 컴파일 실패 : ...\Shaders\Color.vs</code> 다음 <code>[CHECK FATAL] CompileResult</code> 와 <code>HRESULT 0x80070002</code></p>
 				<p class="row"><b>원인</b><span>exe 옆에 <code>Shaders</code> 폴더가 없어요. Visual Studio 에서 셰이더 파일의 항목 형식을 파일 복사로 바꾸지 않았거나 대상 디렉터리를 비워 두면 생겨요. <code>0x80070002</code> 는 파일을 찾지 못했다는 값이에요.</span></p>
 				<p class="row"><b>해결</b><span>셰이더 파일 속성에서 항목 형식과 대상 디렉터리를 정하고 다시 빌드해요.</span></p>
-				<p class="row"><b>본문</b><span><a href="#step-shader">4단계</a> : 셰이더 파일 속성</span></p>
+				<p class="row"><b>본문</b><span><a href="#step-hlsl">4단계</a> : 셰이더 파일 속성</span></p>
 			</div>
 			<div class="pitfall">
 				<p class="symptom">시작하자마자 상자가 뜨고 종료 코드 1. 로그에는 <code>...\Shaders\Color.vs(1,1): error X3000: Illegal character in shader file</code></p>
 				<p class="row"><b>원인</b><span>셰이더 파일이 BOM 이 붙은 UTF-8 로 저장됐어요. <code>D3DCompileFromFile</code> 은 파일 맨 앞의 BOM 을 글자로 읽고 실패해요.</span></p>
-				<p class="row"><b>해결</b><span>셰이더 파일을 BOM 없는 UTF-8 로 다시 저장해요.</span></p>
-				<p class="row"><b>본문</b><span><a href="#step-shader">4단계</a> : 셰이더 파일 인코딩</span></p>
+				<p class="row"><b>해결</b><span>셰이더 파일을 BOM 없는 UTF-8 로 다시 저장해요. Visual Studio 에서는 다른 이름으로 저장의 저장 단추 옆 ▾ › 인코딩하여 저장에서 "유니코드(서명 없는 UTF-8)" 을 골라요.</span></p>
+				<p class="row"><b>본문</b><span><a href="#step-hlsl">4단계</a> : 셰이더 파일 인코딩</span></p>
 			</div>
 			<div class="pitfall">
 				<p class="symptom">창이 검은색뿐이고 삼각형이 없음. 콘솔에 경고도 없음</p>
-				<p class="row"><b>원인</b><span>정점을 반시계 방향으로 적었거나(인덱스 <code>{0, 2, 1}</code> 등), 행렬을 전치하지 않고 상수 버퍼에 넣었어요. 앞의 경우 삼각형이 뒷면으로 보여 그려지지 않고, 뒤의 경우 셰이더가 전치된 다른 행렬을 곱해 삼각형이 보이지 않아요. 둘 다 호출 자체는 올바라서 디버그 레이어도 알리지 않아요.</span></p>
+				<p class="row"><b>원인</b><span>정점을 반시계 방향으로 적었거나(인덱스 <code>{0, 2, 1}</code> 등), 행렬을 전치하지 않고 상수 버퍼에 넣었어요. 앞의 경우 삼각형이 뒷면으로 보여 그려지지 않고, 뒤의 경우 셰이더가 전치된 다른 행렬을 곱해 삼각형이 보이지 않아요. 전치를 빠뜨린 것은 카메라 행렬이 들어오는 8단계부터 보여요. 둘 다 호출 자체는 올바라서 디버그 레이어도 알리지 않아요.</span></p>
 				<p class="row"><b>해결</b><span>정점과 인덱스를 시계 방향으로 적고, <code>FColorShader::Render</code> 에서 행렬마다 <code>XMMatrixTranspose</code> 를 거쳐요.</span></p>
-				<p class="row"><b>본문</b><span><a href="#step-buffer">3단계</a> : 정점 순서 · <a href="#step-cbuffer">6단계</a> : 전치</span></p>
+				<p class="row"><b>본문</b><span><a href="#step-buffer">3단계</a> : 정점 순서 · <a href="#step-cbuffer">7단계</a> : 전치</span></p>
 			</div>
 		</div>
 	</section>
@@ -1283,7 +1478,7 @@ figure.code .diff-view { border-top: 0; }
 			<p>입력 레이아웃은 무엇과 무엇을 잇나요? 두 쪽에서 이름이 같아야 하는 것은 무엇인가요?</p>
 			<details class="fold">
 				<summary>답 보기</summary>
-				<p>C++ 정점 구조체 <code>FVertex</code> 의 바이트 배치와 정점 셰이더의 입력 <code>FVertexInput</code> 을 이어요. 레이아웃 원소의 시맨틱 이름(<code>POSITION</code>·<code>COLOR</code>)이 HLSL 입력 변수의 시맨틱과 같아야 해요. <code>CreateInputLayout</code> 이 정점 셰이더의 바이트코드를 받아 둘이 맞는지 확인해요. (<a href="#step-shader">4단계</a>)</p>
+				<p>C++ 정점 구조체 <code>FVertex</code> 의 바이트 배치와 정점 셰이더의 입력 <code>FVertexInput</code> 을 이어요. 레이아웃 원소의 시맨틱 이름(<code>POSITION</code>·<code>COLOR</code>)이 HLSL 입력 변수의 시맨틱과 같아야 해요. <code>CreateInputLayout</code> 이 정점 셰이더의 바이트코드를 받아 둘이 맞는지 확인해요. (<a href="#step-compile">5단계</a>)</p>
 			</details>
 		</div>
 		<div class="learn">
@@ -1291,7 +1486,7 @@ figure.code .diff-view { border-top: 0; }
 			<p><code>FColorShader::Render</code> 는 행렬을 상수 버퍼에 넣기 전에 전치해요. 빼면 어떻게 되고, 왜 그런가요?</p>
 			<details class="fold">
 				<summary>답 보기</summary>
-				<p>삼각형이 보이지 않아요. DirectXMath 는 행렬을 행 우선으로 두고 HLSL 은 상수 버퍼의 행렬을 열 우선으로 읽어서, 전치하지 않으면 셰이더가 전치된 다른 행렬을 곱해요. 호출 자체는 올바라서 디버그 레이어도 알리지 않아요. (<a href="#step-cbuffer">6단계</a>)</p>
+				<p>삼각형이 보이지 않아요. DirectXMath 는 행렬을 행 우선으로 두고 HLSL 은 상수 버퍼의 행렬을 열 우선으로 읽어서, 전치하지 않으면 셰이더가 전치된 다른 행렬을 곱해요. 호출 자체는 올바라서 디버그 레이어도 알리지 않아요. (<a href="#step-cbuffer">7단계</a>)</p>
 			</details>
 		</div>
 		<div class="learn">
@@ -1310,7 +1505,7 @@ figure.code .diff-view { border-top: 0; }
 		<ul class="labeled">
 			<li><span class="label">1</span><span>삼각형을 빨강으로 변경 (원문 과제 2)</span></li>
 			<li><span class="label">2</span><span>삼각형을 사각형으로 변경. 정점 넷과 인덱스 여섯, 두 삼각형 모두 시계 방향 (원문 과제 3)</span></li>
-			<li><span class="label">3</span><span>카메라를 10 뒤로 이동 (원문 과제 4). 약 290 픽셀이던 삼각형 높이가 몇 픽셀이 될지 7단계의 계산으로 먼저 구한 뒤 확인</span></li>
+			<li><span class="label">3</span><span>카메라를 지금보다 10 더 뒤(z = -15)로 이동 (원문 과제 4). 약 290 픽셀이던 삼각형 높이가 몇 픽셀이 될지 8단계의 계산으로 먼저 구한 뒤 확인</span></li>
 			<li><span class="label">4</span><span>픽셀 셰이더에서 색을 절반 밝기로 변경 (원문 과제 5). 셰이더만 고치고 빌드한 뒤 exe 옆 복사본도 바뀌었는지 확인</span></li>
 			<li><span class="label">5</span><span><code>FApplication::Render</code> 가 넘기는 종횡비를 <code>800.0f / 600.0f</code> 로 고정하고 창을 가로로 넓혀 보기. 삼각형이 옆으로 늘어나는 것을 확인</span></li>
 		</ul>
