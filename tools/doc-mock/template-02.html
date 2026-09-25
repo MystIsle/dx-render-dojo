@@ -515,15 +515,7 @@ details.diff-file summary .why { color: var(--slate); }
 					<p>창을 만들기 전에 도구 세 개를 먼저 넣어요. 03편부터 매 편에 쓰는 것들이고 이 편의 주제는 따로 있으니 이름과 하는 일만 알고 넘어가도 돼요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/Check.h</span><span class="badge">#define CHECK_RETURN</span></figcaption>
-<pre class="snip" data-lang="cpp">#define CHECK_RETURN(Expression, ...)                                                                                  \
-	do                                                                                                                 \
-	{                                                                                                                  \
-		if (::Return::Succeeded(Expression) == false)                                                                  \
-		{                                                                                                              \
-			::Return::ReportFailure(L"" #Expression, L"" __FILE__, __LINE__);                                          \
-			return __VA_ARGS__;                                                                                        \
-		}                                                                                                              \
-	} while (false)</pre>
+<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/Check.h:#define CHECK_RETURN--></pre>
 					</figure>
 					<p>식이 실패하면 그 식과 파일 이름, 줄 번호를 로그에 남기고 함수에서 바로 반환해요. 실패로 치는 값은 <code>false</code>, <code>nullptr</code>, 실패를 뜻하는 <code>HRESULT</code> 예요.</p>
 					<details class="fold">
@@ -541,36 +533,11 @@ details.diff-file summary .why { color: var(--slate); }
 							<summary><code>FLog</code> 와 <code>TSingleton</code> 코드</summary>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FLog.h</span><span class="badge">class FLog</span></figcaption>
-<pre class="snip" data-lang="cpp">class FLog : public TSingleton&lt;FLog&gt;
-{
-public:
-	FLog();
-	~FLog();
-
-	static void Info(std::wstring_view Message);
-	static void Warning(std::wstring_view Message);
-	static void Error(std::wstring_view Message);
-
-	static const std::wstring&amp; GetLastErrorMessage();
-
-private:
-	void Write(std::wstring_view Prefix, std::wstring_view Message);
-
-	HANDLE ConsoleOutput = nullptr;
-	std::wstring LastErrorMessage;
-};</pre>
+<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FLog.h:class FLog--></pre>
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/TSingleton.h</span><span class="badge">TSingleton::Get</span></figcaption>
-<pre class="snip" data-lang="cpp">	static T&amp; Get()
-	{
-		if (Instance == nullptr)
-		{
-			Prepare();
-		}
-
-		return *Instance;
-	}</pre>
+<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/TSingleton.h:static T& Get()--></pre>
 					</figure>
 						</details>
 					<details class="fold">
@@ -604,48 +571,11 @@ private:
 					</details>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FDisplaySettings.h</span><span class="badge">struct FDisplaySettings</span></figcaption>
-<pre class="snip" data-lang="cpp">struct FDisplaySettings
-{
-	int Width = 800;
-	int Height = 600;
-	bool bFullScreen = false;
-	bool bHideCursor = false;
-};</pre>
+<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FDisplaySettings.h:struct FDisplaySettings--></pre>
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FWindow.h</span><span class="badge">class FWindow</span></figcaption>
-<pre class="snip" data-lang="cpp">class FWindow
-{
-private:
-	static LRESULT CALLBACK WndProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam);
-
-public:
-	FWindow() = default;
-	FWindow(const FWindow&amp; Other) = delete;
-	FWindow&amp; operator=(const FWindow&amp; Other) = delete;
-	~FWindow();
-
-	bool Initialize(const FDisplaySettings&amp; Settings, int ShowCmd);
-
-	void SetMessageCallback(std::function&lt;void(UINT, WPARAM, LPARAM)&gt; Callback);
-	void SetResizeCallback(std::function&lt;void(int, int)&gt; Callback);
-
-	HWND GetHandle() const { return Handle; }
-	int GetWidth() const { return Width; }
-	int GetHeight() const { return Height; }
-
-private:
-	LRESULT HandleMessage(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam);
-	void NotifyResize();
-
-	HWND Handle = nullptr;
-	int Width = 0;
-	int Height = 0;
-	bool bCursorHidden = false;
-	bool bSizing = false;
-	std::function&lt;void(UINT, WPARAM, LPARAM)&gt; MessageCallback;
-	std::function&lt;void(int, int)&gt; ResizeCallback;
-};</pre>
+<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FWindow.h:class FWindow--></pre>
 					</figure>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
@@ -660,73 +590,7 @@ private:
 					</details>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge">FWindow::Initialize</span></figcaption>
-<pre class="snip" data-lang="cpp">bool FWindow::Initialize(const FDisplaySettings&amp; Settings, int ShowCmd)
-{
-	constexpr const wchar_t* ClassName = L"DxRenderDojo";
-
-	const HINSTANCE Instance = GetModuleHandleW(nullptr);
-
-	WNDCLASSEXW WindowClass = {};
-	WindowClass.cbSize = sizeof(WindowClass);
-	WindowClass.style = CS_HREDRAW | CS_VREDRAW;
-	WindowClass.lpfnWndProc = &amp;FWindow::WndProc;
-	WindowClass.hInstance = Instance;
-	WindowClass.hIcon = LoadIconW(nullptr, IDI_WINLOGO);
-	WindowClass.hIconSm = WindowClass.hIcon;
-	WindowClass.hCursor = LoadCursorW(nullptr, IDC_ARROW);
-	WindowClass.hbrBackground = static_cast&lt;HBRUSH&gt;(GetStockObject(BLACK_BRUSH));
-	WindowClass.lpszClassName = ClassName;
-	CHECK_RETURN(RegisterClassExW(&amp;WindowClass) != 0, false);
-
-	const int ScreenWidth = GetSystemMetrics(SM_CXSCREEN);
-	const int ScreenHeight = GetSystemMetrics(SM_CYSCREEN);
-
-	DWORD Style = WS_POPUP;
-	int PositionX = 0;
-	int PositionY = 0;
-	int OuterWidth = ScreenWidth;
-	int OuterHeight = ScreenHeight;
-
-	if (Settings.bFullScreen == false)
-	{
-		Style = WS_OVERLAPPEDWINDOW;
-
-		RECT Bounds = {0, 0, Settings.Width, Settings.Height};
-		AdjustWindowRect(&amp;Bounds, Style, FALSE);
-		OuterWidth = Bounds.right - Bounds.left;
-		OuterHeight = Bounds.bottom - Bounds.top;
-		PositionX = (ScreenWidth - OuterWidth) / 2;
-		PositionY = (ScreenHeight - OuterHeight) / 2;
-	}
-
-	Handle = CreateWindowExW(0,
-	                         ClassName,
-	                         ClassName,
-	                         Style,
-	                         PositionX,
-	                         PositionY,
-	                         OuterWidth,
-	                         OuterHeight,
-	                         nullptr,
-	                         nullptr,
-	                         Instance,
-	                         this);
-	CHECK_RETURN(Handle, false);
-
-	RECT Client = {};
-	GetClientRect(Handle, &amp;Client);
-	Width = Client.right - Client.left;
-	Height = Client.bottom - Client.top;
-
-	if (Settings.bHideCursor)
-	{
-		ShowCursor(FALSE);
-		bCursorHidden = true;
-	}
-
-	ShowWindow(Handle, ShowCmd);
-	return true;
-}</pre>
+<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FWindow.cpp:bool FWindow::Initialize--></pre>
 					</figure>
 					<p>800×600 은 창 전체가 아니라 클라이언트 영역의 크기예요. <code>CreateWindowExW</code> 는 제목 표시줄과 테두리를 포함한 바깥 크기를 받기 때문에 <code>Initialize</code> 가 그 차이를 <code>AdjustWindowRect</code> 로 구해 더해요. 배율 100% 에서는 가로 16, 세로 39 픽셀이 더해져 바깥 크기가 816×639 가 돼요.</p>
 					<details class="fold">
@@ -781,22 +645,7 @@ private:
 					</details>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge">FWindow::WndProc</span></figcaption>
-<pre class="snip" data-lang="cpp">LRESULT CALLBACK FWindow::WndProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam)
-{
-	if (Message == WM_NCCREATE)
-	{
-		const CREATESTRUCTW* CreateInfo = reinterpret_cast&lt;const CREATESTRUCTW*&gt;(LParam);
-		SetWindowLongPtrW(WindowHandle, GWLP_USERDATA, reinterpret_cast&lt;LONG_PTR&gt;(CreateInfo-&gt;lpCreateParams));
-	}
-
-	FWindow* Window = reinterpret_cast&lt;FWindow*&gt;(GetWindowLongPtrW(WindowHandle, GWLP_USERDATA));
-	if (Window == nullptr)
-	{
-		return DefWindowProcW(WindowHandle, Message, WParam, LParam);
-	}
-
-	return Window-&gt;HandleMessage(WindowHandle, Message, WParam, LParam);
-}</pre>
+<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FWindow.cpp:LRESULT CALLBACK FWindow::WndProc--></pre>
 					</figure>
 					<p><code>this</code> 는 <code>WM_NCCREATE</code> 에서 넣어요. 앞 단계에서 넘긴 <code>this</code> 가 처음 돌아오는 메시지예요.</p>
 					<p>그런데 이 메시지가 첫 메시지는 아니에요. 창의 최소·최대 크기를 묻는 <code>WM_GETMINMAXINFO</code> 가 먼저 와요. 그때 칸에서 꺼낸 값은 아직 <code>nullptr</code> 이라 그 메시지는 <code>DefWindowProcW</code> 에 맡겨요. 이 검사를 빼면 <code>nullptr</code> 로 멤버 함수를 부르게 돼요.</p>
@@ -824,59 +673,7 @@ private:
 					<p><code>HandleMessage</code> 부터는 <code>this</code> 가 있어요. 여기서 메시지를 <code>FWindow</code> 가 직접 처리할 것과 밖으로 넘길 것으로 나눠요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge">FWindow::HandleMessage</span></figcaption>
-<pre class="snip" data-lang="cpp">LRESULT FWindow::HandleMessage(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam)
-{
-	switch (Message)
-	{
-	case WM_CLOSE:
-		PostQuitMessage(0);
-		return 0;
-
-	// 윈도우가 꺼질 때는 WM_CLOSE 가 오지 않는다. 종료 신호를 같은 길로 모은다.
-	// WParam 이 FALSE 면 다른 앱이 종료를 거부한 것이라 그대로 둔다.
-	case WM_ENDSESSION:
-		if (WParam == TRUE)
-		{
-			PostQuitMessage(0);
-		}
-		return 0;
-
-	// 드래그하는 동안에는 알리지 않고 끝날 때 한 번만 알린다. 매 픽셀마다 스왑체인을 다시 만들지 않기 위해서다.
-	case WM_ENTERSIZEMOVE:
-		bSizing = true;
-		return 0;
-
-	case WM_EXITSIZEMOVE:
-		bSizing = false;
-		NotifyResize();
-		return 0;
-
-	case WM_SIZE:
-		if (WParam != SIZE_MINIMIZED &amp;&amp; bSizing == false)
-		{
-			NotifyResize();
-		}
-		return 0;
-
-	case WM_GETMINMAXINFO:
-	{
-		constexpr int MinimumWidth = 320;
-		constexpr int MinimumHeight = 240;
-
-		MINMAXINFO* Limits = reinterpret_cast&lt;MINMAXINFO*&gt;(LParam);
-		Limits-&gt;ptMinTrackSize.x = MinimumWidth;
-		Limits-&gt;ptMinTrackSize.y = MinimumHeight;
-		return 0;
-	}
-
-	default:
-		if (MessageCallback)
-		{
-			MessageCallback(Message, WParam, LParam);
-		}
-		return DefWindowProcW(WindowHandle, Message, WParam, LParam);
-	}
-}</pre>
+<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FWindow.cpp:LRESULT FWindow::HandleMessage--></pre>
 					</figure>
 					<p><code>case</code> 가 있는 것은 닫기와 크기처럼 창에 대한 메시지라 <code>FWindow</code> 가 처리하고 <code>return 0</code> 으로 끝내요. <code>WM_CLOSE</code> 와 <code>WM_ENDSESSION</code> 은 6단계에서 다뤄요. 키 입력 같은 나머지 메시지는 <code>default</code> 에서 <code>MessageCallback</code> 으로 넘긴 다음 <code>DefWindowProcW</code> 에 맡겨요.</p>
 					<details class="fold">
@@ -892,45 +689,11 @@ private:
 					<p>넘긴 메시지는 <code>FSystem</code> 이 받아서 <code>FInput</code> 에 전달해요. <code>FInput</code> 은 Windows 가 키마다 매긴 번호인 가상 키 코드 256개가 지금 눌려 있는지를 기록해요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FInput.h</span><span class="badge">class FInput</span></figcaption>
-<pre class="snip" data-lang="cpp">class FInput
-{
-public:
-	FInput() = default;
-	FInput(const FInput&amp; Other) = delete;
-	FInput&amp; operator=(const FInput&amp; Other) = delete;
-
-	void KeyDown(unsigned int Key);
-	void KeyUp(unsigned int Key);
-	bool IsKeyDown(unsigned int Key) const { return Keys[Key]; }
-
-private:
-	std::array&lt;bool, 256&gt; Keys = {};
-};</pre>
+<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FInput.h:class FInput--></pre>
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FSystem.h</span><span class="badge">class FSystem</span></figcaption>
-<pre class="snip" data-lang="cpp">class FSystem : public TSingleton&lt;FSystem&gt;
-{
-public:
-	bool Initialize(int ShowCmd);
-	int Run();
-	void RequestExit();
-
-	const FWindow&amp; GetWindow() const { return Window; }
-	const FInput&amp; GetInput() const { return Input; }
-
-private:
-	void Frame();
-	void OnWindowMessage(UINT Message, WPARAM WParam, LPARAM LParam);
-	void OnResize(int NewWidth, int NewHeight);
-
-	// 선언 순서가 곧 생성 순서이고 소멸은 그 역순이다.
-	// 디바이스를 갖게 될 FApplication 이 FWindow 보다 먼저 사라져야 한다.
-	FDisplaySettings Display;
-	FWindow Window;
-	FInput Input;
-	FApplication Application;
-};</pre>
+<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FSystem.h:class FSystem--></pre>
 					</figure>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
@@ -942,34 +705,11 @@ private:
 					</details>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge">FSystem::Initialize</span></figcaption>
-<pre class="snip" data-lang="cpp">bool FSystem::Initialize(int ShowCmd)
-{
-	CHECK_RETURN(Window.Initialize(Display, ShowCmd), false);
-
-	Window.SetMessageCallback([this](UINT Message, WPARAM WParam, LPARAM LParam)
-	                          { OnWindowMessage(Message, WParam, LParam); });
-	Window.SetResizeCallback([this](int NewWidth, int NewHeight) { OnResize(NewWidth, NewHeight); });
-
-	FLog::Info(std::format(L"창 생성 : {}x{}", Window.GetWidth(), Window.GetHeight()));
-	return true;
-}</pre>
+<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FSystem.cpp:bool FSystem::Initialize--></pre>
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge">FSystem::OnWindowMessage</span></figcaption>
-<pre class="snip" data-lang="cpp">void FSystem::OnWindowMessage(UINT Message, WPARAM WParam, LPARAM LParam)
-{
-	switch (Message)
-	{
-	case WM_KEYDOWN:
-		Input.KeyDown(static_cast&lt;unsigned int&gt;(WParam));
-		break;
-	case WM_KEYUP:
-		Input.KeyUp(static_cast&lt;unsigned int&gt;(WParam));
-		break;
-	default:
-		break;
-	}
-}</pre>
+<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FSystem.cpp:void FSystem::OnWindowMessage--></pre>
 					</figure>
 					<p><code>FWindow</code> 가 <code>FInput</code> 을 직접 부르지 않고 <code>FSystem</code> 을 거치면 받는 객체가 늘어나도 누가 어떤 순서로 받는지가 <code>OnWindowMessage</code> 의 <code>switch</code> 하나에 모여요.</p>
 					<div class="learn">
@@ -998,23 +738,7 @@ private:
 					</details>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge">FSystem::Run</span></figcaption>
-<pre class="snip" data-lang="cpp">int FSystem::Run()
-{
-	MSG Message = {};
-	while (Message.message != WM_QUIT)
-	{
-		if (PeekMessageW(&amp;Message, nullptr, 0, 0, PM_REMOVE))
-		{
-			TranslateMessage(&amp;Message);
-			DispatchMessageW(&amp;Message);
-			continue;
-		}
-
-		Frame();
-	}
-
-	return static_cast&lt;int&gt;(Message.wParam);
-}</pre>
+<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FSystem.cpp:int FSystem::Run()--></pre>
 					</figure>
 					<p><code>PeekMessageW</code> 가 메시지를 꺼냈으면 처리하고 <code>continue</code> 로 돌아가 다음 메시지를 봐요. 큐가 비었을 때만 <code>Frame</code> 을 부르기 때문에 프레임 하나가 시작될 때는 그동안 쌓인 입력이 전부 <code>FInput</code> 에 반영돼 있어요.</p>
 					<details class="fold">
@@ -1026,21 +750,11 @@ private:
 					</details>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge">FSystem::Frame</span></figcaption>
-<pre class="snip" data-lang="cpp">void FSystem::Frame()
-{
-	Application.Update();
-	Application.Render();
-}</pre>
+<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FSystem.cpp:void FSystem::Frame()--></pre>
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/App/FApplication.cpp</span><span class="badge">FApplication::Update</span></figcaption>
-<pre class="snip" data-lang="cpp">void FApplication::Update()
-{
-	if (FSystem::Get().GetInput().IsKeyDown(VK_ESCAPE))
-	{
-		FSystem::Get().RequestExit();
-	}
-}</pre>
+<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/App/FApplication.cpp:void FApplication::Update()--></pre>
 					</figure>
 					<p>한 프레임은 <code>Update</code> 다음에 <code>Render</code> 예요. 상태를 바꾸는 코드와 그리는 코드를 처음부터 나눠 둔 것이라 지금은 <code>Update</code> 에 ESC 확인만 있고 <code>Render</code> 는 비어 있어요.</p>
 					<details class="fold">
@@ -1080,47 +794,18 @@ private:
 					<p>저는 반대로 정했어요. 창을 파괴하는 코드는 <code>FWindow</code> 의 소멸자에만 두고, 끝내자는 신호는 <code>PostQuitMessage</code> 로만 보내요. 그러면 닫기 단추든 ESC 든 모두 <code>Run</code> 이 돌아오는 한 곳으로 모이고 정리도 그 뒤 한 곳에서 끝나요. 이 프로그램에는 <code>ExitThread</code> 를 부르는 곳이 없어서 원문이 걱정한 상황도 생기지 않아요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge">FSystem::RequestExit</span></figcaption>
-<pre class="snip" data-lang="cpp">void FSystem::RequestExit()
-{
-	PostQuitMessage(0);
-}</pre>
+<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FSystem.cpp:void FSystem::RequestExit()--></pre>
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge">HandleMessage 의 종료 메시지</span></figcaption>
-<pre class="snip" data-lang="cpp">case WM_CLOSE:
-	PostQuitMessage(0);
-	return 0;
-
-// 윈도우가 꺼질 때는 WM_CLOSE 가 오지 않는다. 종료 신호를 같은 길로 모은다.
-// WParam 이 FALSE 면 다른 앱이 종료를 거부한 것이라 그대로 둔다.
-case WM_ENDSESSION:
-	if (WParam == TRUE)
-	{
-		PostQuitMessage(0);
-	}
-	return 0;</pre>
+<pre class="snip" data-lang="cpp"><!--SLICE:Source/Core/FWindow.cpp:case WM_CLOSE=>case WM_ENTERSIZEMOVE--></pre>
 					</figure>
 					<p>ESC 는 앞 단계의 <code>Update</code> 가 <code>RequestExit</code> 을 부르고, 닫기 단추는 <code>WM_CLOSE</code> 로, Windows 종료는 <code>WM_ENDSESSION</code> 으로 와요. 세 곳 모두 <code>PostQuitMessage(0)</code> 만 부르고 창은 파괴하지 않아요.</p>
 					<p><code>WM_CLOSE</code> 를 <code>return 0</code> 으로 끝내지 않고 <code>DefWindowProcW</code> 에 넘기면 그쪽에서 창을 곧바로 파괴해요. 파괴하는 길이 소멸자 말고 하나 더 생기는 셈이라 넘기지 않아요.</p>
 					<p>다만 Windows 를 끌 때는 <code>WM_ENDSESSION</code> 을 처리하고 돌아온 뒤 정리가 끝나기 전에 프로세스가 끝날 수 있어요. 지금은 저장할 것이 없어서 그대로 둬요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge">FWindow::~FWindow</span></figcaption>
-<pre class="snip" data-lang="cpp">FWindow::~FWindow()
-{
-	// 콜백을 먼저 끊는다. DestroyWindow 가 부르는 메시지가 이미 사라진 FInput·FApplication 에 닿지 않게 한다.
-	MessageCallback = nullptr;
-	ResizeCallback = nullptr;
-
-	if (bCursorHidden)
-	{
-		ShowCursor(TRUE);
-	}
-
-	if (Handle != nullptr)
-	{
-		DestroyWindow(Handle);
-	}
-}</pre>
+<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FWindow.cpp:FWindow::~FWindow()--></pre>
 					</figure>
 					<p>루프가 끝나고 <code>FSystem</code> 이 해제되면 멤버가 선언 역순으로, 그러니까 <code>FApplication</code>, <code>FInput</code>, <code>FWindow</code> 순서로 소멸해요. 03편에서 <code>FApplication</code> 이 갖게 될 D3D 객체들은 이 창에 그림을 내보내기 때문에 창보다 먼저 해제돼야 하고, 4단계의 멤버 선언이 그 순서로 돼 있어요.</p>
 					<p>소멸자가 콜백부터 비우는 것도 이 순서 때문이에요. <code>FWindow</code> 가 맨 마지막에 소멸하니 <code>DestroyWindow</code> 가 파괴 도중에 보내는 <code>WM_DESTROY</code> 를 받아 줄 객체가 그때는 남아 있지 않아요.</p>
@@ -1144,21 +829,7 @@ case WM_ENDSESSION:
 					<p>01편의 <code>WinMain</code> 을 <code>wWinMain</code> 으로 바꾸고 본문을 채워요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Main.cpp</span><span class="badge">wWinMain</span></figcaption>
-<pre class="snip" data-lang="cpp">int WINAPI wWinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _In_ PWSTR CmdLine, _In_ int ShowCmd)
-{
-	// 창과 디바이스를 확실한 시점에 정리하려고 FSystem 만 명시적으로 만든다. 로그는 첫 호출에 맡긴다.
-	FSystem::Prepare();
-
-	if (FSystem::Get().Initialize(ShowCmd) == false)
-	{
-		MessageBoxW(nullptr, FLog::GetLastErrorMessage().c_str(), L"DxRenderDojo", MB_OK | MB_ICONERROR);
-		return 1;
-	}
-
-	const int ExitCode = FSystem::Get().Run();
-	FSystem::Release();
-	return ExitCode;
-}</pre>
+<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Main.cpp:int WINAPI wWinMain--></pre>
 					</figure>
 					<p><code>FSystem</code> 은 <code>Run</code> 이 돌아온 다음 줄에서 <code>Release</code> 로 직접 해제해요. 6단계에서 정리가 모인다고 한 한 곳이 이 줄이에요. 싱글톤은 그냥 두면 프로세스가 끝날 때 해제되고 그 시점은 고를 수 없는데, 03편부터 <code>FSystem</code> 이 갖게 될 D3D 객체는 창보다 먼저 해제돼야 해요.</p>
 					<p><code>Initialize</code> 가 실패하면 마지막 에러 문구를 메시지 상자로 한 번 보여 주고 종료 코드 1 로 끝나요. 릴리스 빌드에는 콘솔 창이 없어서 이 상자가 없으면 아무 표시 없이 꺼져요. 상자에는 <code>[CHECK FAILED] Window.Initialize(Display, ShowCmd)</code> 처럼 가장 바깥의 검사만 뜨고, 처음 실패한 곳은 디버그 빌드의 콘솔 창에서 봐요.</p>
@@ -1166,29 +837,11 @@ case WM_ENDSESSION:
 						<summary><code>Prepare</code> 와 <code>Release</code> 코드</summary>
 						<figure class="code">
 							<figcaption><span class="path">Source/Core/TSingleton.h</span><span class="badge">TSingleton::Prepare</span></figcaption>
-<pre class="snip" data-lang="cpp">	// 생성 비용이 크거나 생성 시점을 잡아야 하는 싱글톤만 부른다. 나머지는 첫 Get() 에 맡긴다.
-	static void Prepare()
-	{
-		CHECK_RETURN(Instance == nullptr);
-
-		const bool bResurrected = bReleased;
-		Instance = std::make_unique&lt;T&gt;();
-
-		if (bResurrected)
-		{
-			// 인스턴스를 만든 뒤에 알린다. FLog 자신이 되살아난 경우라면 알릴 곳이 방금 생긴 것이다.
-			::Return::ReportResurrection(typeid(T).name());
-		}
-	}</pre>
+<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/TSingleton.h:static void Prepare()--></pre>
 						</figure>
 						<figure class="code">
 							<figcaption><span class="path">Source/Core/TSingleton.h</span><span class="badge">TSingleton::Release</span></figcaption>
-<pre class="snip" data-lang="cpp">	// 해제 시점이 중요한 싱글톤만 부른다. 부른 뒤에 Get() 이 오면 경고와 함께 다시 만들어진다.
-	static void Release()
-	{
-		Instance.reset();
-		bReleased = true;
-	}</pre>
+<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/TSingleton.h:static void Release()--></pre>
 						</figure>
 					</details>
 					<details class="fold">
@@ -1201,34 +854,7 @@ case WM_ENDSESSION:
 					<p>새 <code>.cpp</code> 여섯 개는 빌드 파일 두 곳에 등록해요. Visual Studio 는 <code>DxRenderDojo.vcxproj</code>, CMake 는 <code>CMakeLists.txt</code> 예요.</p>
 					<figure class="code">
 						<figcaption><span class="path">CMakeLists.txt</span><span class="badge">전체</span></figcaption>
-<pre class="src" data-lang="cmake">cmake_minimum_required(VERSION 3.25)
-project(DxRenderDojo LANGUAGES CXX)
-
-add_executable(DxRenderDojo WIN32
-	Source/Main.cpp
-	Source/App/FApplication.cpp
-	Source/Core/Check.cpp
-	Source/Core/FInput.cpp
-	Source/Core/FLog.cpp
-	Source/Core/FSystem.cpp
-	Source/Core/FWindow.cpp
-)
-target_include_directories(DxRenderDojo PRIVATE Source)
-target_compile_features(DxRenderDojo PRIVATE cxx_std_20)
-target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN)
-
-if(MSVC)
-	target_compile_options(DxRenderDojo PRIVATE /W3 /utf-8)
-	target_sources(DxRenderDojo PRIVATE DxRenderDojo.manifest)
-else()
-	target_compile_options(DxRenderDojo PRIVATE -Wall)
-endif()
-
-if(MINGW)
-	enable_language(RC)
-	target_sources(DxRenderDojo PRIVATE DxRenderDojo.rc)
-	target_link_options(DxRenderDojo PRIVATE -municode -static -static-libgcc -static-libstdc++)
-endif()</pre>
+<pre class="src" data-lang="cmake"><!--FILE:CMakeLists.txt--></pre>
 					</figure>
 					<p>함께 추가한 매니페스트(<code>DxRenderDojo.manifest</code>)는 모니터 배율을 앱이 직접 처리하겠다고 Windows 에 알리는 선언이에요. MSVC 와 mingw 는 넣는 방법이 달라서 한 빌드에 둘을 같이 쓰면 <code>CVT1100</code> 링크 에러가 나요.</p>
 					<details class="fold">
@@ -1326,50 +952,15 @@ endif()</pre>
 			<h3>작은 타입 둘</h3>
 			<details class="diff-file">
 				<summary><span class="path">Source/Core/FDisplaySettings.h</span><span class="stat"><span class="plus">+9</span></span><span class="why">창 크기·전체 화면·커서 옵션</span></summary>
-<pre class="src" data-lang="cpp">#pragma once
-
-struct FDisplaySettings
-{
-	int Width = 800;
-	int Height = 600;
-	bool bFullScreen = false;
-	bool bHideCursor = false;
-};</pre>
+<pre class="src" data-lang="cpp"><!--FILE:Source/Core/FDisplaySettings.h--></pre>
 			</details>
 			<details class="diff-file">
 				<summary><span class="path">Source/Core/FInput.h</span><span class="stat"><span class="plus">+18</span></span><span class="why">키 256개의 눌림 상태</span></summary>
-<pre class="src" data-lang="cpp">#pragma once
-
-#include &lt;array&gt;
-
-class FInput
-{
-public:
-	FInput() = default;
-	FInput(const FInput&amp; Other) = delete;
-	FInput&amp; operator=(const FInput&amp; Other) = delete;
-
-	void KeyDown(unsigned int Key);
-	void KeyUp(unsigned int Key);
-	bool IsKeyDown(unsigned int Key) const { return Keys[Key]; }
-
-private:
-	std::array&lt;bool, 256&gt; Keys = {};
-};</pre>
+<pre class="src" data-lang="cpp"><!--FILE:Source/Core/FInput.h--></pre>
 			</details>
 			<details class="diff-file">
 				<summary><span class="path">Source/Core/FInput.cpp</span><span class="stat"><span class="plus">+11</span></span><span class="why">눌림·뗌 기록</span></summary>
-<pre class="src" data-lang="cpp">#include "Core/FInput.h"
-
-void FInput::KeyDown(unsigned int Key)
-{
-	Keys[Key] = true;
-}
-
-void FInput::KeyUp(unsigned int Key)
-{
-	Keys[Key] = false;
-}</pre>
+<pre class="src" data-lang="cpp"><!--FILE:Source/Core/FInput.cpp--></pre>
 			</details>
 		</div>
 
@@ -1377,213 +968,23 @@ void FInput::KeyUp(unsigned int Key)
 			<h3>공통 도구 셋</h3>
 			<details class="diff-file">
 				<summary><span class="path">Source/Core/TSingleton.h</span><span class="stat"><span class="plus">+56</span></span><span class="why">전역 접근과 수명</span></summary>
-<pre class="src" data-lang="cpp">#pragma once
-
-#include &lt;memory&gt;
-#include &lt;typeinfo&gt;
-
-#include "Core/Check.h"
-
-template &lt;typename T&gt; class TSingleton
-{
-private:
-	static std::unique_ptr&lt;T&gt; Instance;
-	static bool bReleased;
-
-public:
-	static T&amp; Get()
-	{
-		if (Instance == nullptr)
-		{
-			Prepare();
-		}
-
-		return *Instance;
-	}
-
-	// 생성 비용이 크거나 생성 시점을 잡아야 하는 싱글톤만 부른다. 나머지는 첫 Get() 에 맡긴다.
-	static void Prepare()
-	{
-		CHECK_RETURN(Instance == nullptr);
-
-		const bool bResurrected = bReleased;
-		Instance = std::make_unique&lt;T&gt;();
-
-		if (bResurrected)
-		{
-			// 인스턴스를 만든 뒤에 알린다. FLog 자신이 되살아난 경우라면 알릴 곳이 방금 생긴 것이다.
-			::Return::ReportResurrection(typeid(T).name());
-		}
-	}
-
-	// 해제 시점이 중요한 싱글톤만 부른다. 부른 뒤에 Get() 이 오면 경고와 함께 다시 만들어진다.
-	static void Release()
-	{
-		Instance.reset();
-		bReleased = true;
-	}
-
-protected:
-	TSingleton() = default;
-	~TSingleton() = default;
-
-	TSingleton(const TSingleton&amp; Other) = delete;
-	TSingleton&amp; operator=(const TSingleton&amp; Other) = delete;
-};
-
-template &lt;typename T&gt; std::unique_ptr&lt;T&gt; TSingleton&lt;T&gt;::Instance;
-template &lt;typename T&gt; bool TSingleton&lt;T&gt;::bReleased = false;</pre>
+<pre class="src" data-lang="cpp"><!--FILE:Source/Core/TSingleton.h--></pre>
 			</details>
 			<details class="diff-file">
 				<summary><span class="path">Source/Core/FLog.h</span><span class="stat"><span class="plus">+26</span></span><span class="why">정보·경고·에러 세 수준</span></summary>
-<pre class="src" data-lang="cpp">#pragma once
-
-#include &lt;Windows.h&gt;
-#include &lt;string&gt;
-#include &lt;string_view&gt;
-
-#include "Core/TSingleton.h"
-
-class FLog : public TSingleton&lt;FLog&gt;
-{
-public:
-	FLog();
-	~FLog();
-
-	static void Info(std::wstring_view Message);
-	static void Warning(std::wstring_view Message);
-	static void Error(std::wstring_view Message);
-
-	static const std::wstring&amp; GetLastErrorMessage();
-
-private:
-	void Write(std::wstring_view Prefix, std::wstring_view Message);
-
-	HANDLE ConsoleOutput = nullptr;
-	std::wstring LastErrorMessage;
-};</pre>
+<pre class="src" data-lang="cpp"><!--FILE:Source/Core/FLog.h--></pre>
 			</details>
 			<details class="diff-file">
 				<summary><span class="path">Source/Core/FLog.cpp</span><span class="stat"><span class="plus">+57</span></span><span class="why">출력 창과 디버그 콘솔</span></summary>
-<pre class="src" data-lang="cpp">#include "Core/FLog.h"
-
-FLog::FLog()
-{
-#ifndef NDEBUG
-	if (AllocConsole())
-	{
-		ConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-		SetConsoleTitleW(L"DxRenderDojo");
-	}
-#endif
-}
-
-FLog::~FLog()
-{
-	if (ConsoleOutput != nullptr)
-	{
-		FreeConsole();
-	}
-}
-
-void FLog::Info(std::wstring_view Message)
-{
-	Get().Write(L"", Message);
-}
-
-void FLog::Warning(std::wstring_view Message)
-{
-	Get().Write(L"[경고] ", Message);
-}
-
-void FLog::Error(std::wstring_view Message)
-{
-	FLog&amp; Log = Get();
-	Log.LastErrorMessage.assign(Message);
-	Log.Write(L"[에러] ", Message);
-}
-
-const std::wstring&amp; FLog::GetLastErrorMessage()
-{
-	return Get().LastErrorMessage;
-}
-
-void FLog::Write(std::wstring_view Prefix, std::wstring_view Message)
-{
-	std::wstring Line(Prefix);
-	Line += Message;
-	Line += L'\n';
-
-	OutputDebugStringW(Line.c_str());
-
-	if (ConsoleOutput != nullptr)
-	{
-		DWORD Written = 0;
-		WriteConsoleW(ConsoleOutput, Line.c_str(), static_cast&lt;DWORD&gt;(Line.size()), &amp;Written, nullptr);
-	}
-}</pre>
+<pre class="src" data-lang="cpp"><!--FILE:Source/Core/FLog.cpp--></pre>
 			</details>
 			<details class="diff-file">
 				<summary><span class="path">Source/Core/Check.h</span><span class="stat"><span class="plus">+36</span></span><span class="why">CHECK_RETURN 매크로와 판정</span></summary>
-<pre class="src" data-lang="cpp">#pragma once
-
-#include &lt;Windows.h&gt;
-#include &lt;string_view&gt;
-
-namespace Return
-{
-	inline bool Succeeded(HRESULT Result)
-	{
-		return SUCCEEDED(Result);
-	}
-
-	inline bool Succeeded(bool bResult)
-	{
-		return bResult;
-	}
-
-	template &lt;typename T&gt; bool Succeeded(T* Pointer)
-	{
-		return Pointer != nullptr;
-	}
-
-	// 정의는 Check.cpp 에 있다. 여기서 FLog.h 를 포함하면 TSingleton.h 를 거쳐 되돌아온다.
-	void ReportFailure(std::wstring_view Expression, std::wstring_view File, int Line);
-	void ReportResurrection(std::string_view TypeName);
-} // namespace Return
-
-#define CHECK_RETURN(Expression, ...)                                                                                  \
-	do                                                                                                                 \
-	{                                                                                                                  \
-		if (::Return::Succeeded(Expression) == false)                                                                  \
-		{                                                                                                              \
-			::Return::ReportFailure(L"" #Expression, L"" __FILE__, __LINE__);                                          \
-			return __VA_ARGS__;                                                                                        \
-		}                                                                                                              \
-	} while (false)</pre>
+<pre class="src" data-lang="cpp"><!--FILE:Source/Core/Check.h--></pre>
 			</details>
 			<details class="diff-file">
 				<summary><span class="path">Source/Core/Check.cpp</span><span class="stat"><span class="plus">+20</span></span><span class="why">로그로 보내는 부분. 순환 include 를 피해 .cpp 에</span></summary>
-<pre class="src" data-lang="cpp">#include "Core/Check.h"
-
-#include &lt;format&gt;
-#include &lt;string&gt;
-
-#include "Core/FLog.h"
-
-namespace Return
-{
-	void ReportFailure(std::wstring_view Expression, std::wstring_view File, int Line)
-	{
-		FLog::Error(std::format(L"[CHECK FAILED] {}\n    {}({})", Expression, File, Line));
-	}
-
-	void ReportResurrection(std::string_view TypeName)
-	{
-		const std::wstring Name(TypeName.begin(), TypeName.end());
-		FLog::Warning(std::format(L"해제한 싱글톤이 다시 만들어졌다 : {}", Name));
-	}
-} // namespace Return</pre>
+<pre class="src" data-lang="cpp"><!--FILE:Source/Core/Check.cpp--></pre>
 			</details>
 		</div>
 
@@ -1591,232 +992,11 @@ namespace Return
 			<h3>창</h3>
 			<details class="diff-file">
 				<summary><span class="path">Source/Core/FWindow.h</span><span class="stat"><span class="plus">+39</span></span><span class="why">창 핸들·크기·콜백 둘</span></summary>
-<pre class="src" data-lang="cpp">#pragma once
-
-#include &lt;Windows.h&gt;
-#include &lt;functional&gt;
-
-#include "Core/FDisplaySettings.h"
-
-class FWindow
-{
-private:
-	static LRESULT CALLBACK WndProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam);
-
-public:
-	FWindow() = default;
-	FWindow(const FWindow&amp; Other) = delete;
-	FWindow&amp; operator=(const FWindow&amp; Other) = delete;
-	~FWindow();
-
-	bool Initialize(const FDisplaySettings&amp; Settings, int ShowCmd);
-
-	void SetMessageCallback(std::function&lt;void(UINT, WPARAM, LPARAM)&gt; Callback);
-	void SetResizeCallback(std::function&lt;void(int, int)&gt; Callback);
-
-	HWND GetHandle() const { return Handle; }
-	int GetWidth() const { return Width; }
-	int GetHeight() const { return Height; }
-
-private:
-	LRESULT HandleMessage(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam);
-	void NotifyResize();
-
-	HWND Handle = nullptr;
-	int Width = 0;
-	int Height = 0;
-	bool bCursorHidden = false;
-	bool bSizing = false;
-	std::function&lt;void(UINT, WPARAM, LPARAM)&gt; MessageCallback;
-	std::function&lt;void(int, int)&gt; ResizeCallback;
-};</pre>
+<pre class="src" data-lang="cpp"><!--FILE:Source/Core/FWindow.h--></pre>
 			</details>
 			<details class="diff-file">
 				<summary><span class="path">Source/Core/FWindow.cpp</span><span class="stat"><span class="plus">+184</span></span><span class="why">창 만들기·WndProc·크기 변경·종료</span></summary>
-<pre class="src" data-lang="cpp">#include "Core/FWindow.h"
-
-#include &lt;utility&gt;
-
-#include "Core/Check.h"
-
-LRESULT CALLBACK FWindow::WndProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam)
-{
-	if (Message == WM_NCCREATE)
-	{
-		const CREATESTRUCTW* CreateInfo = reinterpret_cast&lt;const CREATESTRUCTW*&gt;(LParam);
-		SetWindowLongPtrW(WindowHandle, GWLP_USERDATA, reinterpret_cast&lt;LONG_PTR&gt;(CreateInfo-&gt;lpCreateParams));
-	}
-
-	FWindow* Window = reinterpret_cast&lt;FWindow*&gt;(GetWindowLongPtrW(WindowHandle, GWLP_USERDATA));
-	if (Window == nullptr)
-	{
-		return DefWindowProcW(WindowHandle, Message, WParam, LParam);
-	}
-
-	return Window-&gt;HandleMessage(WindowHandle, Message, WParam, LParam);
-}
-
-FWindow::~FWindow()
-{
-	// 콜백을 먼저 끊는다. DestroyWindow 가 부르는 메시지가 이미 사라진 FInput·FApplication 에 닿지 않게 한다.
-	MessageCallback = nullptr;
-	ResizeCallback = nullptr;
-
-	if (bCursorHidden)
-	{
-		ShowCursor(TRUE);
-	}
-
-	if (Handle != nullptr)
-	{
-		DestroyWindow(Handle);
-	}
-}
-
-bool FWindow::Initialize(const FDisplaySettings&amp; Settings, int ShowCmd)
-{
-	constexpr const wchar_t* ClassName = L"DxRenderDojo";
-
-	const HINSTANCE Instance = GetModuleHandleW(nullptr);
-
-	WNDCLASSEXW WindowClass = {};
-	WindowClass.cbSize = sizeof(WindowClass);
-	WindowClass.style = CS_HREDRAW | CS_VREDRAW;
-	WindowClass.lpfnWndProc = &amp;FWindow::WndProc;
-	WindowClass.hInstance = Instance;
-	WindowClass.hIcon = LoadIconW(nullptr, IDI_WINLOGO);
-	WindowClass.hIconSm = WindowClass.hIcon;
-	WindowClass.hCursor = LoadCursorW(nullptr, IDC_ARROW);
-	WindowClass.hbrBackground = static_cast&lt;HBRUSH&gt;(GetStockObject(BLACK_BRUSH));
-	WindowClass.lpszClassName = ClassName;
-	CHECK_RETURN(RegisterClassExW(&amp;WindowClass) != 0, false);
-
-	const int ScreenWidth = GetSystemMetrics(SM_CXSCREEN);
-	const int ScreenHeight = GetSystemMetrics(SM_CYSCREEN);
-
-	DWORD Style = WS_POPUP;
-	int PositionX = 0;
-	int PositionY = 0;
-	int OuterWidth = ScreenWidth;
-	int OuterHeight = ScreenHeight;
-
-	if (Settings.bFullScreen == false)
-	{
-		Style = WS_OVERLAPPEDWINDOW;
-
-		RECT Bounds = {0, 0, Settings.Width, Settings.Height};
-		AdjustWindowRect(&amp;Bounds, Style, FALSE);
-		OuterWidth = Bounds.right - Bounds.left;
-		OuterHeight = Bounds.bottom - Bounds.top;
-		PositionX = (ScreenWidth - OuterWidth) / 2;
-		PositionY = (ScreenHeight - OuterHeight) / 2;
-	}
-
-	Handle = CreateWindowExW(0,
-	                         ClassName,
-	                         ClassName,
-	                         Style,
-	                         PositionX,
-	                         PositionY,
-	                         OuterWidth,
-	                         OuterHeight,
-	                         nullptr,
-	                         nullptr,
-	                         Instance,
-	                         this);
-	CHECK_RETURN(Handle, false);
-
-	RECT Client = {};
-	GetClientRect(Handle, &amp;Client);
-	Width = Client.right - Client.left;
-	Height = Client.bottom - Client.top;
-
-	if (Settings.bHideCursor)
-	{
-		ShowCursor(FALSE);
-		bCursorHidden = true;
-	}
-
-	ShowWindow(Handle, ShowCmd);
-	return true;
-}
-
-void FWindow::SetMessageCallback(std::function&lt;void(UINT, WPARAM, LPARAM)&gt; Callback)
-{
-	MessageCallback = std::move(Callback);
-}
-
-void FWindow::SetResizeCallback(std::function&lt;void(int, int)&gt; Callback)
-{
-	ResizeCallback = std::move(Callback);
-}
-
-LRESULT FWindow::HandleMessage(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam)
-{
-	switch (Message)
-	{
-	case WM_CLOSE:
-		PostQuitMessage(0);
-		return 0;
-
-	// 윈도우가 꺼질 때는 WM_CLOSE 가 오지 않는다. 종료 신호를 같은 길로 모은다.
-	// WParam 이 FALSE 면 다른 앱이 종료를 거부한 것이라 그대로 둔다.
-	case WM_ENDSESSION:
-		if (WParam == TRUE)
-		{
-			PostQuitMessage(0);
-		}
-		return 0;
-
-	// 드래그하는 동안에는 알리지 않고 끝날 때 한 번만 알린다. 매 픽셀마다 스왑체인을 다시 만들지 않기 위해서다.
-	case WM_ENTERSIZEMOVE:
-		bSizing = true;
-		return 0;
-
-	case WM_EXITSIZEMOVE:
-		bSizing = false;
-		NotifyResize();
-		return 0;
-
-	case WM_SIZE:
-		if (WParam != SIZE_MINIMIZED &amp;&amp; bSizing == false)
-		{
-			NotifyResize();
-		}
-		return 0;
-
-	case WM_GETMINMAXINFO:
-	{
-		constexpr int MinimumWidth = 320;
-		constexpr int MinimumHeight = 240;
-
-		MINMAXINFO* Limits = reinterpret_cast&lt;MINMAXINFO*&gt;(LParam);
-		Limits-&gt;ptMinTrackSize.x = MinimumWidth;
-		Limits-&gt;ptMinTrackSize.y = MinimumHeight;
-		return 0;
-	}
-
-	default:
-		if (MessageCallback)
-		{
-			MessageCallback(Message, WParam, LParam);
-		}
-		return DefWindowProcW(WindowHandle, Message, WParam, LParam);
-	}
-}
-
-void FWindow::NotifyResize()
-{
-	RECT Client = {};
-	GetClientRect(Handle, &amp;Client);
-	Width = Client.right - Client.left;
-	Height = Client.bottom - Client.top;
-
-	if (ResizeCallback)
-	{
-		ResizeCallback(Width, Height);
-	}
-}</pre>
+<pre class="src" data-lang="cpp"><!--FILE:Source/Core/FWindow.cpp--></pre>
 			</details>
 		</div>
 
@@ -1824,143 +1004,19 @@ void FWindow::NotifyResize()
 			<h3>루프와 장면</h3>
 			<details class="diff-file">
 				<summary><span class="path">Source/Core/FSystem.h</span><span class="stat"><span class="plus">+32</span></span><span class="why">멤버 넷과 선언 순서</span></summary>
-<pre class="src" data-lang="cpp">#pragma once
-
-#include &lt;Windows.h&gt;
-
-#include "App/FApplication.h"
-#include "Core/FDisplaySettings.h"
-#include "Core/FInput.h"
-#include "Core/FWindow.h"
-#include "Core/TSingleton.h"
-
-class FSystem : public TSingleton&lt;FSystem&gt;
-{
-public:
-	bool Initialize(int ShowCmd);
-	int Run();
-	void RequestExit();
-
-	const FWindow&amp; GetWindow() const { return Window; }
-	const FInput&amp; GetInput() const { return Input; }
-
-private:
-	void Frame();
-	void OnWindowMessage(UINT Message, WPARAM WParam, LPARAM LParam);
-	void OnResize(int NewWidth, int NewHeight);
-
-	// 선언 순서가 곧 생성 순서이고 소멸은 그 역순이다.
-	// 디바이스를 갖게 될 FApplication 이 FWindow 보다 먼저 사라져야 한다.
-	FDisplaySettings Display;
-	FWindow Window;
-	FInput Input;
-	FApplication Application;
-};</pre>
+<pre class="src" data-lang="cpp"><!--FILE:Source/Core/FSystem.h--></pre>
 			</details>
 			<details class="diff-file">
 				<summary><span class="path">Source/Core/FSystem.cpp</span><span class="stat"><span class="plus">+67</span></span><span class="why">메시지 루프·프레임·메시지 라우팅</span></summary>
-<pre class="src" data-lang="cpp">#include "Core/FSystem.h"
-
-#include &lt;format&gt;
-
-#include "Core/Check.h"
-#include "Core/FLog.h"
-
-bool FSystem::Initialize(int ShowCmd)
-{
-	CHECK_RETURN(Window.Initialize(Display, ShowCmd), false);
-
-	Window.SetMessageCallback([this](UINT Message, WPARAM WParam, LPARAM LParam)
-	                          { OnWindowMessage(Message, WParam, LParam); });
-	Window.SetResizeCallback([this](int NewWidth, int NewHeight) { OnResize(NewWidth, NewHeight); });
-
-	FLog::Info(std::format(L"창 생성 : {}x{}", Window.GetWidth(), Window.GetHeight()));
-	return true;
-}
-
-int FSystem::Run()
-{
-	MSG Message = {};
-	while (Message.message != WM_QUIT)
-	{
-		if (PeekMessageW(&amp;Message, nullptr, 0, 0, PM_REMOVE))
-		{
-			TranslateMessage(&amp;Message);
-			DispatchMessageW(&amp;Message);
-			continue;
-		}
-
-		Frame();
-	}
-
-	return static_cast&lt;int&gt;(Message.wParam);
-}
-
-void FSystem::RequestExit()
-{
-	PostQuitMessage(0);
-}
-
-void FSystem::Frame()
-{
-	Application.Update();
-	Application.Render();
-}
-
-void FSystem::OnWindowMessage(UINT Message, WPARAM WParam, LPARAM LParam)
-{
-	switch (Message)
-	{
-	case WM_KEYDOWN:
-		Input.KeyDown(static_cast&lt;unsigned int&gt;(WParam));
-		break;
-	case WM_KEYUP:
-		Input.KeyUp(static_cast&lt;unsigned int&gt;(WParam));
-		break;
-	default:
-		break;
-	}
-}
-
-void FSystem::OnResize(int NewWidth, int NewHeight)
-{
-	FLog::Info(std::format(L"창 크기 변경 : {}x{}", NewWidth, NewHeight));
-}</pre>
+<pre class="src" data-lang="cpp"><!--FILE:Source/Core/FSystem.cpp--></pre>
 			</details>
 			<details class="diff-file">
 				<summary><span class="path">Source/App/FApplication.h</span><span class="stat"><span class="plus">+12</span></span><span class="why">Update 와 Render</span></summary>
-<pre class="src" data-lang="cpp">#pragma once
-
-class FApplication
-{
-public:
-	FApplication() = default;
-	FApplication(const FApplication&amp; Other) = delete;
-	FApplication&amp; operator=(const FApplication&amp; Other) = delete;
-
-	void Update();
-	void Render();
-};</pre>
+<pre class="src" data-lang="cpp"><!--FILE:Source/App/FApplication.h--></pre>
 			</details>
 			<details class="diff-file">
 				<summary><span class="path">Source/App/FApplication.cpp</span><span class="stat"><span class="plus">+17</span></span><span class="why">ESC 판정. Render 는 03편부터</span></summary>
-<pre class="src" data-lang="cpp">#include "App/FApplication.h"
-
-#include &lt;Windows.h&gt;
-
-#include "Core/FSystem.h"
-
-void FApplication::Update()
-{
-	if (FSystem::Get().GetInput().IsKeyDown(VK_ESCAPE))
-	{
-		FSystem::Get().RequestExit();
-	}
-}
-
-void FApplication::Render()
-{
-}</pre>
+<pre class="src" data-lang="cpp"><!--FILE:Source/App/FApplication.cpp--></pre>
 			</details>
 		</div>
 
@@ -1968,148 +1024,23 @@ void FApplication::Render()
 			<h3>호출부와 빌드</h3>
 			<details class="diff-file">
 				<summary><span class="path">Source/Main.cpp</span><span class="stat"><span class="plus">+16</span> <span class="minus">−2</span></span><span class="why">wWinMain 으로 바꾸고 FSystem 을 돌림</span></summary>
-<pre class="diff" data-lang="cpp">@@ -1,6 +1,20 @@
- #include &lt;Windows.h&gt;
- 
--int WINAPI WinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _In_ PSTR CmdLine, _In_ int ShowCmd)
-+#include "Core/FLog.h"
-+#include "Core/FSystem.h"
-+
-+int WINAPI wWinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _In_ PWSTR CmdLine, _In_ int ShowCmd)
- {
--	return 0;
-+	// 창과 디바이스를 확실한 시점에 정리하려고 FSystem 만 명시적으로 만든다. 로그는 첫 호출에 맡긴다.
-+	FSystem::Prepare();
-+
-+	if (FSystem::Get().Initialize(ShowCmd) == false)
-+	{
-+		MessageBoxW(nullptr, FLog::GetLastErrorMessage().c_str(), L"DxRenderDojo", MB_OK | MB_ICONERROR);
-+		return 1;
-+	}
-+
-+	const int ExitCode = FSystem::Get().Run();
-+	FSystem::Release();
-+	return ExitCode;
- }</pre>
+<pre class="diff" data-lang="cpp"><!--DIFF:Source/Main.cpp--></pre>
 			</details>
 			<details class="diff-file">
 				<summary><span class="path">CMakeLists.txt</span><span class="stat"><span class="plus">+15</span> <span class="minus">−3</span></span><span class="why">새 소스, include 경로, 매니페스트, -municode</span></summary>
-<pre class="diff" data-lang="cmake">@@ -1,16 +1,28 @@
- cmake_minimum_required(VERSION 3.25)
- project(DxRenderDojo LANGUAGES CXX)
- 
--add_executable(DxRenderDojo WIN32 Source/Main.cpp)
-+add_executable(DxRenderDojo WIN32
-+	Source/Main.cpp
-+	Source/App/FApplication.cpp
-+	Source/Core/Check.cpp
-+	Source/Core/FInput.cpp
-+	Source/Core/FLog.cpp
-+	Source/Core/FSystem.cpp
-+	Source/Core/FWindow.cpp
-+)
-+target_include_directories(DxRenderDojo PRIVATE Source)
- target_compile_features(DxRenderDojo PRIVATE cxx_std_20)
--target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE)
-+target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN)
- 
- if(MSVC)
- 	target_compile_options(DxRenderDojo PRIVATE /W3 /utf-8)
-+	target_sources(DxRenderDojo PRIVATE DxRenderDojo.manifest)
- else()
- 	target_compile_options(DxRenderDojo PRIVATE -Wall)
- endif()
- 
- if(MINGW)
--	target_link_options(DxRenderDojo PRIVATE -static -static-libgcc -static-libstdc++)
-+	enable_language(RC)
-+	target_sources(DxRenderDojo PRIVATE DxRenderDojo.rc)
-+	target_link_options(DxRenderDojo PRIVATE -municode -static -static-libgcc -static-libstdc++)
- endif()</pre>
+<pre class="diff" data-lang="cmake"><!--DIFF:CMakeLists.txt--></pre>
 			</details>
 			<details class="diff-file">
 				<summary><span class="path">DxRenderDojo.vcxproj</span><span class="stat"><span class="plus">+27</span> <span class="minus">−2</span></span><span class="why">같은 내용을 VS 프로젝트에</span></summary>
-<pre class="diff" data-lang="xml">@@ -42,22 +42,27 @@
-       &lt;ConformanceMode&gt;true&lt;/ConformanceMode&gt;
-       &lt;LanguageStandard&gt;stdcpp20&lt;/LanguageStandard&gt;
-       &lt;AdditionalOptions&gt;/utf-8 %(AdditionalOptions)&lt;/AdditionalOptions&gt;
-+      &lt;AdditionalIncludeDirectories&gt;$(ProjectDir)Source;%(AdditionalIncludeDirectories)&lt;/AdditionalIncludeDirectories&gt;
-     &lt;/ClCompile&gt;
-     &lt;Link&gt;
-       &lt;SubSystem&gt;Windows&lt;/SubSystem&gt;
-       &lt;GenerateDebugInformation&gt;true&lt;/GenerateDebugInformation&gt;
-     &lt;/Link&gt;
-+    &lt;Manifest&gt;
-+      &lt;EnableDpiAwareness&gt;false&lt;/EnableDpiAwareness&gt;
-+      &lt;AdditionalManifestFiles&gt;$(ProjectDir)DxRenderDojo.manifest;%(AdditionalManifestFiles)&lt;/AdditionalManifestFiles&gt;
-+    &lt;/Manifest&gt;
-   &lt;/ItemDefinitionGroup&gt;
-   &lt;ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'"&gt;
-     &lt;ClCompile&gt;
--      &lt;PreprocessorDefinitions&gt;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)&lt;/PreprocessorDefinitions&gt;
-+      &lt;PreprocessorDefinitions&gt;_DEBUG;_WINDOWS;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)&lt;/PreprocessorDefinitions&gt;
-     &lt;/ClCompile&gt;
-   &lt;/ItemDefinitionGroup&gt;
-   &lt;ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'"&gt;
-     &lt;ClCompile&gt;
-       &lt;FunctionLevelLinking&gt;true&lt;/FunctionLevelLinking&gt;
-       &lt;IntrinsicFunctions&gt;true&lt;/IntrinsicFunctions&gt;
--      &lt;PreprocessorDefinitions&gt;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)&lt;/PreprocessorDefinitions&gt;
-+      &lt;PreprocessorDefinitions&gt;NDEBUG;_WINDOWS;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)&lt;/PreprocessorDefinitions&gt;
-     &lt;/ClCompile&gt;
-     &lt;Link&gt;
-       &lt;EnableCOMDATFolding&gt;true&lt;/EnableCOMDATFolding&gt;
-@@ -66,6 +71,26 @@
-   &lt;/ItemDefinitionGroup&gt;
-   &lt;ItemGroup&gt;
-     &lt;ClCompile Include="Source\Main.cpp" /&gt;
-+    &lt;ClCompile Include="Source\App\FApplication.cpp" /&gt;
-+    &lt;ClCompile Include="Source\Core\Check.cpp" /&gt;
-+    &lt;ClCompile Include="Source\Core\FInput.cpp" /&gt;
-+    &lt;ClCompile Include="Source\Core\FLog.cpp" /&gt;
-+    &lt;ClCompile Include="Source\Core\FSystem.cpp" /&gt;
-+    &lt;ClCompile Include="Source\Core\FWindow.cpp" /&gt;
-+  &lt;/ItemGroup&gt;
-+  &lt;ItemGroup&gt;
-+    &lt;ClInclude Include="Source\App\FApplication.h" /&gt;
-+    &lt;ClInclude Include="Source\Core\Check.h" /&gt;
-+    &lt;ClInclude Include="Source\Core\FDisplaySettings.h" /&gt;
-+    &lt;ClInclude Include="Source\Core\FInput.h" /&gt;
-+    &lt;ClInclude Include="Source\Core\FLog.h" /&gt;
-+    &lt;ClInclude Include="Source\Core\FSystem.h" /&gt;
-+    &lt;ClInclude Include="Source\Core\FWindow.h" /&gt;
-+    &lt;ClInclude Include="Source\Core\TSingleton.h" /&gt;
-+  &lt;/ItemGroup&gt;
-+  &lt;ItemGroup&gt;
-+    &lt;None Include="DxRenderDojo.manifest" /&gt;
-+    &lt;None Include="DxRenderDojo.rc" /&gt;
-   &lt;/ItemGroup&gt;
-   &lt;Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" /&gt;
- &lt;/Project&gt;</pre>
+<pre class="diff" data-lang="xml"><!--DIFF:DxRenderDojo.vcxproj--></pre>
 			</details>
 			<details class="diff-file">
 				<summary><span class="path">DxRenderDojo.manifest</span><span class="stat"><span class="plus">+15</span></span><span class="why">DPI 인식과 Windows 10/11 호환 선언</span></summary>
-<pre class="src" data-lang="xml">&lt;?xml version="1.0" encoding="utf-8" standalone="yes"?&gt;
-&lt;assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0"&gt;
-  &lt;assemblyIdentity type="win32" name="DxRenderDojo" version="1.0.0.0" processorArchitecture="amd64"/&gt;
-  &lt;application xmlns="urn:schemas-microsoft-com:asm.v3"&gt;
-    &lt;windowsSettings&gt;
-      &lt;dpiAware xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings"&gt;true/pm&lt;/dpiAware&gt;
-      &lt;dpiAwareness xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings"&gt;PerMonitorV2&lt;/dpiAwareness&gt;
-    &lt;/windowsSettings&gt;
-  &lt;/application&gt;
-  &lt;compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1"&gt;
-    &lt;application&gt;
-      &lt;supportedOS Id="{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"/&gt;
-    &lt;/application&gt;
-  &lt;/compatibility&gt;
-&lt;/assembly&gt;</pre>
+<pre class="src" data-lang="xml"><!--FILE:DxRenderDojo.manifest--></pre>
 			</details>
 			<details class="diff-file">
 				<summary><span class="path">DxRenderDojo.rc</span><span class="stat"><span class="plus">+3</span></span><span class="why">mingw 빌드에만 들어감. MSVC 에 넣으면 CVT1100</span></summary>
-<pre class="src" data-lang="cpp">// mingw 빌드 전용이다. MSVC 는 링커가 매니페스트를 붙이므로 여기까지 넣으면 리소스가 둘이 되어 CVT1100 이 난다.
-// 1 = CREATEPROCESS_MANIFEST_RESOURCE_ID, 24 = RT_MANIFEST
-1 24 "DxRenderDojo.manifest"</pre>
+<pre class="src" data-lang="cpp"><!--FILE:DxRenderDojo.rc--></pre>
 			</details>
 		</div>
 	</section>
