@@ -34,6 +34,8 @@ void FModel::Initialize(ID3D11Device* Device)
 	D3D11_SUBRESOURCE_DATA IndexData = {};
 	IndexData.pSysMem = Indices.data();
 	CHECK_FATAL(Device->CreateBuffer(&IndexBufferDesc, &IndexData, IndexBuffer.GetAddressOf()));
+
+	IndexCount = static_cast<UINT>(Indices.size());
 }
 
 void FModel::Render(ID3D11DeviceContext* Context) const

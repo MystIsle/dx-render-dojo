@@ -81,3 +81,11 @@ void FColorShader::Initialize(ID3D11Device* Device)
 	                                      VertexCode->GetBufferSize(),
 	                                      InputLayout.GetAddressOf()));
 }
+
+void FColorShader::Render(ID3D11DeviceContext* Context, UINT IndexCount) const
+{
+	Context->IASetInputLayout(InputLayout.Get());
+	Context->VSSetShader(VertexShader.Get(), nullptr, 0);
+	Context->PSSetShader(PixelShader.Get(), nullptr, 0);
+	Context->DrawIndexed(IndexCount, 0, 0);
+}

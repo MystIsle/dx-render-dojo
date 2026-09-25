@@ -23,4 +23,5 @@ void FApplication::Render(FD3D11Graphics& Graphics)
 {
 	ID3D11DeviceContext* Context = Graphics.GetContext();
 	Model.Render(Context);
+	ColorShader.Render(Context, Model.GetIndexCount());
 }

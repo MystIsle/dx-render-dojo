@@ -13,6 +13,8 @@ public:
 
 	void Initialize(ID3D11Device* Device);
 
+	UINT GetIndexCount() const { return IndexCount; }
+
 	void Render(ID3D11DeviceContext* Context) const;
 
 private:
@@ -25,4 +27,5 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D11Buffer> VertexBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> IndexBuffer;
+	UINT IndexCount = 0;
 };

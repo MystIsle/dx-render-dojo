@@ -22,7 +22,7 @@ public:
 	void Render(FD3D11Graphics& Graphics);
 
 private:
-	std::array<float, 4> ClearColor = {0.5f, 0.5f, 0.5f, 1.0f};
+	std::array<float, 4> ClearColor = {0.0f, 0.0f, 0.0f, 1.0f};
 	FModel Model;
 	FColorShader ColorShader;
 };
