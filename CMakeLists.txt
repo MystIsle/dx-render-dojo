@@ -3,8 +3,9 @@ project(DxRenderDojo LANGUAGES CXX)
 
 file(GLOB_RECURSE SourceFiles CONFIGURE_DEPENDS Source/*.cpp)
 add_executable(DxRenderDojo WIN32 ${SourceFiles})
+target_include_directories(DxRenderDojo PRIVATE Source)
 target_compile_features(DxRenderDojo PRIVATE cxx_std_20)
-target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE)
+target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN)
 
 if(MSVC)
 	target_compile_options(DxRenderDojo PRIVATE /W3 /utf-8)
