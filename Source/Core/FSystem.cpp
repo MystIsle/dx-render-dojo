@@ -13,6 +13,7 @@ void FSystem::Initialize(int ShowCmd)
 	    L"창 생성 : {}x{} (DPI {}, 배율 {}%)", Window.GetWidth(), Window.GetHeight(), Window.GetDpi(), ScalePercent));
 
 	Graphics.Initialize(Window, Display);
+	Application.Initialize(Graphics);
 
 	Window.SetMessageCallback([this](UINT Message, WPARAM WParam, LPARAM LParam)
 	                          { OnWindowMessage(Message, WParam, LParam); });
@@ -46,7 +47,7 @@ void FSystem::Frame()
 {
 	Application.Update();
 	Graphics.BeginScene(Application.GetClearColor());
-	Application.Render();
+	Application.Render(Graphics);
 	Graphics.EndScene();
 }
 

@@ -31,6 +31,9 @@
     <ClCompile Include="Source\Graphics\FD3D11Graphics.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Graphics\FModel.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Utility\Check.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
@@ -55,6 +58,9 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\FD3D11Graphics.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\FModel.h">
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Source\Utility\Check.h">

@@ -77,6 +77,7 @@
     <ClCompile Include="Source\Core\FSystem.cpp" />
     <ClCompile Include="Source\Core\FWindow.cpp" />
     <ClCompile Include="Source\Graphics\FD3D11Graphics.cpp" />
+    <ClCompile Include="Source\Graphics\FModel.cpp" />
     <ClCompile Include="Source\Utility\Check.cpp" />
     <ClCompile Include="Source\Utility\FLog.cpp" />
   </ItemGroup>
@@ -87,6 +88,7 @@
     <ClInclude Include="Source\Core\FSystem.h" />
     <ClInclude Include="Source\Core\FWindow.h" />
     <ClInclude Include="Source\Graphics\FD3D11Graphics.h" />
+    <ClInclude Include="Source\Graphics\FModel.h" />
     <ClInclude Include="Source\Utility\Check.h" />
     <ClInclude Include="Source\Utility\FLog.h" />
     <ClInclude Include="Source\Utility\TSingleton.h" />

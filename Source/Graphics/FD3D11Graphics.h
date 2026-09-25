@@ -19,6 +19,9 @@ public:
 
 	void Initialize(const FWindow& Window, const FDisplaySettings& Settings);
 
+	ID3D11Device* GetDevice() const { return Device.Get(); }
+	ID3D11DeviceContext* GetContext() const { return Context.Get(); }
+
 	void Resize(int Width, int Height);
 
 	void BeginScene(const std::array<float, 4>& Color);
