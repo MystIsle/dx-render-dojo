@@ -687,9 +687,10 @@ public:
 	FModel&amp; operator=(const FModel&amp; Other) = delete;
 
 	void Initialize(ID3D11Device* Device);
-	void Render(ID3D11DeviceContext* Context) const;
 
 	UINT GetIndexCount() const { return IndexCount; }
+
+	void Render(ID3D11DeviceContext* Context) const;
 
 private:
 	// FColorShader 의 입력 레이아웃, Color.vs 의 FVertexInput 과 멤버 순서·형식이 같아야 한다.
@@ -903,6 +904,7 @@ public:
 	FColorShader&amp; operator=(const FColorShader&amp; Other) = delete;
 
 	void Initialize(ID3D11Device* Device);
+
 	void Render(ID3D11DeviceContext* Context,
 	            UINT IndexCount,
 	            const DirectX::XMMATRIX&amp; World,
@@ -1129,10 +1131,10 @@ public:
 	FCamera(const FCamera&amp; Other) = delete;
 	FCamera&amp; operator=(const FCamera&amp; Other) = delete;
 
-	void SetPosition(float X, float Y, float Z);
-
 	DirectX::XMMATRIX GetViewMatrix() const;
 	DirectX::XMMATRIX GetProjectionMatrix(float AspectRatio) const;
+
+	void SetPosition(float X, float Y, float Z);
 
 private:
 	DirectX::XMFLOAT3 Position = {0.0f, 0.0f, 0.0f};
@@ -1147,11 +1149,6 @@ private:
 
 using namespace DirectX;
 
-void FCamera::SetPosition(float X, float Y, float Z)
-{
-	Position = {X, Y, Z};
-}
-
 XMMATRIX FCamera::GetViewMatrix() const
 {
 	const XMVECTOR Eye = XMLoadFloat3(&amp;Position);
@@ -1163,6 +1160,11 @@ XMMATRIX FCamera::GetViewMatrix() const
 XMMATRIX FCamera::GetProjectionMatrix(float AspectRatio) const
 {
 	return XMMatrixPerspectiveFovLH(FovAngleY, AspectRatio, NearZ, FarZ);
+}
+
+void FCamera::SetPosition(float X, float Y, float Z)
+{
+	Position = {X, Y, Z};
 }</pre>
 					</figure>
 					<details class="fold">
@@ -1260,18 +1262,18 @@ XMMATRIX FCamera::GetProjectionMatrix(float AspectRatio) const
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.h</span><span class="badge mod">바꿈</span><span class="badge">tut03 → tut04</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -23,6 +23,10 @@ public:
- 	void BeginScene(const std::array&lt;float, 4&gt;&amp; Color);
- 	void EndScene();
+<pre class="diff" data-lang="cpp">@@ -19,6 +19,10 @@ public:
+ 
+ 	void Initialize(const FWindow&amp; Window, const FDisplaySettings&amp; Settings);
  
 +	ID3D11Device* GetDevice() const { return Device.Get(); }
 +	ID3D11DeviceContext* GetContext() const { return Context.Get(); }
 +	float GetAspectRatio() const { return Viewport.Width / Viewport.Height; }
 +
- private:
- 	// 창 크기를 따라가는 자원은 여기서 만든다. Initialize 와 Resize 가 같이 부른다.
- 	void CreateSizeDependentResources();
-@@ -33,5 +37,6 @@ private:
+ 	void Resize(int Width, int Height);
+ 
+ 	void BeginScene(const std::array&lt;float, 4&gt;&amp; Color);
+@@ -34,5 +38,6 @@ private:
  	Microsoft::WRL::ComPtr&lt;IDXGISwapChain1&gt; SwapChain;
  	Microsoft::WRL::ComPtr&lt;ID3D11RenderTargetView&gt; RenderTargetView;
  	Microsoft::WRL::ComPtr&lt;IDXGIInfoQueue&gt; InfoQueue;
@@ -1397,16 +1399,17 @@ XMMATRIX FCamera::GetProjectionMatrix(float AspectRatio) const
  class FApplication
  {
  public:
-@@ -9,11 +15,15 @@ public:
+@@ -9,11 +15,16 @@ public:
  	FApplication(const FApplication&amp; Other) = delete;
  	FApplication&amp; operator=(const FApplication&amp; Other) = delete;
  
 +	void Initialize(FD3D11Graphics&amp; Graphics);
++
+ 	const std::array&lt;float, 4&gt;&amp; GetClearColor() const { return ClearColor; }
+ 
  	void Update();
 -	void Render();
 +	void Render(FD3D11Graphics&amp; Graphics);
- 
- 	const std::array&lt;float, 4&gt;&amp; GetClearColor() const { return ClearColor; }
  
  private:
 -	std::array&lt;float, 4&gt; ClearColor = {0.5f, 0.5f, 0.5f, 1.0f};
@@ -1702,7 +1705,7 @@ XMMATRIX FCamera::GetProjectionMatrix(float AspectRatio) const
 		<div class="file-group">
 			<h3>그리기</h3>
 			<details class="diff-file">
-				<summary><span class="path">Source/Graphics/FModel.h</span><span class="stat"><span class="plus">+30</span></span><span class="why">정점 구조체와 두 버퍼</span></summary>
+				<summary><span class="path">Source/Graphics/FModel.h</span><span class="stat"><span class="plus">+31</span></span><span class="why">정점 구조체와 두 버퍼</span></summary>
 <pre class="src" data-lang="cpp">#pragma once
 
 #include &lt;DirectXMath.h&gt;
@@ -1717,9 +1720,10 @@ public:
 	FModel&amp; operator=(const FModel&amp; Other) = delete;
 
 	void Initialize(ID3D11Device* Device);
-	void Render(ID3D11DeviceContext* Context) const;
 
 	UINT GetIndexCount() const { return IndexCount; }
+
+	void Render(ID3D11DeviceContext* Context) const;
 
 private:
 	// FColorShader 의 입력 레이아웃, Color.vs 의 FVertexInput 과 멤버 순서·형식이 같아야 한다.
@@ -1833,7 +1837,7 @@ float4 ColorPixelShader(FPixelInput Input) : SV_TARGET
 }</pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">Source/Shaders/FColorShader.h</span><span class="stat"><span class="plus">+34</span></span><span class="why">셰이더·입력 레이아웃·상수 버퍼</span></summary>
+				<summary><span class="path">Source/Shaders/FColorShader.h</span><span class="stat"><span class="plus">+35</span></span><span class="why">셰이더·입력 레이아웃·상수 버퍼</span></summary>
 <pre class="src" data-lang="cpp">#pragma once
 
 #include &lt;DirectXMath.h&gt;
@@ -1848,6 +1852,7 @@ public:
 	FColorShader&amp; operator=(const FColorShader&amp; Other) = delete;
 
 	void Initialize(ID3D11Device* Device);
+
 	void Render(ID3D11DeviceContext* Context,
 	            UINT IndexCount,
 	            const DirectX::XMMATRIX&amp; World,
@@ -2000,10 +2005,10 @@ public:
 	FCamera(const FCamera&amp; Other) = delete;
 	FCamera&amp; operator=(const FCamera&amp; Other) = delete;
 
-	void SetPosition(float X, float Y, float Z);
-
 	DirectX::XMMATRIX GetViewMatrix() const;
 	DirectX::XMMATRIX GetProjectionMatrix(float AspectRatio) const;
+
+	void SetPosition(float X, float Y, float Z);
 
 private:
 	DirectX::XMFLOAT3 Position = {0.0f, 0.0f, 0.0f};
@@ -2018,11 +2023,6 @@ private:
 
 using namespace DirectX;
 
-void FCamera::SetPosition(float X, float Y, float Z)
-{
-	Position = {X, Y, Z};
-}
-
 XMMATRIX FCamera::GetViewMatrix() const
 {
 	const XMVECTOR Eye = XMLoadFloat3(&amp;Position);
@@ -2034,6 +2034,11 @@ XMMATRIX FCamera::GetViewMatrix() const
 XMMATRIX FCamera::GetProjectionMatrix(float AspectRatio) const
 {
 	return XMMatrixPerspectiveFovLH(FovAngleY, AspectRatio, NearZ, FarZ);
+}
+
+void FCamera::SetPosition(float X, float Y, float Z)
+{
+	Position = {X, Y, Z};
 }</pre>
 			</details>
 		</div>
@@ -2042,18 +2047,18 @@ XMMATRIX FCamera::GetProjectionMatrix(float AspectRatio) const
 			<h3>파이프라인</h3>
 			<details class="diff-file">
 				<summary><span class="path">Source/Graphics/FD3D11Graphics.h</span><span class="stat"><span class="plus">+5</span></span><span class="why">게터 셋과 뷰포트</span></summary>
-<pre class="diff" data-lang="cpp">@@ -23,6 +23,10 @@ public:
- 	void BeginScene(const std::array&lt;float, 4&gt;&amp; Color);
- 	void EndScene();
+<pre class="diff" data-lang="cpp">@@ -19,6 +19,10 @@ public:
+ 
+ 	void Initialize(const FWindow&amp; Window, const FDisplaySettings&amp; Settings);
  
 +	ID3D11Device* GetDevice() const { return Device.Get(); }
 +	ID3D11DeviceContext* GetContext() const { return Context.Get(); }
 +	float GetAspectRatio() const { return Viewport.Width / Viewport.Height; }
 +
- private:
- 	// 창 크기를 따라가는 자원은 여기서 만든다. Initialize 와 Resize 가 같이 부른다.
- 	void CreateSizeDependentResources();
-@@ -33,5 +37,6 @@ private:
+ 	void Resize(int Width, int Height);
+ 
+ 	void BeginScene(const std::array&lt;float, 4&gt;&amp; Color);
+@@ -34,5 +38,6 @@ private:
  	Microsoft::WRL::ComPtr&lt;IDXGISwapChain1&gt; SwapChain;
  	Microsoft::WRL::ComPtr&lt;ID3D11RenderTargetView&gt; RenderTargetView;
  	Microsoft::WRL::ComPtr&lt;IDXGIInfoQueue&gt; InfoQueue;
@@ -2116,7 +2121,7 @@ XMMATRIX FCamera::GetProjectionMatrix(float AspectRatio) const
 		<div class="file-group">
 			<h3>앱과 프레임</h3>
 			<details class="diff-file">
-				<summary><span class="path">Source/App/FApplication.h</span><span class="stat"><span class="plus">+12</span> <span class="minus">−2</span></span><span class="why">카메라·모델·셰이더 멤버, 검정 지우는 색</span></summary>
+				<summary><span class="path">Source/App/FApplication.h</span><span class="stat"><span class="plus">+13</span> <span class="minus">−2</span></span><span class="why">카메라·모델·셰이더 멤버, 검정 지우는 색</span></summary>
 <pre class="diff" data-lang="cpp">@@ -2,6 +2,12 @@
  
  #include &lt;array&gt;
@@ -2130,16 +2135,17 @@ XMMATRIX FCamera::GetProjectionMatrix(float AspectRatio) const
  class FApplication
  {
  public:
-@@ -9,11 +15,15 @@ public:
+@@ -9,11 +15,16 @@ public:
  	FApplication(const FApplication&amp; Other) = delete;
  	FApplication&amp; operator=(const FApplication&amp; Other) = delete;
  
 +	void Initialize(FD3D11Graphics&amp; Graphics);
++
+ 	const std::array&lt;float, 4&gt;&amp; GetClearColor() const { return ClearColor; }
+ 
  	void Update();
 -	void Render();
 +	void Render(FD3D11Graphics&amp; Graphics);
- 
- 	const std::array&lt;float, 4&gt;&amp; GetClearColor() const { return ClearColor; }
  
  private:
 -	std::array&lt;float, 4&gt; ClearColor = {0.5f, 0.5f, 0.5f, 1.0f};
