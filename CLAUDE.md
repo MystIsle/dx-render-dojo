@@ -17,6 +17,7 @@
 - `docs/CODING_STYLE.md` : 코딩 규약의 원본. 규약을 바꿀 때는 이 문서를 고침
 - `.clang-format` : 서식
 - `.clang-tidy` : 네이밍. 도구가 못 잡는 항목은 CODING_STYLE.md 6절에 있음
+- `DxRenderDojo.sln.DotSettings` : Rider 이름 규칙. CODING_STYLE.md 6절을 옮긴 것이라 6절을 먼저 고치고 Rider 설정에서 맞춤
 
 ## 교재 문서를 쓰기 전에
 
@@ -60,7 +61,8 @@ clang-tidy -p build-win <파일>
 - 모든 텍스트 : BOM 없는 UTF-8 (`.editorconfig`)
 - 셰이더 `.hlsl` `.vs` `.ps` : BOM 이 있으면 `D3DCompileFromFile` 이 `(1,1): error X3000` 으로 실패
 - C++ : BOM 이 없으므로 프로젝트 파일(vcxproj·CMake)에 `/utf-8` 필수. 없으면 MSVC 가 한글을 CP949 로 읽음
-- 줄끝 : `.gitattributes`. C++·셰이더·sln·vcxproj 는 CRLF, sh·cmake·md·json·xml 은 LF
+- Rider 설정 `DxRenderDojo.sln.DotSettings` : BOM 있는 UTF-8. Rider 가 저장할 때마다 붙이므로 예외로 둠
+- 줄끝 : `.gitattributes`. C++·셰이더·sln·vcxproj 는 CRLF, sh·cmake·md·json·xml·DotSettings 는 LF
 
 ## 자주 걸리는 곳
 
