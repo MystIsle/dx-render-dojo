@@ -8,7 +8,9 @@ void FSystem::Initialize(int ShowCmd)
 {
 	Window.Initialize(Display, ShowCmd);
 
-	FLog::Info(std::format(L"창 생성 : {}x{}", Window.GetWidth(), Window.GetHeight()));
+	const int ScalePercent = MulDiv(static_cast<int>(Window.GetDpi()), 100, USER_DEFAULT_SCREEN_DPI);
+	FLog::Info(std::format(
+	    L"창 생성 : {}x{} (DPI {}, 배율 {}%)", Window.GetWidth(), Window.GetHeight(), Window.GetDpi(), ScalePercent));
 
 	Window.SetMessageCallback([this](UINT Message, WPARAM WParam, LPARAM LParam)
 	                          { OnWindowMessage(Message, WParam, LParam); });

@@ -58,4 +58,8 @@
       <Filter>Utility</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="DxRenderDojo.manifest" />
+    <None Include="DxRenderDojo.rc" />
+  </ItemGroup>
 </Project>

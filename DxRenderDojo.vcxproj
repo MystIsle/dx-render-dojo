@@ -48,6 +48,10 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Manifest>
+      <EnableDpiAwareness>false</EnableDpiAwareness>
+      <AdditionalManifestFiles>$(ProjectDir)DxRenderDojo.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -83,6 +87,10 @@
     <ClInclude Include="Source\Utility\Check.h" />
     <ClInclude Include="Source\Utility\FLog.h" />
     <ClInclude Include="Source\Utility\TSingleton.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DxRenderDojo.manifest" />
+    <None Include="DxRenderDojo.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>

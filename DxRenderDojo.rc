@@ -1,0 +1,3 @@
+// mingw 빌드 전용이다. MSVC 는 링커가 매니페스트를 붙이므로 여기까지 넣으면 리소스가 둘이 되어 CVT1100 이 난다.
+// 1 = CREATEPROCESS_MANIFEST_RESOURCE_ID, 24 = RT_MANIFEST
+1 24 "DxRenderDojo.manifest"
