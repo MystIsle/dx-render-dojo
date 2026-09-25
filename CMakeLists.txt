@@ -13,5 +13,5 @@ else()
 endif()
 
 if(MINGW)
-	target_link_options(DxRenderDojo PRIVATE -static -static-libgcc -static-libstdc++)
+	target_link_options(DxRenderDojo PRIVATE -municode -static -static-libgcc -static-libstdc++)
 endif()
