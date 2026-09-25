@@ -22,6 +22,7 @@
 ## 교재 문서를 쓰기 전에
 
 - `docs/DOC_STYLE.md` : 교재 문서 규약의 원본. 규약을 바꿀 때는 이 문서를 고침
+- `tools/doc-mock/toc.json` : 목차. 스테이지·편 제목·앞 편 태그의 원본. 빌드가 원고 머리의 STAGE·이전 태그, 이전·다음 편, 목차 페이지(`index.html`)를 여기서 채움
 - 원고는 편마다 `tools/doc-mock/template-NN.html`. `build.ps1 -Lesson NN` 이 태그 코드를 채워 `tutorial-NN.html` 을 만들고, 셀 수 있는 규칙은 `tools/doc-mock/check_prose.py` 가 봄
 
 ## 코드 구조

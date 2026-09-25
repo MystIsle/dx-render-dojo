@@ -328,6 +328,8 @@ figure.code .diff-view { border-top: 0; }
 .pager .dir { font-size: 0.9375rem; color: var(--slate); }
 .pager .name { font-weight: 700; font-size: 1.25rem; letter-spacing: -0.01em; }
 .pager .next { text-align: right; }
+.pager a:not([href]) { opacity: 0.5; }
+.pager a:not([href]):hover { border-color: var(--rule); }
 
 .site-foot { margin-top: 3rem; padding-top: 1.25rem; border-top: 1px solid var(--rule); color: var(--slate); font-size: 0.9375rem; line-height: 1.7; }
 
@@ -371,9 +373,9 @@ figure.code .diff-view { border-top: 0; }
 </div>
 
 <header class="topbar" data-block="site-header" data-source="자동">
-	<a class="brand" href="#">렌더러 공부방</a>
+	<a class="brand" href="index.html">렌더러 공부방</a>
 	<nav aria-label="사이트">
-		<a href="#">목차</a>
+		<a href="index.html">목차</a>
 		<a href="https://github.com/MystIsle/dx-render-dojo">GitHub</a>
 	</nav>
 	<button type="button" class="theme-toggle" id="theme-toggle">테마 · 시스템</button>
@@ -383,7 +385,7 @@ figure.code .diff-view { border-top: 0; }
 <main>
 
 	<header class="lesson-head" data-block="lesson-head" data-source="제목·요약 직접 · 나머지 자동">
-		<p class="eyebrow"><b>STAGE 1</b> · 공통 진도</p>
+		<p class="eyebrow"><!--TOC:eyebrow--></p>
 		<div class="title-row">
 			<span class="num" aria-hidden="true">03</span>
 			<h1>DirectX 11 초기화</h1>
@@ -392,7 +394,7 @@ figure.code .diff-view { border-top: 0; }
 		<ul class="meta">
 			<li><b>태그</b><code>tut03</code></li>
 			<li><b>원문</b><a href="https://www.rastertek.com/dx11win10tut03.html">Tutorial 3</a></li>
-			<li><b>이전 태그</b><code>tut02</code></li>
+			<li><b>이전 태그</b><code><!--TOC:base--></code></li>
 		</ul>
 		<div class="scanline" aria-label="전체 진도에서 이 편의 위치">
 			<div class="scanline-cells" id="scanline"></div>
@@ -1192,8 +1194,7 @@ figure.code .diff-view { border-top: 0; }
 	</section>
 
 	<nav class="pager" aria-label="이전·다음 편" data-block="pager" data-source="자동 : 목차">
-		<a href="#"><span class="dir">← 이전 편</span><span class="name">02 프레임워크와 창</span></a>
-		<a class="next" href="#"><span class="dir">다음 편 →</span><span class="name">04 버퍼·셰이더·HLSL</span></a>
+		<!--TOC:pager-->
 	</nav>
 
 	<footer class="site-foot" data-block="site-foot" data-source="자동">

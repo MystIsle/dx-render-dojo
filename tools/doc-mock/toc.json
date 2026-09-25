@@ -1,0 +1,165 @@
+{
+	"labels": {
+		"common": "공통 진도",
+		"optional": "각자 선택",
+		"prev": "← 이전 편",
+		"next": "다음 편 →",
+		"tocPrev": "← 목차",
+		"tocNext": "목차 →",
+		"home": "렌더러 공부방"
+	},
+	"stages": [
+		{
+			"no": 1, "name": "기초 셋업", "common": true,
+			"desc": "빈 프로젝트에서 시작해 창을 띄우고 D3D11 을 초기화해요. 버퍼와 셰이더로 첫 삼각형을 그린 뒤 텍스처를 입혀요.",
+			"lessons": [
+				{ "tag": "tut01", "base": null, "title": "개발 환경 셋업", "original": "Setting up DirectX 11 with Visual Studio 2022" },
+				{ "tag": "tut02", "base": "tut01", "title": "프레임워크와 창", "original": "Creating a Framework and Window" },
+				{ "tag": "tut03", "base": "tut02", "title": "DirectX 11 초기화", "original": "Initializing DirectX 11" },
+				{ "tag": "tut04", "base": "tut03", "title": "버퍼·셰이더·HLSL", "original": "Buffers, Shaders, and HLSL" },
+				{ "tag": "tut05", "base": "tut04", "title": "텍스처링", "original": "Texturing" }
+			]
+		},
+		{
+			"no": 2, "name": "3D 모델 & 조명", "common": true,
+			"desc": "파일에서 모델을 읽어 배치하고 빛을 계산해요. 디퓨즈·앰비언트·스페큘러와 여러 점광원을 다뤄요.",
+			"lessons": [
+				{ "tag": "tut06", "base": "tut05", "title": "디퓨즈 라이팅", "original": "Diffuse Lighting" },
+				{ "tag": "tut07", "base": "tut06", "title": "3D 모델 렌더링", "original": "3D Model Rendering" },
+				{ "tag": "tut08", "base": "tut07", "title": "스케일·회전·이동", "original": "Scaling, Rotation, and Translation" },
+				{ "tag": "tut09", "base": "tut08", "title": "앰비언트 라이팅", "original": "Ambient Lighting" },
+				{ "tag": "tut10", "base": "tut09", "title": "스페큘러 라이팅", "original": "Specular Lighting" },
+				{ "tag": "tut11", "base": "tut10", "title": "다중 점광원", "original": "Multiple Point Lights" }
+			]
+		},
+		{
+			"no": 3, "name": "2D · 텍스트 · 입력", "common": true,
+			"desc": "직교 투영으로 2D 이미지·스프라이트·글자를 그려요. 키보드와 마우스는 DirectInput 으로 읽어요.",
+			"lessons": [
+				{ "tag": "tut12", "base": "tut11", "title": "2D 렌더링", "original": "2D Rendering" },
+				{ "tag": "tut13", "base": "tut12", "title": "스프라이트·타이머", "original": "Sprites and Timers" },
+				{ "tag": "tut14", "base": "tut13", "title": "폰트 엔진", "original": "Font Engine" },
+				{ "tag": "tut15", "base": "tut14", "title": "FPS 카운터", "original": "FPS Counters" },
+				{ "tag": "tut16", "base": "tut15", "title": "다이렉트 인풋", "original": "Direct Input" }
+			]
+		},
+		{
+			"no": 4, "name": "텍스처 매핑", "common": true,
+			"desc": "한 표면에 텍스처 여러 장을 섞어 디테일을 더해요. 라이트 맵·알파 맵·노멀 맵·스페큘러 맵을 다뤄요.",
+			"lessons": [
+				{ "tag": "tut17", "base": "tut16", "title": "멀티텍스처링", "original": "Multitexturing" },
+				{ "tag": "tut18", "base": "tut17", "title": "라이트 맵", "original": "Light Maps" },
+				{ "tag": "tut19", "base": "tut18", "title": "알파 매핑", "original": "Alpha Mapping" },
+				{ "tag": "tut20", "base": "tut19", "title": "노멀 매핑", "original": "Normal Mapping" },
+				{ "tag": "tut21", "base": "tut20", "title": "스페큘러 매핑", "original": "Specular Mapping" }
+			]
+		},
+		{
+			"no": 5, "name": "엔진 구조", "common": true,
+			"desc": "셰이더 여러 개를 관리하고 화면 밖 물체를 걸러요. 장면을 텍스처에 그리는 렌더 투 텍스처가 뒤 스테이지의 바탕이 돼요.",
+			"lessons": [
+				{ "tag": "tut22", "base": "tut21", "title": "다중 셰이더 관리", "original": "Managing Multiple Shaders" },
+				{ "tag": "tut23", "base": "tut22", "title": "프러스텀 컬링", "original": "Frustum Culling" },
+				{ "tag": "tut24", "base": "tut23", "title": "Maya 모델 로딩", "original": "Loading Maya Models" },
+				{ "tag": "tut25", "base": "tut24", "title": "렌더 투 텍스처", "original": "Render to Texture" }
+			]
+		},
+		{
+			"no": 6, "name": "렌더 기법 기초", "common": true,
+			"desc": "안개·클리핑 평면·텍스처 이동·투명도를 다루고 평면 반사로 마무리해요.",
+			"lessons": [
+				{ "tag": "tut26", "base": "tut25", "title": "안개", "original": "Fog" },
+				{ "tag": "tut27", "base": "tut26", "title": "클리핑 평면", "original": "Clipping Planes" },
+				{ "tag": "tut28", "base": "tut27", "title": "텍스처 평행이동", "original": "Texture Translation" },
+				{ "tag": "tut29", "base": "tut28", "title": "투명도", "original": "Transparency" },
+				{ "tag": "tut30", "base": "tut29", "title": "반사", "original": "Reflection" }
+			]
+		},
+		{
+			"no": 7, "name": "자연 효과", "common": false,
+			"desc": "굴절과 노이즈로 물·유리·얼음·불을 흉내 내요. 먼 물체는 카메라를 향하는 판으로 바꿔 그려요.",
+			"lessons": [
+				{ "tag": "tut31", "base": "tut30", "title": "물", "original": "Water" },
+				{ "tag": "tut32", "base": "tut31", "title": "유리와 얼음", "original": "Glass and Ice" },
+				{ "tag": "tut33", "base": "tut32", "title": "불", "original": "Fire" },
+				{ "tag": "tut34", "base": "tut33", "title": "빌보딩", "original": "Billboarding" }
+			]
+		},
+		{
+			"no": 8, "name": "후처리 · 파티클", "common": false,
+			"desc": "장면을 텍스처에 그린 뒤 블러·페이드 같은 후처리를 걸어요. 파티클과 투영 텍스처도 다뤄요.",
+			"lessons": [
+				{ "tag": "tut35", "base": "tut34", "title": "깊이 버퍼", "original": "Depth Buffer" },
+				{ "tag": "tut36", "base": "tut35", "title": "블러", "original": "Blur" },
+				{ "tag": "tut37", "base": "tut36", "title": "스크린 페이드", "original": "Screen Fades" },
+				{ "tag": "tut38", "base": "tut37", "title": "파티클 시스템", "original": "Particle Systems" },
+				{ "tag": "tut39", "base": "tut38", "title": "투영 텍스처링", "original": "Projective Texturing" },
+				{ "tag": "tut40", "base": "tut39", "title": "투영 라이트맵", "original": "Projected Light Maps" }
+			]
+		},
+		{
+			"no": 9, "name": "그림자", "common": true,
+			"desc": "광원 시점의 깊이로 그림자를 그려요. 광원 여러 개, 방향광, 부드러운 가장자리, 투명한 물체의 그림자로 넓혀요.",
+			"lessons": [
+				{ "tag": "tut41", "base": "tut40", "title": "섀도우 매핑", "original": "Shadow Mapping" },
+				{ "tag": "tut42", "base": "tut41", "title": "다중 광원 섀도우 매핑", "original": "Multiple Light Shadow Mapping" },
+				{ "tag": "tut43", "base": "tut42", "title": "방향성 섀도우 맵", "original": "Directional Shadow Maps" },
+				{ "tag": "tut44", "base": "tut43", "title": "소프트 섀도우", "original": "Soft Shadows" },
+				{ "tag": "tut45", "base": "tut44", "title": "섀도우 매핑과 투명도", "original": "Shadow Mapping and Transparency" }
+			]
+		},
+		{
+			"no": 10, "name": "고급 렌더", "common": false,
+			"desc": "글로우·피킹·인스턴싱·하드웨어 테셀레이션을 다뤄요.",
+			"lessons": [
+				{ "tag": "tut46", "base": "tut45", "title": "글로우", "original": "Glow" },
+				{ "tag": "tut47", "base": "tut46", "title": "피킹", "original": "Picking" },
+				{ "tag": "tut48", "base": "tut47", "title": "인스턴싱", "original": "Instancing" },
+				{ "tag": "tut49", "base": "tut48", "title": "하드웨어 테셀레이션", "original": "Hardware Tessellation" }
+			]
+		},
+		{
+			"no": 11, "name": "현대 파이프라인", "common": false,
+			"desc": "디퍼드 셰이딩·SSAO·물리 기반 렌더링을 다뤄요.",
+			"lessons": [
+				{ "tag": "tut50", "base": "tut49", "title": "디퍼드 셰이딩", "original": "Deferred Shading" },
+				{ "tag": "tut51", "base": "tut50", "title": "화면 공간 앰비언트 오클루전", "original": "Screen Space Ambient Occlusion" },
+				{ "tag": "tut52", "base": "tut51", "title": "물리 기반 렌더링", "original": "Physically Based Rendering" }
+			]
+		},
+		{
+			"no": 12, "name": "추가 효과", "common": false,
+			"desc": "앞 스테이지의 기법을 섞어 열 아지랑이·패럴랙스 스크롤링·애니메이션 파티클을 만들어요.",
+			"lessons": [
+				{ "tag": "tut53", "base": "tut52", "title": "열 아지랑이", "original": "Heat" },
+				{ "tag": "tut54", "base": "tut53", "title": "패럴랙스 스크롤링", "original": "Parallax Scrolling" },
+				{ "tag": "tut59", "base": "tut58", "title": "애니메이션 파티클", "original": "Animated Particles" }
+			]
+		},
+		{
+			"no": 13, "name": "사운드", "common": false,
+			"desc": "DirectSound 와 XAudio2 로 소리를 내고 3D 위치에 따라 섞어요.",
+			"lessons": [
+				{ "tag": "tut55", "base": "tut54", "title": "다이렉트사운드", "original": "Direct Sound" },
+				{ "tag": "tut56", "base": "tut55", "title": "3D 사운드", "original": "3D Sound" },
+				{ "tag": "tut57", "base": "tut56", "title": "XAudio2", "original": "XAudio2" },
+				{ "tag": "tut58", "base": "tut57", "title": "X3DAudio", "original": "X3DAudio" }
+			]
+		},
+		{
+			"no": 14, "name": "입력 · 피날레", "common": false,
+			"desc": "XInput 으로 게임패드를 읽어요. 마지막 편은 3D LUT 로 색을 보정하는 후처리예요.",
+			"lessons": [
+				{ "tag": "tut60", "base": "tut59", "title": "XInput", "original": "XInput" },
+				{ "tag": "tut61", "base": "tut60", "title": "컬러 그레이딩", "original": "Color Grading" }
+			]
+		},
+		{
+			"no": null, "name": "원문에 없는 편", "common": true,
+			"desc": "Rastertek 61편에 없는 주제예요. 스키닝 애니메이션은 30편 코드에서 이어져요.",
+			"lessons": [
+				{ "tag": "tutalpha01", "base": "tut30", "title": "스키닝 애니메이션", "original": null }
+			]
+		}
+	]
+}
