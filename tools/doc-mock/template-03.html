@@ -250,6 +250,10 @@ details.fold[open] > summary::before { content: "▾"; }
 details.fold > *:not(summary) { margin: 0 1.15rem 0.95rem; }
 details.fold > summary + * { margin-top: 0.3rem; }
 details.fold .walk { padding-left: 2.4rem; }
+details.fold.must { border-style: dashed; border-color: var(--accent); }
+details.fold.must > summary { color: var(--accent); }
+.checkpoint { display: grid; gap: 0.35rem; margin: 0; padding: 0.85rem 1.15rem; border: 1px solid var(--code-add); border-radius: var(--radius); }
+.checkpoint .box-label { color: var(--code-add); }
 .learn { display: grid; gap: 0.45rem; margin: 0; padding: 0.95rem 1.15rem; border-radius: var(--radius); background: var(--amber-soft); }
 .learn .box-label { color: var(--amber); }
 .learn details.fold { border-color: var(--amber); background: var(--paper); }
@@ -429,7 +433,7 @@ figure.code .diff-view { border-top: 0; }
 			<div class="diverge-row"><span class="topic">어댑터</span><span class="orig"><code>EnumAdapters(0)</code> 로 정보만 읽음<br>디바이스는 기본 어댑터로</span><span>성능 우선(<code>EnumAdapterByGpuPreference</code>)으로 고른 어댑터로 디바이스 생성</span></div>
 			<div class="diverge-row"><span class="topic">주사율</span><span class="orig">디스플레이 모드 목록에서 찾아 스왑체인에 넣음</span><span>조회하지 않음. 독점 전체 화면을 쓰지 않음</span></div>
 			<div class="diverge-row"><span class="topic">카드 정보</span><span class="orig"><code>GetVideoCardInfo</code> 로 보관</span><span>시작 로그 한 줄</span></div>
-			<div class="diverge-row"><span class="topic">전체 화면</span><span class="orig"><code>FULL_SCREEN</code> 을 바꿔 다시 빌드<br>독점 전체 화면</span><span>Alt+Enter 로 테두리 없는 전체 화면을 켜고 끔</span></div>
+			<div class="diverge-row"><span class="topic">전체 화면</span><span class="orig"><code>FULL_SCREEN</code> 을 바꿔 다시 빌드<br>독점 전체 화면</span><span>02편의 테두리 없는 전체 화면을 그대로 씀<br>DXGI 가 Alt+Enter 에 거는 독점 전체 화면 전환은 끔</span></div>
 			<div class="diverge-row"><span class="topic">크기 변경</span><span class="orig">없음. 창 크기 고정</span><span><code>ResizeBuffers</code> 로 스왑체인 버퍼를 창 크기에 맞춤</span></div>
 			<div class="diverge-row"><span class="topic">지우기와 Present</span><span class="orig"><code>ApplicationClass::Render</code> 가 부름</span><span><code>FSystem::Frame</code> 이 부름<br><code>FApplication</code> 은 지우는 색만</span></div>
 			<div class="diverge-row"><span class="topic">정리</span><span class="orig"><code>Shutdown</code> 에서 <code>SetFullscreenState(false)</code> 뒤 역순 <code>Release</code></span><span><code>ComPtr</code> 과 소멸자</span></div>
@@ -449,7 +453,7 @@ figure.code .diff-view { border-top: 0; }
 			<li><code>FD3D11Graphics</code><span>새 클래스. 디바이스·컨텍스트·스왑체인·RTV. 지우기와 <code>Present</code>, 크기 변경</span></li>
 			<li><code>FSystem</code><span><code>FD3D11Graphics</code> 를 멤버로 갖고 프레임 앞뒤와 크기 변경에서 부름</span></li>
 			<li><code>FApplication</code><span>장면. 이 편에서는 지우는 색만 정함</span></li>
-			<li><code>FWindow</code><span>창. 배율 변경과 Alt+Enter 전체 화면이 새로 들어옴</span></li>
+			<li><code>FWindow</code><span>창. 크기가 그대로면 크기 변경을 알리지 않게 바뀜</span></li>
 		</ul>
 		<div class="flow">
 			<div class="flow-row">
@@ -503,7 +507,7 @@ figure.code .diff-view { border-top: 0; }
 			<p>그림을 그릴 버퍼를 만들 때 크기를 정해야 해요. <code>FDisplaySettings</code> 의 <code>Width</code>·<code>Height</code> 와 <code>FWindow</code> 의 <code>GetWidth()</code>·<code>GetHeight()</code> 중 어느 쪽을 써야 할까요?</p>
 			<details class="fold">
 				<summary>답 보기</summary>
-				<p><code>FWindow</code> 쪽이에요. <code>FDisplaySettings</code> 의 800×600 은 배율 100% 에서의 크기라서 배율 175% 에서 시작하면 클라이언트 영역이 처음부터 1400×1050 이에요. 창 크기는 실행 중에도 바뀌고 <code>FDisplaySettings</code> 는 처음 값 그대로예요. (<a href="#step-swapchain">3단계</a>)</p>
+				<p><code>FWindow</code> 쪽이에요. <code>FDisplaySettings</code> 의 800×600 은 배율 100% 에서의 크기라서 배율 175% 에서 시작하면 클라이언트 영역이 처음부터 1400×1050 이에요. 창 크기는 실행 중에도 바뀌고 <code>FDisplaySettings</code> 는 처음 값 그대로예요. (<a href="#step-swapchain">2단계</a>)</p>
 			</details>
 		</div>
 		<div class="learn">
@@ -511,69 +515,15 @@ figure.code .diff-view { border-top: 0; }
 			<p>02편 앱은 실행 중에 CPU 코어 하나를 다 썼어요. 이 편은 프레임마다 <code>Present</code> 를 불러 그린 것을 화면에 내보내요. CPU 사용량은 어떻게 될까요?</p>
 			<details class="fold">
 				<summary>답 보기</summary>
-				<p>코어 하나를 다 쓰지 않아요. vsync 를 켜 두면 프레임이 모니터 주사율보다 빨리 돌 수 없어서 루프가 <code>Present</code> 에서 쉬어요. (<a href="#step-frame">4단계</a>)</p>
+				<p>코어 하나를 다 쓰지 않아요. vsync 를 켜 두면 프레임이 모니터 주사율보다 빨리 돌 수 없어서 루프가 <code>Present</code> 에서 쉬어요. (<a href="#step-frame">3단계</a>)</p>
 			</details>
 		</div>
 	</section>
 
 	<section id="steps" data-block="steps" data-source="직접">
 		<h2>따라 하기</h2>
-		<p class="section-note">코드 조각의 배지는 할 일이에요. <b>신규</b>는 추가, <b>수정</b>은 있던 함수나 파일을 통째로 바꿔 넣기, <b>삭제</b>는 빨간 줄 지우기예요. diff 조각은 초록 줄을 넣고 빨간 줄을 지워요.</p>
+		<p class="section-note">코드 조각의 배지는 할 일이에요. <b>신규</b>는 추가, <b>수정</b>은 있던 함수나 파일을 통째로 바꿔 넣기, <b>삭제</b>는 빨간 줄 지우기예요. diff 조각은 초록 줄을 넣고 빨간 줄을 지워요. 점선 접기 안의 코드도 쳐야 해요. 단계마다 끝의 <b>여기까지</b> 상자대로 빌드하고 실행해 보세요.</p>
 		<ol class="steps">
-
-			<li class="step" id="step-fatal">
-				<div class="step-body">
-					<h3>실패하면 그 자리에서 멈춘다</h3>
-					<p>이 편부터 계속할 수 없는 실패는 발견한 줄에서 멈춰요. 02편은 실패를 <code>bool</code> 로 돌려주며 <code>wWinMain</code> 까지 올라갔고, 상자에는 가장 바깥의 검사만 떴어요. D3D 초기화는 호출마다 실패할 수 있어서 어느 호출이 실패했는지는 그 줄에서 멈춰야 바로 보여요.</p>
-					<figure class="code">
-						<figcaption><span class="path">Source/Utility/Check.h</span><span class="badge mod">수정</span><span class="badge">파일 전체</span></figcaption>
-<pre class="src" data-lang="cpp"><!--FILE:Source/Utility/Check.h--></pre>
-					</figure>
-					<p><code>CHECK_FATAL</code> 은 디버거로 실행 중이면 <code>__debugbreak</code> 에서 먼저 멈춰요. 호출 스택과 변수를 실패한 순간 그대로 볼 수 있어요. 디버거가 없으면 로그를 남기고 실패한 식과 줄 번호를 상자로 띄운 뒤 종료 코드 1 로 끝나요.</p>
-					<details class="fold">
-						<summary>줄 단위 풀이</summary>
-						<ul class="walk">
-							<li class="entry"><code>const auto CheckResult = (Expression);</code> 식을 한 번만 계산해 판정과 로그에 같이 씀. <code>CHECK_RETURN</code> 도 같은 모양으로 바뀜</li>
-							<li class="entry"><code>std::wstring Describe(HRESULT Result);</code> 결과가 <code>HRESULT</code> 면 <code>HRESULT 0x887A0001</code> 처럼 값을 로그에 붙임. <code>bool</code> 과 포인터는 붙일 것이 없어 빈 문자열</li>
-							<li class="entry"><code>[[noreturn]] void ReportFatal(...)</code> 돌아오지 않는 함수. 컴파일러도 이 호출 뒤로는 실행이 이어지지 않는다고 봄</li>
-							<li class="entry"><code>void SetFatalHook(...)</code> 끝나기 직전에 한 번 부를 함수를 등록. <a href="#step-debug">7단계</a></li>
-							<li class="entry"><code>__LINE__</code> 호출이 여러 줄에 걸치면 MSVC 빌드는 끝나는 줄 번호를 찍음. 디버거는 시작 줄에서 멈춤</li>
-							<li class="entry"><code>CHECK_RETURN</code> 로그를 남기고 함수에서 빠져나오기만 함. 프로그램을 계속해도 되는 실패에 씀. 이 편에서는 <a href="#step-debug">7단계</a>의 <code>FlushDebugMessages</code> 가 씀</li>
-						</ul>
-					</details>
-					<p>실패하면 멈추니 <code>wWinMain</code> 의 실패 분기와 상자가 없어지고, 상자에 띄우던 <code>FLog</code> 의 마지막 에러 문구도 지워요. <code>void</code> 가 되는 <code>FSystem::Initialize</code> 와 <code>FWindow::Initialize</code> 는 각각 2단계와 6단계에서 통째로 바꿔 넣어요.</p>
-					<figure class="code">
-						<figcaption><span class="path">Source/Utility/FLog.h</span><span class="badge del">삭제</span><span class="badge">tut02 → tut03</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF:Source/Utility/FLog.h--></pre>
-					</figure>
-					<details class="fold">
-						<summary>멈추는 쪽 코드</summary>
-					<figure class="code">
-						<figcaption><span class="path">Source/Utility/Check.cpp</span><span class="badge mod">수정</span><span class="badge">파일 전체</span></figcaption>
-<pre class="src" data-lang="cpp"><!--FILE:Source/Utility/Check.cpp--></pre>
-					</figure>
-					<figure class="code">
-						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">신규</span><span class="badge">WndProc 맨 앞</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF:Source/Core/FWindow.cpp:LRESULT CALLBACK FWindow::WndProc=>const CREATESTRUCTW* CreateInfo--></pre>
-					</figure>
-					<ul class="walk">
-						<li class="entry"><code>namespace { ... }</code> 이름 없는 네임스페이스. 안의 변수와 함수는 이 파일에서만 보임</li>
-						<li class="entry"><code>bFatal = true;</code> 상자가 떠 있는 동안에도 창 메시지는 계속 옴. <code>WndProc</code> 가 이 값을 보고 메시지를 <code>DefWindowProcW</code> 에만 넘김</li>
-						<li class="entry"><code>FatalHook</code> 끝나기 직전에 한 번 부르는 함수. <a href="#step-debug">7단계</a>에서 쌓인 디버그 메시지를 내보내는 데 씀</li>
-						<li class="entry"><code>MB_TASKMODAL</code> 부모 창을 넘기지 않아도 상자가 떠 있는 동안 이 스레드의 창이 입력을 받지 않음</li>
-						<li class="entry"><code>std::_Exit(1)</code> 표준 함수. <code>exit</code> 와 달리 <code>atexit</code> 로 등록한 함수도 부르지 않음</li>
-					</ul>
-					</details>
-					<figure class="code">
-						<figcaption><span class="path">Source/Utility/FLog.cpp</span><span class="badge mod">수정</span><span class="badge">tut02 → tut03</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF:Source/Utility/FLog.cpp--></pre>
-					</figure>
-					<figure class="code">
-						<figcaption><span class="path">Source/Main.cpp</span><span class="badge mod">수정</span><span class="badge">tut02 → tut03</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF:Source/Main.cpp--></pre>
-					</figure>
-				</div>
-			</li>
 
 			<li class="step" id="step-device">
 				<div class="step-body">
@@ -591,106 +541,84 @@ figure.code .diff-view { border-top: 0; }
 							</ul>
 						</aside>
 					</details>
+					<p>D3D 를 맡는 새 클래스 <code>FD3D11Graphics</code> 를 <code>Source/Graphics</code> 에 만들어요. 이 단계에서는 디바이스와 컨텍스트만 가져요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.h</span><span class="badge new">신규</span><span class="badge">파일 전체</span></figcaption>
-<pre class="src" data-lang="cpp"><!--FILE:Source/Graphics/FD3D11Graphics.h--></pre>
+<pre class="src" data-lang="cpp"><!--FILE@1:Source/Graphics/FD3D11Graphics.h--></pre>
 					</figure>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
 							<li class="entry"><code>Microsoft::WRL::ComPtr</code> COM 객체를 가리키는 스마트 포인터. 소멸할 때 <code>Release</code> 를 불러서 원문의 <code>Shutdown</code> 이 하던 해제를 대신함</li>
-							<li class="entry"><code>class FWindow;</code> 헤더에서는 참조로만 받아서 전방 선언으로 충분함</li>
-							<li class="entry"><code>FD3D11Graphics(const FD3D11Graphics&amp; Other) = delete;</code> 복사를 막으면 이동도 막혀 주소가 바뀌지 않음. <a href="#step-debug">7단계</a>에서 훅이 이 객체의 주소(<code>this</code>)를 저장함</li>
-							<li class="entry"><code>void Resize(int Width, int Height);</code> <a href="#step-resize">5단계</a></li>
-							<li class="entry"><code>IDXGIInfoQueue</code> 디버그 메시지를 꺼내는 큐. <a href="#step-debug">7단계</a></li>
 						</ul>
 					</details>
-					<p><code>FD3D11Graphics</code> 는 <code>FSystem</code> 의 멤버예요. <code>FSystem::Initialize</code> 가 창을 만든 다음 <code>Graphics.Initialize</code> 를 불러요.</p>
-					<figure class="code">
-						<figcaption><span class="path">Source/Core/FSystem.h</span><span class="badge mod">수정</span><span class="badge">tut02 → tut03</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF:Source/Core/FSystem.h--></pre>
-					</figure>
-					<figure class="code">
-						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge del">삭제</span><span class="badge">맨 위 include</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF:Source/Core/FSystem.cpp:#include "Core/FSystem.h"=>void FSystem::Initialize--></pre>
-					</figure>
-					<figure class="code">
-						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge mod">수정</span><span class="badge">FSystem::Initialize</span></figcaption>
-<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FSystem.cpp:void FSystem::Initialize--></pre>
-					</figure>
-					<details class="fold">
-						<summary>줄 단위 풀이</summary>
-						<ul class="walk">
-							<li class="entry"><code>FD3D11Graphics Graphics;</code> <code>FWindow</code> 뒤에 선언해서 먼저 소멸함. 스왑체인은 창에 그림을 내보내므로 창보다 먼저 해제돼야 함</li>
-							<li class="entry"><code>Window.SetResizeCallback(...)</code> <code>Graphics.Initialize</code> 뒤에 검. 창을 만드는 도중의 크기 알림이 아직 없는 스왑체인으로 가지 않음</li>
-							<li class="entry"><code>L"창 생성 : {}x{} (DPI {}, 배율 {}%)"</code> 배율은 <a href="#step-dpi">6단계</a></li>
-						</ul>
-					</details>
-					<p><code>FD3D11Graphics.cpp</code> 는 새 파일이에요. include 묶음 다음에 <code>Initialize</code> 를 ① 조각부터 차례로 이어 붙이고, 마지막 ⑥ 조각은 3단계에서 붙여요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">파일 맨 위 include</span></figcaption>
-<pre class="snip" data-lang="cpp"><!--SLICE:Source/Graphics/FD3D11Graphics.cpp:#include <initguid.h>=>FD3D11Graphics::~FD3D11Graphics()--></pre>
+<pre class="snip" data-lang="cpp"><!--SLICE@1:Source/Graphics/FD3D11Graphics.cpp:#include "Graphics/FD3D11Graphics.h"=>void FD3D11Graphics::Initialize--></pre>
 					</figure>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
-							<li class="entry"><code>#include &lt;initguid.h&gt;</code> <a href="#step-debug">7단계</a>에서 설명</li>
 							<li class="entry"><code>#include &lt;dxgi1_6.h&gt;</code> 어댑터를 성능 순으로 고르는 <code>IDXGIFactory6</code> 가 이 헤더에 있음</li>
 							<li class="entry"><code>using Microsoft::WRL::ComPtr;</code> 이 파일 안에서는 <code>ComPtr</code> 로 줄여 씀</li>
 						</ul>
 					</details>
+					<p><code>FD3D11Graphics::Initialize</code> 는 DXGI 팩토리로 어댑터를 고른 뒤 그 어댑터로 디바이스를 만들어요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">Initialize ① 시작 · include 묶음 다음</span></figcaption>
-<pre class="snip" data-lang="cpp"><!--SLICE:Source/Graphics/FD3D11Graphics.cpp:void FD3D11Graphics::Initialize=>UINT FactoryFlags = 0;--></pre>
-					</figure>
-					<details class="fold" id="fold-debug-factory">
-						<summary>Initialize ② 디버그 빌드 코드 · 7단계에서 설명</summary>
-					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">Initialize ② DXGI 디버그 큐</span></figcaption>
-<pre class="snip" data-lang="cpp"><!--SLICE:Source/Graphics/FD3D11Graphics.cpp:UINT FactoryFlags = 0;=>ComPtr<IDXGIFactory2> Factory;--></pre>
-					</figure>
-					</details>
-					<p><code>FD3D11Graphics::Initialize</code> 는 먼저 DXGI 팩토리로 어댑터를 골라요.</p>
-					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">Initialize ③ 어댑터 고르기</span></figcaption>
-<pre class="snip" data-lang="cpp"><!--SLICE:Source/Graphics/FD3D11Graphics.cpp:ComPtr<IDXGIFactory2> Factory;=>UINT Flags = 0;--></pre>
-					</figure>
-					<details class="fold">
-						<summary>줄 단위 풀이</summary>
-						<ul class="walk">
-							<li class="entry"><code>FactoryFlags</code> ② 조각에서 정함. 릴리스 빌드에서는 0</li>
-							<li class="entry"><code>Factory</code> 어댑터를 나열한 이 팩토리로 <a href="#step-swapchain">3단계</a>의 스왑체인도 만듦</li>
-							<li class="entry"><code>EnumAdapterByGpuPreference</code> <code>IDXGIFactory6</code> 에 있는 함수. <code>DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE</code> 는 성능이 높은 순서로 나열해서 0 번이 가장 빠른 GPU. <code>IDXGIFactory6</code> 가 없으면 첫 어댑터를 씀</li>
-							<li class="entry"><code>DedicatedVideoMemory / 1024 / 1024</code> 그래픽 카드 전용 메모리를 MB 로</li>
-						</ul>
-					</details>
-					<details class="fold" id="fold-debug-layer">
-						<summary>Initialize ④ 디버그 빌드 코드 · 7단계에서 설명</summary>
-					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">Initialize ④ D3D 디버그 레이어</span></figcaption>
-<pre class="snip" data-lang="cpp"><!--SLICE:Source/Graphics/FD3D11Graphics.cpp:UINT Flags = 0;=>const D3D_FEATURE_LEVEL FeatureLevel--></pre>
-					</figure>
-					</details>
-					<figure class="code" id="code-init-device">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">Initialize ⑤ 디바이스 만들기</span></figcaption>
-<pre class="snip" data-lang="cpp"><!--SLICE:Source/Graphics/FD3D11Graphics.cpp:const D3D_FEATURE_LEVEL FeatureLevel=>DXGI_SWAP_CHAIN_DESC1 SwapChainDesc--></pre>
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">FD3D11Graphics::Initialize · using 다음</span></figcaption>
+<pre class="snip" data-lang="cpp"><!--SYMBOL@1:Source/Graphics/FD3D11Graphics.cpp:void FD3D11Graphics::Initialize--></pre>
 					</figure>
 					<p><code>D3D11CreateDevice</code> 는 디바이스와 컨텍스트를 한 번에 돌려줘요. 무엇을 만드는 함수는 <code>Device</code> 에, 파이프라인에 일을 시키는 함수는 <code>Context</code> 에 있어요.</p>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
-							<li class="entry"><code>Flags</code> ④ 조각에서 정함. 릴리스 빌드에서는 0</li>
+							<li class="entry"><code>CreateDXGIFactory2(0, ...)</code> 첫 인자는 팩토리를 만드는 플래그. 0 은 플래그 없음</li>
+							<li class="entry"><code>EnumAdapterByGpuPreference</code> <code>IDXGIFactory6</code> 에 있는 함수. <code>DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE</code> 는 성능이 높은 순서로 나열해서 0 번이 가장 빠른 GPU. <code>IDXGIFactory6</code> 가 없으면 첫 어댑터를 씀</li>
+							<li class="entry"><code>DedicatedVideoMemory / 1024 / 1024</code> 그래픽 카드 전용 메모리를 MB 로</li>
 							<li class="entry"><code>D3D_DRIVER_TYPE_UNKNOWN</code> 어댑터를 직접 넘길 때 드라이버 종류는 이 값이어야 함</li>
 							<li class="entry"><code>&amp;FeatureLevel, 1</code> 요구하는 기능 수준 목록과 개수. 11_0 하나만 요구함</li>
 							<li class="entry"><code>nullptr,</code> (<code>Device.GetAddressOf()</code> 다음) 실제로 만들어진 기능 수준을 받는 칸. 하나만 요구해서 받지 않음</li>
 							<li class="entry"><code>Device.GetAddressOf()</code> 출력 인자도 <code>GetAddressOf()</code> 로 넘김. <code>ComPtr</code> 의 <code>&amp;</code> 는 가리키던 객체를 먼저 해제함</li>
-							<li class="entry"><code>ComPtr&lt;ID3D11InfoQueue&gt; D3DInfoQueue;</code> 이 <code>#ifndef NDEBUG</code> 블록은 <a href="#step-debug">7단계</a>에서 설명</li>
 						</ul>
+					</details>
+					<p><code>FD3D11Graphics</code> 는 <code>FSystem</code> 의 멤버예요. <code>FSystem::Initialize</code> 가 창을 만든 다음 <code>Graphics.Initialize</code> 를 불러요.</p>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/FSystem.h</span><span class="badge mod">수정</span><span class="badge">include 와 멤버</span></figcaption>
+<pre class="diff" data-lang="cpp"><!--DIFF@1:Source/Core/FSystem.h--></pre>
+					</figure>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge new">신규</span><span class="badge">FSystem::Initialize 안, 창 생성 로그 다음</span></figcaption>
+<pre class="diff" data-lang="cpp"><!--DIFF@1:Source/Core/FSystem.cpp--></pre>
+					</figure>
+					<details class="fold">
+						<summary>줄 단위 풀이</summary>
+						<ul class="walk">
+							<li class="entry"><code>FD3D11Graphics Graphics;</code> <code>FWindow</code> 뒤에 선언해서 먼저 소멸함. 다음 단계의 스왑체인이 창에 그림을 내보내서 창보다 먼저 해제돼야 함</li>
+						</ul>
+					</details>
+					<p>새 파일을 빌드에 등록해요. CMake 빌드는 <code>CMakeLists.txt</code> 에 <code>FD3D11Graphics.cpp</code> 를 적고 D3D 라이브러리 <code>d3d11</code>·<code>dxgi</code> 를 링크에 더해요.</p>
+					<figure class="code">
+						<figcaption><span class="path">CMakeLists.txt</span><span class="badge mod">수정</span><span class="badge">소스 목록과 링크</span></figcaption>
+<pre class="diff" data-lang="cmake"><!--DIFF@1:CMakeLists.txt--></pre>
+					</figure>
+					<details class="fold">
+						<summary>줄 단위 풀이</summary>
+						<ul class="walk">
+							<li class="entry"><code>target_link_libraries(DxRenderDojo PRIVATE d3d11 dxgi)</code> 원문은 헤더의 <code>#pragma comment(lib, ...)</code> 로 링크함. mingw 빌드와 맞추려고 빌드 파일에 적음</li>
+						</ul>
+					</details>
+					<p>Visual Studio 에서는 솔루션 탐색기에 <code>Graphics</code> 필터를 만들고 <code>FD3D11Graphics.h</code>·<code>FD3D11Graphics.cpp</code> 를 기존 항목 추가로 넣어요. 링크할 라이브러리는 프로젝트 속성에서 구성을 모든 구성으로 두고 링커 › 입력 › 추가 종속성에 <code>d3d11.lib;dxgi.lib</code> 를 더해요. 두 조작이 <code>DxRenderDojo.vcxproj</code> 와 <code>DxRenderDojo.vcxproj.filters</code> 를 바꿔요.</p>
+					<details class="fold">
+						<summary>참고 : 위 조작이 프로젝트 파일에 남기는 diff · 따로 치지 않음</summary>
+					<figure class="code">
+						<figcaption><span class="path">DxRenderDojo.vcxproj</span><span class="badge mod">수정</span><span class="badge">새 파일과 추가 종속성</span></figcaption>
+<pre class="diff" data-lang="xml"><!--DIFF@1:DxRenderDojo.vcxproj--></pre>
+					</figure>
 					</details>
 					<details class="fold">
 						<summary>원문과 비교</summary>
 						<p>원문은 <code>D3D11CreateDeviceAndSwapChain</code> 한 번으로 디바이스·컨텍스트·스왑체인을 함께 만들고 어댑터 인자에 <code>NULL</code> 을 넘겨 기본 어댑터를 써요. <code>EnumAdapters(0)</code> 로 얻은 어댑터는 주사율과 카드 이름을 읽는 데만 써요. 원문 본문도 GPU 가 둘인 노트북에서는 기본 어댑터가 성능이 낮은 쪽일 수 있다고 적고 카드를 모두 나열해 사용자가 고르게 하라고 권해요.</p>
-						<p>이 교재는 디바이스를 먼저 만들고 스왑체인은 3단계에서 따로 만들어요. 디바이스는 프로그램에 하나이고 스왑체인은 창에 딸린 것이에요.</p>
+						<p>이 교재는 디바이스를 먼저 만들고 스왑체인은 2단계에서 따로 만들어요. 디바이스는 프로그램에 하나이고 스왑체인은 창에 딸린 것이에요.</p>
 					</details>
 					<details class="fold">
 						<summary>언리얼로 치면</summary>
@@ -701,7 +629,11 @@ figure.code .diff-view { border-top: 0; }
 					</details>
 					<div class="learn">
 						<p class="box-label">스스로 설명해 보기</p>
-						<p>4단계에서 백 버퍼를 지우는 함수 <code>ClearRenderTargetView</code> 는 <code>Device</code> 와 <code>Context</code> 중 어느 쪽에 있을까요? 이 단계의 설명으로 이유까지 말해 보세요.</p>
+						<p>3단계에서 백 버퍼를 지우는 함수 <code>ClearRenderTargetView</code> 는 <code>Device</code> 와 <code>Context</code> 중 어느 쪽에 있을까요? 이 단계의 설명으로 이유까지 말해 보세요.</p>
+					</div>
+					<div class="checkpoint">
+						<p class="box-label">여기까지</p>
+						<p>빌드하고 실행하면 콘솔 창에 <code>그래픽 카드 : 이름 (메모리 MB)</code> 가 찍혀요. 창 안쪽은 아직 02편처럼 검정이에요.</p>
 					</div>
 				</div>
 			</li>
@@ -721,27 +653,36 @@ figure.code .diff-view { border-top: 0; }
 							</ul>
 						</aside>
 					</details>
+					<p>스왑체인은 창에 딸려서 <code>Initialize</code> 가 이제 창을 받아요. 헤더에는 스왑체인과 RTV 멤버, RTV 를 만드는 함수를 더해요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">Initialize ⑥ 스왑체인과 끝</span></figcaption>
-<pre class="snip" data-lang="cpp"><!--SLICE:Source/Graphics/FD3D11Graphics.cpp:DXGI_SWAP_CHAIN_DESC1 SwapChainDesc=>void FD3D11Graphics::Resize--></pre>
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.h</span><span class="badge mod">수정</span><span class="badge">Initialize 인자와 멤버</span></figcaption>
+<pre class="diff" data-lang="cpp"><!--DIFF@2:Source/Graphics/FD3D11Graphics.h--></pre>
+					</figure>
+					<figure class="code">
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge mod">수정</span><span class="badge">include 와 FD3D11Graphics::Initialize</span></figcaption>
+<pre class="diff" data-lang="cpp"><!--DIFF@2:Source/Graphics/FD3D11Graphics.cpp:#include "Graphics/FD3D11Graphics.h"=>void FD3D11Graphics::CreateSizeDependentResources--></pre>
 					</figure>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
+							<li class="entry"><code>class FWindow;</code> 헤더에서는 참조로만 받아서 전방 선언으로 충분함</li>
 							<li class="entry"><code>Window.GetWidth()</code> 버퍼 크기는 창의 클라이언트 영역 크기. <a href="#predict">먼저 예측</a> 1번의 답</li>
 							<li class="entry"><code>DXGI_FORMAT_R8G8B8A8_UNORM</code> 한 픽셀에 R·G·B·A 각 8비트. <code>UNORM</code> 은 0~255 를 0.0~1.0 으로 읽는다는 뜻</li>
 							<li class="entry"><code>SampleDesc.Count = 1</code> 멀티샘플링을 쓰지 않음</li>
 							<li class="entry"><code>DXGI_USAGE_RENDER_TARGET_OUTPUT</code> 이 버퍼에 그린다는 선언</li>
 							<li class="entry"><code>BufferCount = 2</code> 플립 모델은 2개 이상이어야 함. 1 로 두면 <a href="#pitfalls">흔한 실수</a> 2번</li>
 							<li class="entry"><code>CreateSwapChainForHwnd(Device.Get(), Window.GetHandle(), ...)</code> D3D11 에서는 첫 인자로 디바이스를 넘김. 뒤의 두 <code>nullptr</code> 는 독점 전체 화면 설정과 출력 모니터 제한</li>
-							<li class="entry"><code>DXGI_MWA_NO_ALT_ENTER</code> Alt+Enter 는 <a href="#step-dpi">6단계</a>에서 직접 처리</li>
-							<li class="entry"><code>FlushDebugMessages();</code> 쌓인 디버그 메시지를 로그로. <a href="#step-debug">7단계</a></li>
+							<li class="entry"><code>DXGI_MWA_NO_ALT_ENTER</code> DXGI 는 스왑체인을 만든 창에 Alt+Enter 로 독점 전체 화면 전환을 걸어 둠. 02편에서 Alt+Enter 를 직접 처리하므로 그 전환을 끔</li>
 						</ul>
 					</details>
-					<p>백 버퍼는 텍스처일 뿐이라 그대로는 지울 수도 그릴 수도 없어요. <code>CreateSizeDependentResources</code> 가 백 버퍼로 RTV 를 만들고, 4단계는 이 RTV 를 거쳐 백 버퍼를 지워요.</p>
+					<p>백 버퍼는 텍스처일 뿐이라 그대로는 지울 수도 그릴 수도 없어요. <code>CreateSizeDependentResources</code> 가 백 버퍼로 RTV 를 만들고, 3단계는 이 RTV 를 거쳐 백 버퍼를 지워요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">FD3D11Graphics::CreateSizeDependentResources · Initialize 다음</span></figcaption>
-<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Graphics/FD3D11Graphics.cpp:void FD3D11Graphics::CreateSizeDependentResources--></pre>
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">FD3D11Graphics::CreateSizeDependentResources · 파일 끝, Initialize 다음</span></figcaption>
+<pre class="snip" data-lang="cpp"><!--SYMBOL@2:Source/Graphics/FD3D11Graphics.cpp:void FD3D11Graphics::CreateSizeDependentResources--></pre>
+					</figure>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge mod">수정</span><span class="badge">FSystem::Initialize 안, Graphics.Initialize</span></figcaption>
+<pre class="diff" data-lang="cpp"><!--DIFF@2:Source/Core/FSystem.cpp--></pre>
 					</figure>
 					<details class="fold">
 						<summary>원문과 비교</summary>
@@ -759,6 +700,10 @@ figure.code .diff-view { border-top: 0; }
 						<p class="box-label">스스로 설명해 보기</p>
 						<p><code>CreateSizeDependentResources</code> 의 <code>BackBuffer</code> 는 지역 변수라 함수가 끝나면 해제돼요. 그런데도 RTV 로 백 버퍼를 계속 지울 수 있는 이유를 말해 보세요.</p>
 					</div>
+					<div class="checkpoint">
+						<p class="box-label">여기까지</p>
+						<p>실행하면 1단계와 같아 보여요. 스왑체인은 만들었지만 아직 아무것도 내보내지 않아요. 상자 없이 창이 뜨면 돼요.</p>
+					</div>
 				</div>
 			</li>
 
@@ -766,26 +711,31 @@ figure.code .diff-view { border-top: 0; }
 				<div class="step-body">
 					<h3>매 프레임 지우고 내보낸다</h3>
 					<p>한 프레임은 백 버퍼를 지우는 것으로 시작해 <code>Present</code> 로 끝나요. 그 앞뒤를 <code>FSystem::Frame</code> 이 맡아서 <code>FApplication::Render</code> 는 그 사이에 그리기만 하면 돼요.</p>
-					<p>지우는 색은 장면이 정해요. <code>FApplication</code> 의 <code>ClearColor</code> 가 (0.5, 0.5, 0.5, 1) 이라 창 안쪽이 회색이 돼요. vsync 를 켤지는 <code>FDisplaySettings</code> 의 <code>bVSync</code> 가 정해요.</p>
+					<p>설정부터 더해요. vsync 를 켤지는 <code>FDisplaySettings</code> 의 <code>bVSync</code> 가 정해요. 지우는 색은 장면이 정해서 <code>FApplication</code> 의 <code>ClearColor</code> 가 (0.5, 0.5, 0.5, 1) 이면 창 안쪽이 회색이 돼요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FDisplaySettings.h</span><span class="badge new">신규</span><span class="badge">tut02 → tut03</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF:Source/Core/FDisplaySettings.h--></pre>
+						<figcaption><span class="path">Source/Core/FDisplaySettings.h</span><span class="badge new">신규</span><span class="badge">bVSync</span></figcaption>
+<pre class="diff" data-lang="cpp"><!--DIFF@3:Source/Core/FDisplaySettings.h--></pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/App/FApplication.h</span><span class="badge new">신규</span><span class="badge">tut02 → tut03</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF:Source/App/FApplication.h--></pre>
+						<figcaption><span class="path">Source/App/FApplication.h</span><span class="badge new">신규</span><span class="badge">지우는 색</span></figcaption>
+<pre class="diff" data-lang="cpp"><!--DIFF@3:Source/App/FApplication.h--></pre>
+					</figure>
+					<p><code>FD3D11Graphics</code> 는 <code>Initialize</code> 에서 설정을 받아 <code>bVSync</code> 를 보관해요. 프레임 앞뒤에 부를 <code>BeginScene</code>·<code>EndScene</code> 도 더해요.</p>
+					<figure class="code">
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.h</span><span class="badge mod">수정</span><span class="badge">Initialize 인자, 프레임 함수, bVSync</span></figcaption>
+<pre class="diff" data-lang="cpp"><!--DIFF@3:Source/Graphics/FD3D11Graphics.h--></pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge mod">수정</span><span class="badge">FSystem::Frame</span></figcaption>
-<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FSystem.cpp:void FSystem::Frame()--></pre>
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge mod">수정</span><span class="badge">include 와 FD3D11Graphics::Initialize 첫 줄</span></figcaption>
+<pre class="diff" data-lang="cpp"><!--DIFF@3:Source/Graphics/FD3D11Graphics.cpp:#include "Graphics/FD3D11Graphics.h"=>ComPtr<IDXGIFactory2> Factory;--></pre>
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">FD3D11Graphics::BeginScene · Initialize 다음, CreateSizeDependentResources 앞</span></figcaption>
-<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Graphics/FD3D11Graphics.cpp:void FD3D11Graphics::BeginScene--></pre>
+<pre class="snip" data-lang="cpp"><!--SYMBOL@3:Source/Graphics/FD3D11Graphics.cpp:void FD3D11Graphics::BeginScene--></pre>
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">FD3D11Graphics::EndScene · BeginScene 다음</span></figcaption>
-<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Graphics/FD3D11Graphics.cpp:void FD3D11Graphics::EndScene--></pre>
+<pre class="snip" data-lang="cpp"><!--SYMBOL@3:Source/Graphics/FD3D11Graphics.cpp:void FD3D11Graphics::EndScene--></pre>
 					</figure>
 					<p><code>Present</code> 의 첫 인자는 화면이 몇 번 갱신될 때마다 한 프레임을 내보낼지예요. 1 을 넘기면 화면이 한 번 갱신될 때 한 프레임씩만 나가요. 내보내지 못한 프레임이 쌓여 있으면 <code>Present</code> 가 기다리고 루프도 그동안 멈춰서 02편처럼 코어 하나를 다 쓰지 않아요.</p>
 					<details class="fold">
@@ -793,9 +743,12 @@ figure.code .diff-view { border-top: 0; }
 						<ul class="walk">
 							<li class="entry"><code>ClearRenderTargetView(RenderTargetView.Get(), Color.data())</code> RTV 가 가리키는 백 버퍼 전체를 한 색으로 채움</li>
 							<li class="entry"><code>bVSync ? 1 : 0</code> 0 이면 기다리지 않고 바로 내보냄</li>
-							<li class="entry"><code>FlushDebugMessages();</code> 쌓인 디버그 메시지를 로그로. <a href="#step-debug">7단계</a></li>
 						</ul>
 					</details>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge mod">수정</span><span class="badge">Graphics.Initialize 인자와 FSystem::Frame</span></figcaption>
+<pre class="diff" data-lang="cpp"><!--DIFF@3:Source/Core/FSystem.cpp--></pre>
+					</figure>
 					<details class="fold">
 						<summary>원문과 비교</summary>
 						<p>원문은 <code>ApplicationClass::Render</code> 가 <code>BeginScene</code> 과 <code>EndScene</code> 을 직접 불러요. 저는 이 둘을 <code>FSystem::Frame</code> 으로 옮겼어요. 그러면 편마다 <code>Render</code> 를 새로 써도 <code>Present</code> 를 빠뜨릴 일이 없어요.</p>
@@ -812,6 +765,10 @@ figure.code .diff-view { border-top: 0; }
 						<p class="box-label">스스로 설명해 보기</p>
 						<p>모니터 주사율이 144Hz 라면 <code>Frame</code> 은 1초에 몇 번쯤 불릴까요? <code>bVSync</code> 가 켜져 있을 때와 꺼져 있을 때를 나눠 말해 보세요.</p>
 					</div>
+					<div class="checkpoint">
+						<p class="box-label">여기까지</p>
+						<p>창 안쪽이 회색이 돼요. 작업 관리자에서 보면 02편과 달리 CPU 코어 하나를 다 쓰지 않아요.</p>
+					</div>
 				</div>
 			</li>
 
@@ -821,26 +778,36 @@ figure.code .diff-view { border-top: 0; }
 					<p>스왑체인 버퍼의 크기는 만들 때 정해지고 창을 따라 저절로 바뀌지 않아요. 창 크기가 바뀌면 <code>ResizeBuffers</code> 로 버퍼를 다시 만들어야 해요.</p>
 					<p><code>ResizeBuffers</code> 는 백 버퍼를 참조하는 RTV 가 남아 있으면 실패해요. 그래서 RTV 를 먼저 놓고 버퍼를 다시 만든 뒤 새 백 버퍼로 RTV 를 다시 만들어요.</p>
 					<figure class="code">
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.h</span><span class="badge new">신규</span><span class="badge">Resize</span></figcaption>
+<pre class="diff" data-lang="cpp"><!--DIFF@4:Source/Graphics/FD3D11Graphics.h--></pre>
+					</figure>
+					<figure class="code">
 						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">FD3D11Graphics::Resize · Initialize 다음, BeginScene 앞</span></figcaption>
-<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Graphics/FD3D11Graphics.cpp:void FD3D11Graphics::Resize--></pre>
+<pre class="snip" data-lang="cpp"><!--SYMBOL@4:Source/Graphics/FD3D11Graphics.cpp:void FD3D11Graphics::Resize--></pre>
 					</figure>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
 							<li class="entry"><code>ResizeBuffers(0, ..., DXGI_FORMAT_UNKNOWN, 0)</code> 첫 인자 0 과 <code>DXGI_FORMAT_UNKNOWN</code> 은 버퍼 개수와 형식을 그대로 둔다는 뜻</li>
-							<li class="entry"><code>CreateSizeDependentResources();</code> <a href="#step-swapchain">3단계</a>에서 <code>Initialize</code> 가 부른 것과 같은 함수</li>
+							<li class="entry"><code>CreateSizeDependentResources();</code> <a href="#step-swapchain">2단계</a>에서 <code>Initialize</code> 가 부른 것과 같은 함수</li>
 						</ul>
 					</details>
 					<p>크기 알림은 02편의 <code>FWindow::NotifyResize</code> 에서 출발해요. 이 편에서는 <code>FSystem::OnResize</code> 가 로그를 남긴 다음 <code>Graphics.Resize</code> 를 불러요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge mod">수정</span><span class="badge">FSystem::OnResize</span></figcaption>
-<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FSystem.cpp:void FSystem::OnResize--></pre>
+						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge new">신규</span><span class="badge">FSystem::OnResize 끝</span></figcaption>
+<pre class="diff" data-lang="cpp"><!--DIFF@4:Source/Core/FSystem.cpp--></pre>
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge mod">수정</span><span class="badge">FWindow::NotifyResize</span></figcaption>
-<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FWindow.cpp:void FWindow::NotifyResize--></pre>
+<pre class="snip" data-lang="cpp"><!--SYMBOL@4:Source/Core/FWindow.cpp:void FWindow::NotifyResize--></pre>
 					</figure>
 					<p><code>NotifyResize</code> 의 <code>if (NewWidth == Width &amp;&amp; NewHeight == Height)</code> 가 02편 바꿔 보기 4번의 답이에요. 창을 옮기기만 하면 이제 로그도 찍히지 않고 스왑체인도 그대로예요.</p>
+					<details class="fold">
+						<summary>줄 단위 풀이</summary>
+						<ul class="walk">
+							<li class="entry"><code>Window.SetResizeCallback(...)</code> <code>FSystem::Initialize</code> 가 <code>Graphics.Initialize</code> 뒤에 검. 창을 만드는 도중의 크기 알림이 아직 없는 스왑체인으로 가지 않음</li>
+						</ul>
+					</details>
 					<details class="fold">
 						<summary>언리얼로 치면</summary>
 						<aside class="ue">
@@ -852,84 +819,10 @@ figure.code .diff-view { border-top: 0; }
 						<p class="box-label">스스로 설명해 보기</p>
 						<p>창을 최소화하면 클라이언트 영역이 0×0 이 돼요. 그래도 <code>Resize</code> 가 0×0 으로 불리지 않는 이유를 02편 <code>HandleMessage</code> 에서 찾아 말해 보세요.</p>
 					</div>
-				</div>
-			</li>
-
-			<li class="step" id="step-dpi">
-				<div class="step-body">
-					<h3>배율과 전체 화면을 맞춘다</h3>
-					<p>모니터 배율 변경과 Alt+Enter 전체 화면도 창 크기를 바꾸므로 5단계와 같은 <code>NotifyResize</code> 로 와요. 둘 다 <code>FWindow</code> 안에서 처리하고 <code>FD3D11Graphics</code> 에는 따로 들어가는 코드가 없어요.</p>
-					<p>창 크기는 <code>FDisplaySettings</code> 의 800×600 에 배율을 곱해 정해요. 실행 중에 배율을 바꾸면 창도 같은 비율로 커지거나 작아져요.</p>
-					<details class="fold">
-						<summary>Win32 개념 · 배율과 DPI</summary>
-						<aside class="concept">
-							<ul class="walk">
-								<li><strong>DPI</strong> : 창이 쓰는 배율을 1인치당 픽셀 수로 나타낸 값. 배율 100% 가 96, 150% 가 144</li>
-								<li class="entry"><code>WM_DPICHANGED</code> 창이 있는 모니터의 배율이 바뀌거나 배율이 다른 모니터로 옮겼을 때. 새 배율에 맞춘 창 사각형을 함께 보냄</li>
-								<li class="entry"><code>WM_GETDPISCALEDSIZE</code> <code>WM_DPICHANGED</code> 직전에 옴. 새 배율에서의 창 크기를 앱이 계산해 돌려줄 수 있음</li>
-								<li class="entry"><code>AdjustWindowRectExForDpi</code> <code>AdjustWindowRect</code> 의 배율 버전. 제목 표시줄과 테두리 두께도 배율에 따라 달라짐</li>
-							</ul>
-						</aside>
-					</details>
-					<details class="fold">
-						<summary>배율을 처리하는 코드</summary>
-					<figure class="code">
-						<figcaption><span class="path">Source/Core/FWindow.h</span><span class="badge mod">수정</span><span class="badge">tut02 → tut03 · 전체 화면 멤버도 함께</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF:Source/Core/FWindow.h--></pre>
-					</figure>
-					<figure class="code">
-						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">신규</span><span class="badge">맨 위 include</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF:Source/Core/FWindow.cpp:#include "Core/FWindow.h"=>LRESULT CALLBACK FWindow::WndProc--></pre>
-					</figure>
-					<figure class="code">
-						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge mod">수정</span><span class="badge">FWindow::Initialize</span></figcaption>
-<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FWindow.cpp:void FWindow::Initialize--></pre>
-					</figure>
-					<figure class="code">
-						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">신규</span><span class="badge">HandleMessage 의 switch 안, case WM_SIZE 다음</span></figcaption>
-<pre class="snip" data-lang="cpp"><!--SLICE:Source/Core/FWindow.cpp:case WM_GETDPISCALEDSIZE=>case WM_GETMINMAXINFO--></pre>
-					</figure>
-					<figure class="code">
-						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge mod">수정</span><span class="badge">HandleMessage 의 case WM_GETMINMAXINFO</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF:Source/Core/FWindow.cpp:case WM_GETMINMAXINFO=>case WM_MENUCHAR--></pre>
-					</figure>
-					<figure class="code">
-						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">신규</span><span class="badge">FWindow::ScaleForDpi · 파일 끝, NotifyResize 다음</span></figcaption>
-<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FWindow.cpp:int FWindow::ScaleForDpi--></pre>
-					</figure>
-					<ul class="walk">
-						<li class="entry"><code>ScaleForDpi(Settings.Width)</code> 배율 100% 기준 값을 지금 배율로 바꿈. <code>WM_GETMINMAXINFO</code> 의 최소 크기 320×240 에도 곱함</li>
-						<li class="entry"><code>if (Settings.bFullScreen)</code> 창은 늘 창 모드로 만들고, 시작 설정이 전체 화면이면 만든 직후 Alt+Enter 와 같은 <code>ToggleFullScreen</code> 을 부름</li>
-						<li class="entry"><code>case WM_GETDPISCALEDSIZE:</code> 이 처리가 없으면 배율 175% 에서 200% 로 바꿀 때 <code>1601x1202</code>, 이어서 100% 로 바꿀 때 <code>798x598</code> 처럼 1~2 픽셀씩 어긋나고 쌓임</li>
-						<li class="entry"><code>Suggested</code> 윈도우가 보낸 새 창 사각형. <code>WM_GETDPISCALEDSIZE</code> 에서 돌려준 크기가 반영돼 있음</li>
-					</ul>
-					</details>
-					<p>Alt+Enter 는 테두리 없는 전체 화면을 켜고 꺼요. 제목 표시줄과 테두리를 빼고 창이 있는 모니터를 채울 뿐이라 해상도는 그대로예요. 다시 누르면 원래 위치와 크기로 돌아와요.</p>
-					<details class="fold">
-						<summary>전체 화면 코드</summary>
-					<figure class="code">
-						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">신규</span><span class="badge">HandleMessage 의 switch 안, case WM_GETMINMAXINFO 다음</span></figcaption>
-<pre class="snip" data-lang="cpp"><!--SLICE:Source/Core/FWindow.cpp:case WM_MENUCHAR=>default:--></pre>
-					</figure>
-					<figure class="code">
-						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">신규</span><span class="badge">FWindow::ToggleFullScreen · ScaleForDpi 다음</span></figcaption>
-<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FWindow.cpp:void FWindow::ToggleFullScreen--></pre>
-					</figure>
-					<figure class="code">
-						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">신규</span><span class="badge">FWindow::FitToMonitor · ToggleFullScreen 다음</span></figcaption>
-<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FWindow.cpp:void FWindow::FitToMonitor--></pre>
-					</figure>
-					<ul class="walk">
-						<li class="entry"><code>case WM_SYSKEYDOWN:</code> Alt 와 함께 누른 키는 <code>WM_KEYDOWN</code> 대신 이 메시지로 옴</li>
-						<li class="entry"><code>Style &amp; ~WS_OVERLAPPEDWINDOW</code> 제목 표시줄·테두리·최소화와 최대화 단추의 스타일 비트를 끔</li>
-						<li class="entry"><code>SWP_FRAMECHANGED</code> 스타일을 바꾼 뒤 테두리를 다시 계산하게 함</li>
-						<li class="entry"><code>rcMonitor</code> 작업 표시줄까지 포함한 모니터 전체 사각형</li>
-					</ul>
-					</details>
-					<details class="fold">
-						<summary>원문과 비교</summary>
-						<p>원문 과제 2 는 <code>FULL_SCREEN</code> 을 <code>true</code> 로 바꿔 다시 빌드하고 독점 전체 화면을 보는 것이에요. 이 교재는 독점 전체 화면을 쓰지 않아요. DXGI 가 Alt+Enter 에 거는 독점 전체 화면 전환도 3단계의 <code>DXGI_MWA_NO_ALT_ENTER</code> 로 막아 두고 같은 키로 테두리 없는 전체 화면을 켜고 꺼요.</p>
-					</details>
+					<div class="checkpoint">
+						<p class="box-label">여기까지</p>
+						<p>테두리를 끌거나 최대화해도 회색이 창을 채워요. 크기가 바뀔 때마다 로그에 <code>창 크기 변경</code> 과 새 크기가 찍혀요.</p>
+					</div>
 				</div>
 			</li>
 
@@ -937,61 +830,73 @@ figure.code .diff-view { border-top: 0; }
 				<div class="step-body">
 					<h3>디버그 메시지를 로그로 옮긴다</h3>
 					<p>디버그 빌드에서는 D3D 와 DXGI 가 잘못된 호출의 원인을 영어 문장으로 설명해 줘요. 그 문장을 <code>FLog</code> 로 옮기면 콘솔 창에서 <code>[CHECK FATAL]</code> 줄 바로 위에 원인이 찍혀요. <a href="#pitfalls">흔한 실수</a> 두 항목의 증상이 그 예예요.</p>
-					<p>디버그 기능을 켜는 코드는 2단계에서 <code>Initialize</code> 에 넣은 조각 셋이에요.</p>
-					<ul class="walk">
-						<li><a href="#fold-debug-factory">② DXGI 디버그 큐</a> : <code>DXGIGetDebugInterface1</code> 로 큐를 얻고 팩토리에 <code>DXGI_CREATE_FACTORY_DEBUG</code> 를 줌. 치명 실패 직전에 부를 훅도 여기서 검</li>
-						<li><a href="#fold-debug-layer">④ D3D 디버그 레이어</a> : <code>LayerProbe</code> 가 화면에 그리지 않는 NULL 드라이버로 디버그 디바이스를 먼저 만들어 봄. 성공할 때만 <code>D3D11_CREATE_DEVICE_DEBUG</code> 를 켜고, 실패하면 경고를 남기고 디버그 레이어 없이 만듦</li>
-						<li><a href="#code-init-device">⑤ 조각 끝의 출력 창 끄기</a> : D3D11 런타임이 출력 창에 직접 쓰는 것을 끔. DXGI 런타임의 출력은 이것으로 꺼지지 않아서 Visual Studio 출력 창에는 DXGI 메시지가 두 번 찍힘</li>
-					</ul>
+					<p>치명 실패로 끝나기 직전에도 쌓인 메시지를 내보내야 원인이 보여요. 그래서 <code>ReportFatal</code> 이 로그와 상자보다 먼저 부를 훅을 <code>Check</code> 에 더해요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">FD3D11Graphics::FlushDebugMessages · 파일 끝, CreateSizeDependentResources 다음</span></figcaption>
-<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Graphics/FD3D11Graphics.cpp:void FD3D11Graphics::FlushDebugMessages--></pre>
+						<figcaption><span class="path">Source/Utility/Check.h</span><span class="badge new">신규</span><span class="badge">SetFatalHook</span></figcaption>
+<pre class="diff" data-lang="cpp"><!--DIFF@5:Source/Utility/Check.h--></pre>
 					</figure>
-					<p>메시지는 DXGI 정보 큐 하나에서 꺼내요. 스왑체인 메시지는 DXGI 쪽이라 D3D11 의 <code>ID3D11InfoQueue</code> 로는 받지 못해요. 꺼내는 때는 <code>Initialize</code> 끝, <code>Present</code> 뒤마다, 그리고 치명 실패로 끝나기 직전이에요.</p>
+					<figure class="code">
+						<figcaption><span class="path">Source/Utility/Check.cpp</span><span class="badge new">신규</span><span class="badge">FatalHook 과 SetFatalHook</span></figcaption>
+<pre class="diff" data-lang="cpp"><!--DIFF@5:Source/Utility/Check.cpp--></pre>
+					</figure>
+					<p><code>FD3D11Graphics</code> 는 메시지를 꺼낼 정보 큐와 <code>FlushDebugMessages</code> 를 가져요. 소멸자는 건 훅을 풀어요.</p>
+					<figure class="code">
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.h</span><span class="badge new">신규</span><span class="badge">소멸자, FlushDebugMessages, InfoQueue</span></figcaption>
+<pre class="diff" data-lang="cpp"><!--DIFF@5:Source/Graphics/FD3D11Graphics.h--></pre>
+					</figure>
+					<figure class="code">
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">파일 맨 위 include</span></figcaption>
+<pre class="diff" data-lang="cpp"><!--DIFF@5:Source/Graphics/FD3D11Graphics.cpp:#include <initguid.h>=>using Microsoft::WRL::ComPtr;--></pre>
+					</figure>
+					<figure class="code">
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">FD3D11Graphics::~FD3D11Graphics · using 다음, Initialize 앞</span></figcaption>
+<pre class="snip" data-lang="cpp"><!--SYMBOL@5:Source/Graphics/FD3D11Graphics.cpp:FD3D11Graphics::~FD3D11Graphics()--></pre>
+					</figure>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
-							<li class="entry"><code>#include &lt;initguid.h&gt;</code> 2단계 include 묶음의 첫 줄. 다른 헤더보다 먼저 와야 그 뒤 헤더가 선언하는 GUID 가 이 파일에서 정의됨</li>
-							<li class="entry"><code>SetFatalHook([this] { FlushDebugMessages(); })</code> <a href="#step-fatal">1단계</a>의 <code>ReportFatal</code> 이 로그와 상자 전에 부름. 실패 원인이 <code>[CHECK FATAL]</code> 줄보다 먼저 찍힘</li>
+							<li class="entry"><code>#include &lt;initguid.h&gt;</code> 다른 헤더보다 먼저 와야 그 뒤 헤더가 선언하는 GUID 가 이 파일에서 정의됨</li>
+							<li class="entry"><code>::Return::SetFatalHook(nullptr);</code> 훅은 이 객체의 주소(<code>this</code>)를 붙잡고 있음. 복사를 막아 둬서 객체가 옮겨지지 않으니 소멸할 때 한 번만 풀면 됨</li>
+						</ul>
+					</details>
+					<p>디버그 기능은 <code>Initialize</code> 두 곳에서 켜요. 둘 다 <code>#ifndef NDEBUG</code> 안이라 릴리스 빌드에는 들어가지 않아요.</p>
+					<ul class="walk">
+						<li>DXGI 디버그 큐 : <code>DXGIGetDebugInterface1</code> 로 큐를 얻고 팩토리에 <code>DXGI_CREATE_FACTORY_DEBUG</code> 를 줌. 치명 실패 직전에 부를 훅도 여기서 검</li>
+						<li>D3D 디버그 레이어 : <code>LayerProbe</code> 가 화면에 그리지 않는 NULL 드라이버로 디버그 디바이스를 먼저 만들어 봄. 성공할 때만 <code>D3D11_CREATE_DEVICE_DEBUG</code> 를 켜고, 실패하면 경고를 남기고 디버그 레이어 없이 만듦. 디바이스를 만든 뒤에는 D3D11 런타임이 출력 창에 직접 쓰는 것을 끔. DXGI 런타임의 출력은 이것으로 꺼지지 않아서 Visual Studio 출력 창에는 DXGI 메시지가 두 번 찍힘</li>
+					</ul>
+					<figure class="code">
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge mod">수정</span><span class="badge">FD3D11Graphics::Initialize 안, DXGI 디버그 큐</span></figcaption>
+<pre class="diff" data-lang="cpp"><!--DIFF@5:Source/Graphics/FD3D11Graphics.cpp:UINT FactoryFlags = 0;=>ComPtr<IDXGIAdapter1> Adapter;--></pre>
+					</figure>
+					<figure class="code">
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge mod">수정</span><span class="badge">FD3D11Graphics::Initialize 안, D3D 디버그 레이어</span></figcaption>
+<pre class="diff" data-lang="cpp"><!--DIFF@5:Source/Graphics/FD3D11Graphics.cpp:UINT Flags = 0;=>DXGI_SWAP_CHAIN_DESC1 SwapChainDesc--></pre>
+					</figure>
+					<p>메시지는 DXGI 정보 큐 하나에서 꺼내요. 스왑체인 메시지는 DXGI 쪽이라 D3D11 의 <code>ID3D11InfoQueue</code> 로는 받지 못해요. 꺼내는 때는 <code>Initialize</code> 끝, <code>Present</code> 뒤마다, 그리고 치명 실패로 끝나기 직전이에요.</p>
+					<figure class="code">
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">FD3D11Graphics::Initialize 끝</span></figcaption>
+<pre class="diff" data-lang="cpp"><!--DIFF@5:Source/Graphics/FD3D11Graphics.cpp:CreateSizeDependentResources();=>void FD3D11Graphics::Resize--></pre>
+					</figure>
+					<figure class="code">
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">FD3D11Graphics::EndScene 끝</span></figcaption>
+<pre class="diff" data-lang="cpp"><!--DIFF@5:Source/Graphics/FD3D11Graphics.cpp:void FD3D11Graphics::EndScene=>void FD3D11Graphics::CreateSizeDependentResources--></pre>
+					</figure>
+					<figure class="code">
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">FD3D11Graphics::FlushDebugMessages · 파일 끝, CreateSizeDependentResources 다음</span></figcaption>
+<pre class="snip" data-lang="cpp"><!--SYMBOL@5:Source/Graphics/FD3D11Graphics.cpp:void FD3D11Graphics::FlushDebugMessages--></pre>
+					</figure>
+					<details class="fold">
+						<summary>줄 단위 풀이</summary>
+						<ul class="walk">
 							<li class="entry"><code>GetMessage(DXGI_DEBUG_ALL, Index, nullptr, &amp;Length)</code> 처음에는 길이만 받고, 그만큼 버퍼를 잡은 뒤 다시 불러 내용을 받음</li>
 							<li class="entry"><code>CHECK_RETURN(...)</code> 메시지 하나를 못 꺼내는 것은 치명 실패로 볼 일이 없어 함수만 빠져나옴</li>
 							<li class="entry"><code>Message-&gt;Producer == DXGI_DEBUG_DXGI</code> 메시지를 낸 쪽에 따라 <code>[DXGI]</code>·<code>[D3D]</code> 를 붙임</li>
 						</ul>
 					</details>
-					<details class="fold">
-						<summary>소멸자</summary>
-					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">FD3D11Graphics::~FD3D11Graphics · using 다음, Initialize 앞</span></figcaption>
-<pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Graphics/FD3D11Graphics.cpp:FD3D11Graphics::~FD3D11Graphics()--></pre>
-					</figure>
-					</details>
-				</div>
-			</li>
-
-			<li class="step" id="step-build">
-				<div class="step-body">
-					<h3>새 파일을 빌드에 등록한다</h3>
-					<p>CMake 빌드는 <code>CMakeLists.txt</code> 에 새 파일 <code>FD3D11Graphics.cpp</code> 를 등록하고 D3D 라이브러리 <code>d3d11</code>·<code>dxgi</code> 를 링크에 더해요.</p>
-					<figure class="code">
-						<figcaption><span class="path">CMakeLists.txt</span><span class="badge new">신규</span><span class="badge">tut02 → tut03</span></figcaption>
-<pre class="diff" data-lang="cmake"><!--DIFF:CMakeLists.txt--></pre>
-					</figure>
-					<details class="fold">
-						<summary>줄 단위 풀이</summary>
-						<ul class="walk">
-							<li class="entry"><code>target_link_libraries(DxRenderDojo PRIVATE d3d11 dxgi)</code> 원문은 헤더의 <code>#pragma comment(lib, ...)</code> 로 링크함. mingw 빌드와 맞추려고 빌드 파일에 적음</li>
-							<li class="entry"><code>_WIN32_WINNT=0x0A00 WINVER=0x0A00</code> mingw 빌드에서 <code>GetDpiForWindow</code> 같은 Windows 10 함수 선언이 보이게 대상 버전을 정함</li>
-						</ul>
-					</details>
-					<p>Visual Studio 에서는 솔루션 탐색기에 <code>Graphics</code> 필터를 만들고 <code>FD3D11Graphics.h</code>·<code>FD3D11Graphics.cpp</code> 를 기존 항목 추가로 넣어요. 링크할 라이브러리는 프로젝트 속성에서 구성을 모든 구성으로 두고 링커 › 입력 › 추가 종속성에 <code>d3d11.lib;dxgi.lib</code> 를 더해요. 두 조작이 <code>DxRenderDojo.vcxproj</code> 와 <code>DxRenderDojo.vcxproj.filters</code> 를 바꿔요.</p>
-					<details class="fold">
-						<summary>참고 : 위 조작이 프로젝트 파일에 남기는 diff · 따로 치지 않음</summary>
-					<figure class="code">
-						<figcaption><span class="path">DxRenderDojo.vcxproj</span><span class="badge new">신규</span><span class="badge">tut02 → tut03</span></figcaption>
-<pre class="diff" data-lang="xml"><!--DIFF:DxRenderDojo.vcxproj--></pre>
-					</figure>
-					</details>
-					<p>이제 F5 로 실행하고 <a href="#check">다 됐는지 확인</a> 목록과 맞춰 보세요.</p>
+					<div class="checkpoint">
+						<p class="box-label">여기까지</p>
+						<p>겉모습은 4단계와 같아요. 2단계의 <code>BufferCount</code> 를 1 로 바꿔 디버그 빌드로 실행하면 상자가 뜨기 전에 콘솔에 <code>[DXGI]</code> 로 시작하는 원인 문장이 찍혀요. 확인했으면 2 로 되돌리고 <a href="#check">다 됐는지 확인</a> 목록과 맞춰 보세요.</p>
+					</div>
 				</div>
 			</li>
 
@@ -1006,8 +911,8 @@ figure.code .diff-view { border-top: 0; }
 			<li><label><input type="checkbox"><span class="label">시작 로그</span><span class="what"><code>창 생성 : 800x600 (DPI 96, 배율 100%)</code> 다음 <code>그래픽 카드 : 이름 (메모리 MB)</code>. 카드 이름과 메모리는 PC 마다 다름</span></label></li>
 			<li><label><input type="checkbox"><span class="label">CPU</span><span class="what">실행 중에도 CPU 코어 하나를 다 쓰지 않음. 02편과 달라진 점</span></label></li>
 			<li><label><input type="checkbox"><span class="label">크기</span><span class="what">테두리를 끌었다 놓으면 <code>창 크기 변경</code> 이 한 번 찍힘. 옮기기만 하거나 최소화했다 되돌리면 로그 없음. 최대화하면 작업 표시줄을 뺀 화면 크기로 찍힘</span></label></li>
-			<li><label><input type="checkbox"><span class="label">전체 화면</span><span class="what">Alt+Enter 를 누르면 <code>전체 화면 : 켬</code> 과 모니터 크기의 <code>창 크기 변경</code>. 다시 누르면 <code>전체 화면 : 끔</code> 과 함께 원래 위치와 크기로 돌아옴</span></label></li>
-			<li><label><input type="checkbox"><span class="label">배율</span><span class="what">실행 중에 배율을 150% 로 바꾸면 <code>DPI 변경 : 144 (배율 150%)</code> 다음 <code>창 크기 변경 : 1200x900</code></span></label></li>
+			<li><label><input type="checkbox"><span class="label">전체 화면</span><span class="what">Alt+Enter 로 전체 화면이 되어도 회색이 모니터를 채움. 다시 누르면 원래 위치와 크기로 돌아옴</span></label></li>
+			<li><label><input type="checkbox"><span class="label">배율</span><span class="what">실행 중에 배율을 150% 로 바꾸면 <code>창 크기 변경 : 1200x900</code> 이 찍히고 회색이 커진 창을 채움</span></label></li>
 			<li><label><input type="checkbox"><span class="label">종료</span><span class="what">ESC 로 끝내면 종료 코드 0. 디버그 콘솔 창을 닫아서 끝내면 종료 코드가 <code>-1073741510</code> 이고 정리 코드를 거치지 않음</span></label></li>
 			<li><label><input type="checkbox"><span class="label">빌드</span><span class="what">Debug·Release x64 모두 경고 0개</span></label></li>
 		</ul>
@@ -1020,13 +925,13 @@ figure.code .diff-view { border-top: 0; }
 				<p class="symptom">창 크기를 바꾸는 순간 상자가 뜨고 종료 코드 1. 디버그 빌드 콘솔에는 <code>[에러] [DXGI] IDXGISwapChain::ResizeBuffers: Swapchain cannot be resized unless all outstanding buffer references have been released.</code> 다음 <code>[CHECK FATAL] SwapChain-&gt;ResizeBuffers(...)</code> 와 <code>HRESULT 0x887A0001</code></p>
 				<p class="row"><b>원인</b><span><code>Resize</code> 에서 <code>ResizeBuffers</code> 전에 RTV 를 놓지 않았어요. RTV 가 아직 백 버퍼를 참조하고 있어서 <code>ResizeBuffers</code> 가 <code>DXGI_ERROR_INVALID_CALL</code>(<code>0x887A0001</code>)로 실패해요.</span></p>
 				<p class="row"><b>해결</b><span><code>RenderTargetView.Reset()</code> 과 <code>Context-&gt;Flush()</code> 를 <code>ResizeBuffers</code> 앞에 두고 뒤에서 RTV 를 다시 만들어요.</span></p>
-				<p class="row"><b>본문</b><span><a href="#step-resize">5단계</a> : RTV 를 먼저 놓는 순서</span></p>
+				<p class="row"><b>본문</b><span><a href="#step-resize">4단계</a> : RTV 를 먼저 놓는 순서</span></p>
 			</div>
 			<div class="pitfall">
 				<p class="symptom">시작하자마자 상자가 뜸. 디버그 빌드 콘솔에는 <code>[에러] [DXGI] IDXGIFactory::CreateSwapChain: Flip model swapchains (DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL and DXGI_SWAP_EFFECT_FLIP_DISCARD) require BufferCount to be between 2 and DXGI_MAX_SWAP_CHAIN_BUFFERS, inclusively.</code></p>
 				<p class="row"><b>원인</b><span>원문처럼 <code>BufferCount</code> 를 1 로 두었어요. 플립 모델 스왑체인은 버퍼가 2개 이상이어야 만들어져요.</span></p>
 				<p class="row"><b>해결</b><span><code>SwapChainDesc.BufferCount = 2;</code></span></p>
-				<p class="row"><b>본문</b><span><a href="#step-swapchain">3단계</a> : 플립 모델과 버퍼 개수</span></p>
+				<p class="row"><b>본문</b><span><a href="#step-swapchain">2단계</a> : 플립 모델과 버퍼 개수</span></p>
 			</div>
 		</div>
 	</section>
@@ -1038,18 +943,14 @@ figure.code .diff-view { border-top: 0; }
 		<ul class="file-list">
 			<li><span class="mark a">+</span><span class="name">Source/Graphics/FD3D11Graphics.h</span><span class="note">+38</span></li>
 			<li><span class="mark a">+</span><span class="name">Source/Graphics/FD3D11Graphics.cpp</span><span class="note">+191</span></li>
-			<li><span class="mark m">~</span><span class="name">Source/Utility/Check.h</span><span class="note">+42 −3</span></li>
-			<li><span class="mark m">~</span><span class="name">Source/Utility/Check.cpp</span><span class="note">+61 −2</span></li>
-			<li><span class="mark m">~</span><span class="name">Source/Utility/FLog.h</span><span class="note">−4</span></li>
-			<li><span class="mark m">~</span><span class="name">Source/Utility/FLog.cpp</span><span class="note">+2 −7</span></li>
-			<li><span class="mark m">~</span><span class="name">Source/Main.cpp</span><span class="note">+1 −7</span></li>
-			<li><span class="mark m">~</span><span class="name">Source/Core/FWindow.h</span><span class="note">+8 −1</span></li>
-			<li><span class="mark m">~</span><span class="name">Source/Core/FWindow.cpp</span><span class="note">+156 −37</span></li>
-			<li><span class="mark m">~</span><span class="name">Source/Core/FSystem.h</span><span class="note">+4 −2</span></li>
-			<li><span class="mark m">~</span><span class="name">Source/Core/FSystem.cpp</span><span class="note">+11 −6</span></li>
+			<li><span class="mark m">~</span><span class="name">Source/Core/FSystem.h</span><span class="note">+3 −1</span></li>
+			<li><span class="mark m">~</span><span class="name">Source/Core/FSystem.cpp</span><span class="note">+5</span></li>
 			<li><span class="mark m">~</span><span class="name">Source/App/FApplication.h</span><span class="note">+7</span></li>
 			<li><span class="mark m">~</span><span class="name">Source/Core/FDisplaySettings.h</span><span class="note">+1</span></li>
-			<li><span class="mark m">~</span><span class="name">CMakeLists.txt</span><span class="note">+3</span></li>
+			<li><span class="mark m">~</span><span class="name">Source/Core/FWindow.cpp</span><span class="note">+11 −2</span></li>
+			<li><span class="mark m">~</span><span class="name">Source/Utility/Check.h</span><span class="note">+4</span></li>
+			<li><span class="mark m">~</span><span class="name">Source/Utility/Check.cpp</span><span class="note">+14</span></li>
+			<li><span class="mark m">~</span><span class="name">CMakeLists.txt</span><span class="note">+2</span></li>
 			<li><span class="mark m">~</span><span class="name">DxRenderDojo.vcxproj</span><span class="note">+3</span></li>
 			<li><span class="mark m">~</span><span class="name">DxRenderDojo.vcxproj.filters</span><span class="note">VS 폴더 표시. 본문 생략</span></li>
 		</ul>
@@ -1067,49 +968,13 @@ figure.code .diff-view { border-top: 0; }
 		</div>
 
 		<div class="file-group">
-			<h3>실패 처리</h3>
-			<details class="diff-file">
-				<summary><span class="path">Source/Utility/Check.h</span><span class="stat"><span class="plus">+42</span> <span class="minus">−3</span></span><span class="why">CHECK_FATAL 과 HRESULT 값 붙이기</span></summary>
-<pre class="diff" data-lang="cpp"><!--DIFF:Source/Utility/Check.h--></pre>
-			</details>
-			<details class="diff-file">
-				<summary><span class="path">Source/Utility/Check.cpp</span><span class="stat"><span class="plus">+61</span> <span class="minus">−2</span></span><span class="why">치명 실패 처리와 훅</span></summary>
-<pre class="diff" data-lang="cpp"><!--DIFF:Source/Utility/Check.cpp--></pre>
-			</details>
-			<details class="diff-file">
-				<summary><span class="path">Source/Utility/FLog.h</span><span class="stat"><span class="minus">−4</span></span><span class="why">마지막 에러 문구를 뺌</span></summary>
-<pre class="diff" data-lang="cpp"><!--DIFF:Source/Utility/FLog.h--></pre>
-			</details>
-			<details class="diff-file">
-				<summary><span class="path">Source/Utility/FLog.cpp</span><span class="stat"><span class="plus">+2</span> <span class="minus">−7</span></span><span class="why">같은 변경</span></summary>
-<pre class="diff" data-lang="cpp"><!--DIFF:Source/Utility/FLog.cpp--></pre>
-			</details>
-			<details class="diff-file">
-				<summary><span class="path">Source/Main.cpp</span><span class="stat"><span class="plus">+1</span> <span class="minus">−7</span></span><span class="why">실패 분기와 상자를 뺌</span></summary>
-<pre class="diff" data-lang="cpp"><!--DIFF:Source/Main.cpp--></pre>
-			</details>
-		</div>
-
-		<div class="file-group">
-			<h3>창</h3>
-			<details class="diff-file">
-				<summary><span class="path">Source/Core/FWindow.h</span><span class="stat"><span class="plus">+8</span> <span class="minus">−1</span></span><span class="why">DPI 와 전체 화면 상태</span></summary>
-<pre class="diff" data-lang="cpp"><!--DIFF:Source/Core/FWindow.h--></pre>
-			</details>
-			<details class="diff-file">
-				<summary><span class="path">Source/Core/FWindow.cpp</span><span class="stat"><span class="plus">+156</span> <span class="minus">−37</span></span><span class="why">배율 처리, Alt+Enter, 같은 크기 알림 건너뛰기</span></summary>
-<pre class="diff" data-lang="cpp"><!--DIFF:Source/Core/FWindow.cpp--></pre>
-			</details>
-		</div>
-
-		<div class="file-group">
 			<h3>프레임과 설정</h3>
 			<details class="diff-file">
-				<summary><span class="path">Source/Core/FSystem.h</span><span class="stat"><span class="plus">+4</span> <span class="minus">−2</span></span><span class="why">Graphics 멤버와 선언 순서</span></summary>
+				<summary><span class="path">Source/Core/FSystem.h</span><span class="stat"><span class="plus">+3</span> <span class="minus">−1</span></span><span class="why">Graphics 멤버와 선언 순서</span></summary>
 <pre class="diff" data-lang="cpp"><!--DIFF:Source/Core/FSystem.h--></pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">Source/Core/FSystem.cpp</span><span class="stat"><span class="plus">+11</span> <span class="minus">−6</span></span><span class="why">초기화 순서, 프레임 앞뒤, 크기 변경</span></summary>
+				<summary><span class="path">Source/Core/FSystem.cpp</span><span class="stat"><span class="plus">+5</span></span><span class="why">초기화, 프레임 앞뒤, 크기 변경</span></summary>
 <pre class="diff" data-lang="cpp"><!--DIFF:Source/Core/FSystem.cpp--></pre>
 			</details>
 			<details class="diff-file">
@@ -1120,12 +985,28 @@ figure.code .diff-view { border-top: 0; }
 				<summary><span class="path">Source/Core/FDisplaySettings.h</span><span class="stat"><span class="plus">+1</span></span><span class="why">bVSync</span></summary>
 <pre class="diff" data-lang="cpp"><!--DIFF:Source/Core/FDisplaySettings.h--></pre>
 			</details>
+			<details class="diff-file">
+				<summary><span class="path">Source/Core/FWindow.cpp</span><span class="stat"><span class="plus">+11</span> <span class="minus">−2</span></span><span class="why">크기가 그대로면 알리지 않음</span></summary>
+<pre class="diff" data-lang="cpp"><!--DIFF:Source/Core/FWindow.cpp--></pre>
+			</details>
+		</div>
+
+		<div class="file-group">
+			<h3>실패 처리</h3>
+			<details class="diff-file">
+				<summary><span class="path">Source/Utility/Check.h</span><span class="stat"><span class="plus">+4</span></span><span class="why">SetFatalHook</span></summary>
+<pre class="diff" data-lang="cpp"><!--DIFF:Source/Utility/Check.h--></pre>
+			</details>
+			<details class="diff-file">
+				<summary><span class="path">Source/Utility/Check.cpp</span><span class="stat"><span class="plus">+14</span></span><span class="why">치명 실패 직전에 부르는 훅</span></summary>
+<pre class="diff" data-lang="cpp"><!--DIFF:Source/Utility/Check.cpp--></pre>
+			</details>
 		</div>
 
 		<div class="file-group">
 			<h3>빌드</h3>
 			<details class="diff-file">
-				<summary><span class="path">CMakeLists.txt</span><span class="stat"><span class="plus">+3</span></span><span class="why">새 소스, d3d11·dxgi 링크, mingw 대상 버전</span></summary>
+				<summary><span class="path">CMakeLists.txt</span><span class="stat"><span class="plus">+2</span></span><span class="why">새 소스, d3d11·dxgi 링크</span></summary>
 <pre class="diff" data-lang="cmake"><!--DIFF:CMakeLists.txt--></pre>
 			</details>
 			<details class="diff-file">
@@ -1144,7 +1025,7 @@ figure.code .diff-view { border-top: 0; }
 			<p><code>D3D11CreateDevice</code> 는 <code>ID3D11Device</code> 와 <code>ID3D11DeviceContext</code> 를 함께 돌려줘요. 이 편의 코드에서 각각 무엇에 쓰였나요?</p>
 			<details class="fold">
 				<summary>답 보기</summary>
-				<p>디바이스는 백 버퍼로 RTV 를 만들 때(<code>CreateRenderTargetView</code>) 쓰고 스왑체인을 만들 때 인자로 넘겨요. 컨텍스트는 백 버퍼를 지울 때(<code>ClearRenderTargetView</code>)와 <code>Resize</code> 의 <code>Flush</code> 에 써요. 무엇을 만드는 일은 디바이스가, GPU 에 일을 시키는 일은 컨텍스트가 맡아요. (<a href="#step-device">2단계</a>)</p>
+				<p>디바이스는 백 버퍼로 RTV 를 만들 때(<code>CreateRenderTargetView</code>) 쓰고 스왑체인을 만들 때 인자로 넘겨요. 컨텍스트는 백 버퍼를 지울 때(<code>ClearRenderTargetView</code>)와 <code>Resize</code> 의 <code>Flush</code> 에 써요. 무엇을 만드는 일은 디바이스가, GPU 에 일을 시키는 일은 컨텍스트가 맡아요. (<a href="#step-device">1단계</a>)</p>
 			</details>
 		</div>
 		<div class="learn">
@@ -1152,7 +1033,7 @@ figure.code .diff-view { border-top: 0; }
 			<p><code>Resize</code> 는 <code>ResizeBuffers</code> 앞에서 무엇을 하고 뒤에서 무엇을 하나요? 순서를 바꾸면 안 되는 이유도 말해 보세요.</p>
 			<details class="fold">
 				<summary>답 보기</summary>
-				<p>앞에서 RTV 를 놓고 <code>Flush</code> 로 미뤄 둔 해제를 끝내요. 뒤에서 새 백 버퍼로 RTV 를 다시 만들어요. 백 버퍼를 참조하는 RTV 가 남아 있으면 <code>ResizeBuffers</code> 가 실패하고, 버퍼가 새로 만들어지면 새 버퍼를 가리킬 RTV 가 다시 필요해요. (<a href="#step-resize">5단계</a>)</p>
+				<p>앞에서 RTV 를 놓고 <code>Flush</code> 로 미뤄 둔 해제를 끝내요. 뒤에서 새 백 버퍼로 RTV 를 다시 만들어요. 백 버퍼를 참조하는 RTV 가 남아 있으면 <code>ResizeBuffers</code> 가 실패하고, 버퍼가 새로 만들어지면 새 버퍼를 가리킬 RTV 가 다시 필요해요. (<a href="#step-resize">4단계</a>)</p>
 			</details>
 		</div>
 		<div class="learn">
@@ -1160,7 +1041,7 @@ figure.code .diff-view { border-top: 0; }
 			<p>vsync 를 켜 두면 <code>Frame</code> 이 모니터 주사율보다 빨리 돌지 않아요. 루프 안의 어느 호출이 속도를 맞추나요?</p>
 			<details class="fold">
 				<summary>답 보기</summary>
-				<p><code>EndScene</code> 의 <code>Present(1, 0)</code> 이에요. 화면이 한 번 갱신될 때 한 프레임씩만 나가서, 내보내지 못한 프레임이 쌓이면 여기서 기다려요. <code>bVSync</code> 를 끄면 0 을 넘겨 기다리지 않고, 02편처럼 CPU 를 쉬지 않고 써요. (<a href="#step-frame">4단계</a>)</p>
+				<p><code>EndScene</code> 의 <code>Present(1, 0)</code> 이에요. 화면이 한 번 갱신될 때 한 프레임씩만 나가서, 내보내지 못한 프레임이 쌓이면 여기서 기다려요. <code>bVSync</code> 를 끄면 0 을 넘겨 기다리지 않고, 02편처럼 CPU 를 쉬지 않고 써요. (<a href="#step-frame">3단계</a>)</p>
 			</details>
 		</div>
 	</section>

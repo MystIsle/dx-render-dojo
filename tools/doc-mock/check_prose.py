@@ -44,7 +44,7 @@ PHRASE_PATTERNS = [
 
 PAIRED_TAGS = ["details", "summary", "figure", "figcaption", "section", "ul", "ol", "li", "div", "aside", "p", "pre"]
 
-MARKER = re.compile(r"<!--(INCLUDE|FILE|SYMBOL|DIFF|SLICE|TOC):(.*?)-->", re.S)
+MARKER = re.compile(r"<!--(INCLUDE|FILE|SYMBOL|DIFF|SLICE|TOC)(?:@(\d+))?:(.*?)-->", re.S)
 TOC_NAMES = ("eyebrow", "base", "pager", "progress", "count", "stages", "rail")
 
 # 빠짐없음을 세는 파일. 프로젝트 파일은 솔루션 탐색기로 바뀌는 것이라 본문이 언급하는지만 본다.
@@ -139,14 +139,19 @@ def code_blocks(lines):
     return blocks
 
 
+def tag_ref(tag, step=""):
+    ref = tag if tag.startswith("refs/") else f"refs/tags/{tag}"
+    return f"{ref}-s{step}" if step else ref
+
+
 def check_markers(source, tag, built, report):
     markers = MARKER.findall(source)
     kinds = {}
-    for kind, _ in markers:
+    for kind, _, _ in markers:
         kinds[kind] = kinds.get(kind, 0) + 1
     report.note("마커 : " + (", ".join(f"{k} {v}" for k, v in sorted(kinds.items())) or "없음"))
 
-    for kind, body in markers:
+    for kind, _, body in markers:
         if kind == "SYMBOL" and ":" not in body:
             report.error(f"SYMBOL 마커에 심볼이 없음 : {body}")
         if kind == "SLICE" and not re.fullmatch(r".+?:.+?=>.+", body, re.S):
@@ -161,23 +166,23 @@ def check_markers(source, tag, built, report):
     if tag is None or built:
         return
 
-    ref = tag if tag.startswith("refs/") else f"refs/tags/{tag}"
     cache = {}
 
-    def lines_of(path):
-        if path not in cache:
-            cache[path] = git_lines(ref, path)
-        return cache[path]
+    def lines_of(ref, path):
+        if (ref, path) not in cache:
+            cache[(ref, path)] = git_lines(ref, path)
+        return cache[(ref, path)]
 
-    for kind, body in markers:
+    for kind, step, body in markers:
         if kind == "TOC":
             continue
         if kind == "INCLUDE":
             if not (HERE / body).exists():
                 report.error(f"INCLUDE 대상이 없음 : {body}")
             continue
+        ref = tag_ref(tag, step)
         path = body.split(":", 1)[0]
-        lines = lines_of(path)
+        lines = lines_of(ref, path)
         if lines is None:
             report.error(f"{kind} : {ref} 에 없는 경로 : {path}")
             continue
@@ -200,7 +205,7 @@ def step_pieces(steps, tag):
     for figure in re.finditer(r"<figure\b.*?</figure>", steps, re.S):
         badges = re.findall(r'<span class="badge[^"]*">\s*([^<]*?)\s*</span>', figure.group(0))
         action = next((b for b in badges if b in ACTION_BADGES), None)
-        for kind, body in MARKER.findall(figure.group(0)):
+        for kind, _, body in MARKER.findall(figure.group(0)):
             if kind == "INCLUDE":
                 continue
             path = body.split(":", 1)[0]
@@ -262,8 +267,14 @@ def spans_text(numbers):
     return ", ".join(str(s[0] + 1) if len(s) == 1 else f"{s[0] + 1}-{s[-1] + 1}" for s in spans)
 
 
+def step_blocks(steps):
+    """따라 하기 절을 단계(<li class="step">)마다 자른다."""
+    starts = [match.start() for match in re.finditer(r'<li class="step"', steps)]
+    return [steps[start:end] for start, end in zip(starts, starts[1:] + [len(steps)])]
+
+
 def check_follow_along(source, tag, report):
-    ref = tag if tag.startswith("refs/") else f"refs/tags/{tag}"
+    ref = tag_ref(tag)
     # 앞 편 태그는 목차에서 읽는다. 원문에 없는 편은 번호로 앞 편을 알 수 없다.
     toc = json.loads((HERE / "toc.json").read_text(encoding="utf-8"))
     bases = {lesson["tag"]: lesson["base"] for stage in toc["stages"] for lesson in stage["lessons"]}
@@ -277,20 +288,50 @@ def check_follow_along(source, tag, report):
     if not steps_match:
         return
     steps = steps_match.group(0)
+
+    if not any(step for _, step, _ in MARKER.findall(steps)):
+        check_range(steps, base, ref, "", report)
+        return
+
+    # 단계 커밋 사슬. N단계 조각을 모으면 N-1단계에서 N단계로 온 diff 와 같아야 한다.
+    blocks = step_blocks(steps)
+    last = tag_ref(tag, str(len(blocks)))
+    if git_run("rev-parse", "--verify", "--quiet", last) is None:
+        report.error(f"단계 커밋 : 마지막 단계 태그가 없음 : {last}")
+        return
+    code_names = [
+        name
+        for name in (git_run("diff", "--name-only", base, ref) or "").split("\n")
+        if name and (CODE_PATH.search(name) or PROJECT_FILE.search(name))
+    ]
+    leftover = [name for name in (git_run("diff", "--name-only", last, ref, "--", *code_names) or "").split("\n") if name]
+    if leftover:
+        report.error(f"단계 커밋 : 마지막 단계와 {ref.rsplit('/', 1)[-1]} 의 코드가 다름 : " + ", ".join(leftover))
+
+    for number, block in enumerate(blocks, 1):
+        strays = sorted({f"{kind}@{step or '없음'}" for kind, step, _ in MARKER.findall(block) if kind != "INCLUDE" and step != str(number)})
+        if strays:
+            report.error(f"{number}단계 : 다른 단계를 가리키거나 단계가 없는 마커 : " + ", ".join(strays))
+        step_base = tag_ref(tag, str(number - 1)) if number > 1 else base
+        check_range(block, step_base, tag_ref(tag, str(number)), f"{number}단계 ", report)
+
+
+def check_range(steps, base, ref, label, report):
+    """base 에서 ref 로 온 코드 변경이 steps 의 조각에 빠짐없이 나오는지, 나눈 조각의 순서가 소스와 같은지."""
     pieces = step_pieces(steps, ref)
 
     unbadged = sum(1 for piece in pieces if piece[4] is None)
     if unbadged:
-        report.warn(f"배지(신규·수정·삭제)가 없는 코드 조각 {unbadged}개")
+        report.warn(f"{label}배지(신규·수정·삭제)가 없는 코드 조각 {unbadged}개")
 
     names = [name for name in (git_run("diff", "-M", "--name-only", base, ref) or "").split("\n") if name]
     renames = renamed_paths(base, ref)
     steps_text = strip_tags(steps)
     if any(PROJECT_FILE.search(name) for name in names) and "vcxproj" not in steps_text:
-        report.error("빠짐없음 : 프로젝트 파일이 바뀌었는데 따라 하기 본문이 언급하지 않음")
+        report.error(f"{label}빠짐없음 : 프로젝트 파일이 바뀌었는데 따라 하기 본문이 언급하지 않음")
     unmentioned = sorted(Path(new).name for new in renames if CODE_PATH.search(new) and Path(new).name not in steps_text)
     if unmentioned:
-        report.error("빠짐없음 : 옮긴 파일을 따라 하기 본문이 언급하지 않음 : " + ", ".join(unmentioned))
+        report.error(f"{label}빠짐없음 : 옮긴 파일을 따라 하기 본문이 언급하지 않음 : " + ", ".join(unmentioned))
 
     total_added = total_missing = total_removed = total_removed_missing = 0
     for path in names:
@@ -314,16 +355,16 @@ def check_follow_along(source, tag, report):
         total_removed += sum(count for _, count in removed)
         total_removed_missing += sum(count for _, count in removed_missing)
         if missing:
-            report.error(f"빠짐없음 : {path} 추가 줄 {len(missing)}개가 조각에 없음 [{spans_text(missing)}]")
+            report.error(f"{label}빠짐없음 : {path} 추가 줄 {len(missing)}개가 조각에 없음 [{spans_text(missing)}]")
         if removed_missing:
             where = spans_text({min(around) for around, _ in removed_missing})
-            report.error(f"빠짐없음 : {path} 지운 줄 {sum(c for _, c in removed_missing)}개가 조각에 없음 [새 파일 {where}줄 근처]")
-    report.note(f"빠짐없음 : 추가 {total_added}줄 중 빠짐 {total_missing}, 지운 {total_removed}줄 중 빠짐 {total_removed_missing}")
+            report.error(f"{label}빠짐없음 : {path} 지운 줄 {sum(c for _, c in removed_missing)}개가 조각에 없음 [새 파일 {where}줄 근처]")
+    report.note(f"{label}빠짐없음 : 추가 {total_added}줄 중 빠짐 {total_missing}, 지운 {total_removed}줄 중 빠짐 {total_removed_missing}")
 
-    check_piece_order(pieces, ref, report)
+    check_piece_order(pieces, ref, label, report)
 
 
-def check_piece_order(pieces, ref, report):
+def check_piece_order(pieces, ref, label, report):
     """한 덩어리(함수 본문, 클래스 선언, 파일 머리)를 나눈 조각은 문서 순서와 소스 순서가 같아야 한다. 네임스페이스는 덩어리로 치지 않는다."""
     groups = {}
     for index, (kind, path, first, last, _) in enumerate(pieces):
@@ -343,7 +384,7 @@ def check_piece_order(pieces, ref, report):
             lines = git_lines(ref, path) or []
             where = lines[block[0]].strip() if block else "파일 머리"
             order = ", ".join(str(s + 1) for s in starts)
-            report.error(f"덩어리 순서 : {path} `{where}` 의 조각 순서가 소스와 다름 (문서 순서의 시작 줄 {order})")
+            report.error(f"{label}덩어리 순서 : {path} `{where}` 의 조각 순서가 소스와 다름 (문서 순서의 시작 줄 {order})")
 
 
 def check_structure(body, report):

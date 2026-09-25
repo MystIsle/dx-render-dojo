@@ -1155,7 +1155,7 @@ void FCamera::SetPosition(float X, float Y, float Z)
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.h</span><span class="badge mod">수정</span><span class="badge">tut03 → tut04</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -19,6 +19,10 @@ public:
+<pre class="diff" data-lang="cpp">@@ -19,6 +19,10 @@
  
  	void Initialize(const FWindow&amp; Window, const FDisplaySettings&amp; Settings);
  
@@ -1166,7 +1166,7 @@ void FCamera::SetPosition(float X, float Y, float Z)
  	void Resize(int Width, int Height);
  
  	void BeginScene(const std::array&lt;float, 4&gt;&amp; Color);
-@@ -34,5 +38,6 @@ private:
+@@ -34,5 +38,6 @@
  	Microsoft::WRL::ComPtr&lt;IDXGISwapChain1&gt; SwapChain;
  	Microsoft::WRL::ComPtr&lt;ID3D11RenderTargetView&gt; RenderTargetView;
  	Microsoft::WRL::ComPtr&lt;IDXGIInfoQueue&gt; InfoQueue;
@@ -1292,7 +1292,7 @@ void FCamera::SetPosition(float X, float Y, float Z)
  class FApplication
  {
  public:
-@@ -9,11 +15,16 @@ public:
+@@ -9,11 +15,16 @@
  	FApplication(const FApplication&amp; Other) = delete;
  	FApplication&amp; operator=(const FApplication&amp; Other) = delete;
  
@@ -1331,7 +1331,7 @@ void FCamera::SetPosition(float X, float Y, float Z)
  
  void FApplication::Update()
  {
-@@ -12,6 +22,13 @@ void FApplication::Update()
+@@ -12,6 +22,13 @@
  	}
  }
  
@@ -1396,7 +1396,7 @@ void FCamera::SetPosition(float X, float Y, float Z)
 					<p>CMake 빌드는 <code>CMakeLists.txt</code> 에 새 파일을 적고, DirectXMath 포함 경로와 셰이더 컴파일 라이브러리 <code>d3dcompiler</code> 를 더해요. 셰이더 파일은 빌드 결과 옆 <code>Shaders</code> 폴더로 복사해요.</p>
 					<figure class="code">
 						<figcaption><span class="path">CMakeLists.txt</span><span class="badge mod">수정</span><span class="badge">tut03 → tut04</span></figcaption>
-<pre class="diff" data-lang="cmake">@@ -7,14 +7,24 @@ add_executable(DxRenderDojo WIN32
+<pre class="diff" data-lang="cmake">@@ -7,14 +7,24 @@
  	Source/Core/FInput.cpp
  	Source/Core/FSystem.cpp
  	Source/Core/FWindow.cpp
@@ -1920,7 +1920,7 @@ void FCamera::SetPosition(float X, float Y, float Z)
 			<h3>파이프라인</h3>
 			<details class="diff-file">
 				<summary><span class="path">Source/Graphics/FD3D11Graphics.h</span><span class="stat"><span class="plus">+5</span></span><span class="why">게터 셋과 뷰포트</span></summary>
-<pre class="diff" data-lang="cpp">@@ -19,6 +19,10 @@ public:
+<pre class="diff" data-lang="cpp">@@ -19,6 +19,10 @@
  
  	void Initialize(const FWindow&amp; Window, const FDisplaySettings&amp; Settings);
  
@@ -1931,7 +1931,7 @@ void FCamera::SetPosition(float X, float Y, float Z)
  	void Resize(int Width, int Height);
  
  	void BeginScene(const std::array&lt;float, 4&gt;&amp; Color);
-@@ -34,5 +38,6 @@ private:
+@@ -34,5 +38,6 @@
  	Microsoft::WRL::ComPtr&lt;IDXGISwapChain1&gt; SwapChain;
  	Microsoft::WRL::ComPtr&lt;ID3D11RenderTargetView&gt; RenderTargetView;
  	Microsoft::WRL::ComPtr&lt;IDXGIInfoQueue&gt; InfoQueue;
@@ -1941,7 +1941,7 @@ void FCamera::SetPosition(float X, float Y, float Z)
 			</details>
 			<details class="diff-file">
 				<summary><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="stat"><span class="plus">+12</span> <span class="minus">−1</span></span><span class="why">매 프레임 RTV·뷰포트 묶기, 크기 변경 때 떼기</span></summary>
-<pre class="diff" data-lang="cpp">@@ -124,7 +124,9 @@ void FD3D11Graphics::Initialize(const FWindow&amp; Window, const FDisplaySettings&amp; S
+<pre class="diff" data-lang="cpp">@@ -124,7 +124,9 @@
  
  void FD3D11Graphics::Resize(int Width, int Height)
  {
@@ -1952,7 +1952,7 @@ void FCamera::SetPosition(float X, float Y, float Z)
  	RenderTargetView.Reset();
  	Context-&gt;Flush();
  
-@@ -136,6 +138,9 @@ void FD3D11Graphics::Resize(int Width, int Height)
+@@ -136,6 +138,9 @@
  void FD3D11Graphics::BeginScene(const std::array&lt;float, 4&gt;&amp; Color)
  {
  	Context-&gt;ClearRenderTargetView(RenderTargetView.Get(), Color.data());
@@ -1962,7 +1962,7 @@ void FCamera::SetPosition(float X, float Y, float Z)
  }
  
  void FD3D11Graphics::EndScene()
-@@ -149,6 +154,12 @@ void FD3D11Graphics::CreateSizeDependentResources()
+@@ -149,6 +154,12 @@
  	ComPtr&lt;ID3D11Texture2D&gt; BackBuffer;
  	CHECK_FATAL(SwapChain-&gt;GetBuffer(0, IID_PPV_ARGS(BackBuffer.GetAddressOf())));
  	CHECK_FATAL(Device-&gt;CreateRenderTargetView(BackBuffer.Get(), nullptr, RenderTargetView.GetAddressOf()));
@@ -1995,7 +1995,7 @@ void FCamera::SetPosition(float X, float Y, float Z)
  class FApplication
  {
  public:
-@@ -9,11 +15,16 @@ public:
+@@ -9,11 +15,16 @@
  	FApplication(const FApplication&amp; Other) = delete;
  	FApplication&amp; operator=(const FApplication&amp; Other) = delete;
  
@@ -2034,7 +2034,7 @@ void FCamera::SetPosition(float X, float Y, float Z)
  
  void FApplication::Update()
  {
-@@ -12,6 +22,13 @@ void FApplication::Update()
+@@ -12,6 +22,13 @@
  	}
  }
  
@@ -2052,7 +2052,7 @@ void FCamera::SetPosition(float X, float Y, float Z)
 			</details>
 			<details class="diff-file">
 				<summary><span class="path">Source/Core/FSystem.cpp</span><span class="stat"><span class="plus">+2</span> <span class="minus">−1</span></span><span class="why">앱 초기화, Render 에 Graphics 넘기기</span></summary>
-<pre class="diff" data-lang="cpp">@@ -13,6 +13,7 @@ void FSystem::Initialize(int ShowCmd)
+<pre class="diff" data-lang="cpp">@@ -13,6 +13,7 @@
  	    L"창 생성 : {}x{} (DPI {}, 배율 {}%)", Window.GetWidth(), Window.GetHeight(), Window.GetDpi(), ScalePercent));
  
  	Graphics.Initialize(Window, Display);
@@ -2060,7 +2060,7 @@ void FCamera::SetPosition(float X, float Y, float Z)
  
  	Window.SetMessageCallback([this](UINT Message, WPARAM WParam, LPARAM LParam)
  	                          { OnWindowMessage(Message, WParam, LParam); });
-@@ -46,7 +47,7 @@ void FSystem::Frame()
+@@ -46,7 +47,7 @@
  {
  	Application.Update();
  	Graphics.BeginScene(Application.GetClearColor());
@@ -2129,7 +2129,7 @@ std::filesystem::path FPaths::GetExecutableDirectory()
 			<h3>빌드</h3>
 			<details class="diff-file">
 				<summary><span class="path">CMakeLists.txt</span><span class="stat"><span class="plus">+11</span> <span class="minus">−1</span></span><span class="why">새 소스, DirectXMath 포함 경로, d3dcompiler, 셰이더 복사</span></summary>
-<pre class="diff" data-lang="cmake">@@ -7,14 +7,24 @@ add_executable(DxRenderDojo WIN32
+<pre class="diff" data-lang="cmake">@@ -7,14 +7,24 @@
  	Source/Core/FInput.cpp
  	Source/Core/FSystem.cpp
  	Source/Core/FWindow.cpp

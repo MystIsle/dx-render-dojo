@@ -12,6 +12,18 @@ function Escape-Html([string] $Text) {
 	return $Text.Replace('&', '&amp;').Replace('<', '&lt;').Replace('>', '&gt;')
 }
 
+# 마커의 @N 은 N단계 커밋(tutNN-sN)을 읽는다. DIFF@N 은 N-1단계와 N단계의 차이다. @ 가 없으면 편 태그와 앞 편 태그.
+function Set-Step([string] $Step) {
+	if ($Step -eq '') {
+		$script:Tag = $LessonTag
+		$script:BaseTag = $LessonBase
+		return
+	}
+	$Number = [int]$Step
+	$script:Tag = "refs/tags/$($Entry.Tag)-s$Number"
+	$script:BaseTag = $(if ($Number -gt 1) { "refs/tags/$($Entry.Tag)-s$($Number - 1)" } else { $LessonBase })
+}
+
 function Get-BlobLines([string] $Path) {
 	$Lines = @(& git -C $Repo show "${Tag}:$Path")
 	if ($LASTEXITCODE -ne 0) { throw "git show failed: $Path" }
@@ -79,17 +91,20 @@ function Get-Slice([string] $Path, [string] $Begin, [string] $Until) {
 
 $FileEvaluator = [Text.RegularExpressions.MatchEvaluator] {
 	param($Match)
-	return Escape-Html ((Get-BlobLines $Match.Groups[1].Value) -join "`n")
+	Set-Step $Match.Groups['step'].Value
+	return Escape-Html ((Get-BlobLines $Match.Groups['path'].Value) -join "`n")
 }
 
 $SymbolEvaluator = [Text.RegularExpressions.MatchEvaluator] {
 	param($Match)
-	return Escape-Html (Get-Symbol $Match.Groups[1].Value $Match.Groups[2].Value)
+	Set-Step $Match.Groups['step'].Value
+	return Escape-Html (Get-Symbol $Match.Groups['path'].Value $Match.Groups['symbol'].Value)
 }
 
 $SliceEvaluator = [Text.RegularExpressions.MatchEvaluator] {
 	param($Match)
-	return Escape-Html (Get-Slice $Match.Groups[1].Value $Match.Groups[2].Value $Match.Groups[3].Value)
+	Set-Step $Match.Groups['step'].Value
+	return Escape-Html (Get-Slice $Match.Groups['path'].Value $Match.Groups['begin'].Value $Match.Groups['until'].Value)
 }
 
 # 옮긴 파일의 옛 경로. 옛 경로를 함께 넘겨야 git 이 짝을 지어 바뀐 줄만 보인다.
@@ -102,6 +117,7 @@ function Get-OldPath([string] $Path) {
 }
 
 # diff 에서 머리글을 빼고 헝크만 돌려준다. 머리글 줄 수가 새 파일과 바뀐 파일에서 달라서 첫 @@ 부터 자른다.
+# 헝크 머리글 끝에 git 이 붙이는 문맥 줄은 뗀다. 헝크보다 위의 가장 가까운 함수 머리라서 바뀐 줄이 든 함수와 다를 수 있다.
 function Get-DiffHunks([string] $Path) {
 	$Paths = @($Path)
 	$OldPath = Get-OldPath $Path
@@ -111,7 +127,8 @@ function Get-DiffHunks([string] $Path) {
 	$First = 0
 	while ($First -lt $Lines.Count -and $Lines[$First].StartsWith('@@') -eq $false) { $First++ }
 	if ($First -ge $Lines.Count) { throw "no diff: $Path" }
-	return ,$Lines[$First..($Lines.Count - 1)]
+	$Hunks = $Lines[$First..($Lines.Count - 1)] | ForEach-Object { $_ -replace '^(@@ [^@]+ @@).*$', '$1' }
+	return ,@($Hunks)
 }
 
 # 범위 DIFF. SLICE 와 같은 규칙으로 잡은 범위 안의 줄만 남기고 헝크 머리글을 다시 계산한다. 범위 끝 줄 바로 뒤에서 지운 줄도 범위에 넣는다.
@@ -169,12 +186,14 @@ function Get-DiffRange([string] $Path, [string] $Begin, [string] $Until) {
 
 $DiffEvaluator = [Text.RegularExpressions.MatchEvaluator] {
 	param($Match)
-	return Escape-Html ((Get-DiffHunks $Match.Groups[1].Value) -join "`n")
+	Set-Step $Match.Groups['step'].Value
+	return Escape-Html ((Get-DiffHunks $Match.Groups['path'].Value) -join "`n")
 }
 
 $DiffRangeEvaluator = [Text.RegularExpressions.MatchEvaluator] {
 	param($Match)
-	return Escape-Html (Get-DiffRange $Match.Groups[1].Value $Match.Groups[2].Value $Match.Groups[3].Value)
+	Set-Step $Match.Groups['step'].Value
+	return Escape-Html (Get-DiffRange $Match.Groups['path'].Value $Match.Groups['begin'].Value $Match.Groups['until'].Value)
 }
 
 # 목차 순서로 편 목록을 편다. 이전·다음 편은 이 순서를 따른다.
@@ -298,7 +317,7 @@ function Get-Rail {
 
 function Write-Page([string] $Target, [string] $Output) {
 	[IO.File]::WriteAllText($Target, $Output, $Utf8)
-	$Left = [regex]::Matches($Output, '<!--(FILE|SYMBOL|SLICE|DIFF|TOC):').Count
+	$Left = [regex]::Matches($Output, '<!--(FILE|SYMBOL|SLICE|DIFF|TOC)[:@]').Count
 	"written : $Target ($([Math]::Round((Get-Item $Target).Length / 1KB)) KB), unreplaced placeholders : $Left"
 }
 
@@ -313,8 +332,8 @@ else {
 
 foreach ($Entry in $Wanted) {
 	$Template = [IO.File]::ReadAllText($Entry.Source, $Utf8)
-	$Tag = "refs/tags/$($Entry.Tag)"
-	$BaseTag = $(if ($Entry.Base) { "refs/tags/$($Entry.Base)" } else { $null })
+	$LessonTag = "refs/tags/$($Entry.Tag)"
+	$LessonBase = $(if ($Entry.Base) { "refs/tags/$($Entry.Base)" } else { $null })
 
 	# 원고 h1 과 목차 제목이 다르면 멈춘다. 이전·다음 편 이름이 목차에서 온다.
 	$Heading = [regex]::Match($Template, '<h1>(.*?)</h1>').Groups[1].Value
@@ -324,11 +343,12 @@ foreach ($Entry in $Wanted) {
 	$Output = $Template.Replace('<!--TOC:eyebrow-->', "<b>$Eyebrow</b> $([char]0x00B7) $(Escape-Html (Get-StageTrack $Entry.Stage))")
 	$Output = $Output.Replace('<!--TOC:base-->', [string]$Entry.Base)
 	$Output = $Output.Replace('<!--TOC:pager-->', (Get-Pager $Lessons $Lessons.IndexOf($Entry)))
-	$Output = [regex]::Replace($Output, '<!--FILE:(.+?)-->', $FileEvaluator)
-	$Output = [regex]::Replace($Output, '<!--SYMBOL:(.+?):(.+?)-->', $SymbolEvaluator)
-	$Output = [regex]::Replace($Output, '<!--SLICE:(.+?):(.+?)=>(.+?)-->', $SliceEvaluator)
-	$Output = [regex]::Replace($Output, '<!--DIFF:([^:>\n]+?):(.+?)=>(.+?)-->', $DiffRangeEvaluator)
-	$Output = [regex]::Replace($Output, '<!--DIFF:([^:>\n]+?)-->', $DiffEvaluator)
+	$Step = '(?:@(?<step>\d+))?'
+	$Output = [regex]::Replace($Output, "<!--FILE${Step}:(?<path>.+?)-->", $FileEvaluator)
+	$Output = [regex]::Replace($Output, "<!--SYMBOL${Step}:(?<path>.+?):(?<symbol>.+?)-->", $SymbolEvaluator)
+	$Output = [regex]::Replace($Output, "<!--SLICE${Step}:(?<path>.+?):(?<begin>.+?)=>(?<until>.+?)-->", $SliceEvaluator)
+	$Output = [regex]::Replace($Output, "<!--DIFF${Step}:(?<path>[^:>\n]+?):(?<begin>.+?)=>(?<until>.+?)-->", $DiffRangeEvaluator)
+	$Output = [regex]::Replace($Output, "<!--DIFF${Step}:(?<path>[^:>\n]+?)-->", $DiffEvaluator)
 	Write-Page (Join-Path $Dir $Entry.Page) $Output
 }
 
