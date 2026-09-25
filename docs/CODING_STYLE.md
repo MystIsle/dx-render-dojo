@@ -100,6 +100,7 @@ Rider 이름 규칙(`DxRenderDojo.sln.DotSettings`)은 이 절을 옮긴 것입�
 
 - `#pragma once` 사용
 - 매개변수 이름 : 항상 표기
+- 값으로 받는 매개변수 : `const` 를 붙이지 않음. 호출하는 쪽에는 차이가 없음. 참조·포인터로 받을 때만 가리키는 대상에 `const` (`const FWindow& Window`)
 - 한 줄 게터 : 인라인 `const`
 - `using namespace` : 헤더에서 금지
 - 전역 상수 : 두지 않음. 한 함수만 쓰면 그 함수 안의 `constexpr`, 여러 함수가 쓰면 클래스의 `static constexpr` 나 멤버로
@@ -211,3 +212,4 @@ static 을 먼저, 함수를 변수보다 먼저 둡니다. `.cpp` 의 정의 �
 - 옮기면서 6절에 없던 항목(열거자·네임스페이스·타입 별칭·템플릿 매개변수·공용체·매크로)을 더했습니다
 - 같은 항목을 `.clang-tidy` 에도 더했습니다
 - 설정 파일(DotSettings, `.editorconfig`·`.gitattributes` 줄, `.clang-tidy` 항목)은 이력을 다시 써서 `tut01` 커밋부터 넣었습니다. 태그에서 브랜치를 따도 Rider 설정이 따라갑니다
+- 7절에 값 매개변수의 `const` 를 넣었습니다. Rider 가 값 매개변수마다 "상수로 만들 수 있다" 는 약한 경고를 띄웠습니다(02편 코드에서 30곳쯤). 붙이지 않기로 하고 DotSettings 에서 그 검사(`CppParameterMayBeConst`)를 껐습니다
