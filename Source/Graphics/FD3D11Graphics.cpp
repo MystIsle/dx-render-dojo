@@ -124,7 +124,9 @@ void FD3D11Graphics::Initialize(const FWindow& Window, const FDisplaySettings& S
 
 void FD3D11Graphics::Resize(int Width, int Height)
 {
-	// 백 버퍼를 가리키는 뷰가 남아 있으면 ResizeBuffers 가 실패한다. Flush 는 D3D 가 미뤄 둔 해제를 지금 끝낸다.
+	// 백 버퍼를 가리키는 뷰가 멤버나 파이프라인에 남아 있으면 ResizeBuffers 가 실패한다.
+	// Flush 는 D3D 가 미뤄 둔 해제를 지금 끝낸다.
+	Context->OMSetRenderTargets(0, nullptr, nullptr);
 	RenderTargetView.Reset();
 	Context->Flush();
 
@@ -136,6 +138,9 @@ void FD3D11Graphics::Resize(int Width, int Height)
 void FD3D11Graphics::BeginScene(const std::array<float, 4>& Color)
 {
 	Context->ClearRenderTargetView(RenderTargetView.Get(), Color.data());
+	// 플립 모델은 Present 가 백 버퍼를 파이프라인에서 떼므로 매 프레임 다시 묶는다.
+	Context->OMSetRenderTargets(1, RenderTargetView.GetAddressOf(), nullptr);
+	Context->RSSetViewports(1, &Viewport);
 }
 
 void FD3D11Graphics::EndScene()
@@ -149,6 +154,12 @@ void FD3D11Graphics::CreateSizeDependentResources()
 	ComPtr<ID3D11Texture2D> BackBuffer;
 	CHECK_FATAL(SwapChain->GetBuffer(0, IID_PPV_ARGS(BackBuffer.GetAddressOf())));
 	CHECK_FATAL(Device->CreateRenderTargetView(BackBuffer.Get(), nullptr, RenderTargetView.GetAddressOf()));
+
+	D3D11_TEXTURE2D_DESC BackBufferDesc = {};
+	BackBuffer->GetDesc(&BackBufferDesc);
+	Viewport.Width = static_cast<float>(BackBufferDesc.Width);
+	Viewport.Height = static_cast<float>(BackBufferDesc.Height);
+	Viewport.MaxDepth = 1.0f;
 }
 
 void FD3D11Graphics::FlushDebugMessages()

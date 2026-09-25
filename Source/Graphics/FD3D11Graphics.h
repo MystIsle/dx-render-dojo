@@ -34,5 +34,6 @@ private:
 	Microsoft::WRL::ComPtr<IDXGISwapChain1> SwapChain;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> RenderTargetView;
 	Microsoft::WRL::ComPtr<IDXGIInfoQueue> InfoQueue;
+	D3D11_VIEWPORT Viewport = {};
 	bool bVSync = true;
 };
