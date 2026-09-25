@@ -231,8 +231,6 @@ figure.code figcaption .path { font-family: var(--font-mono); color: var(--code-
 .copy:hover { color: var(--code-ink); }
 pre { margin: 0; padding: 0.6rem 0 0.9rem; font-family: var(--font-mono); font-size: 0.9375rem; font-weight: 400; line-height: 1.65; color: var(--code-ink); tab-size: 4; }
 pre .line { --hang: 4ch; display: block; position: relative; white-space: pre-wrap; overflow-wrap: anywhere; padding: 0 1rem 0 calc(1rem + var(--hang)); text-indent: calc(-1 * var(--hang)); }
-pre.nowrap { overflow-x: auto; }
-pre.nowrap .line { white-space: pre; overflow-wrap: normal; width: max-content; min-width: 100%; box-sizing: border-box; }
 pre.src, pre.numbered { counter-reset: ln; }
 pre.src .line, pre.numbered .line { padding-left: calc(3.6rem + var(--hang)); }
 pre.src .line::before, pre.numbered .line::before { counter-increment: ln; content: counter(ln); position: absolute; left: 0; width: 2.6rem; text-align: right; text-indent: 0; color: var(--code-muted); opacity: 0.75; font-size: 0.8125rem; user-select: none; }
@@ -1223,9 +1221,10 @@ details.diff-file summary .why { color: var(--slate); }
 	document.querySelectorAll("pre.src, pre.snip").forEach(function (Pre) {
 		var Lang = Pre.dataset.lang;
 		var Lines = Pre.textContent.replace(/\n$/, "").split("\n");
-		if (Lines.some(function (Line) { return /\\$/.test(Line); })) { Pre.classList.add("nowrap"); }
+		Pre.SourceText = Lines.join("\n");
 		Pre.innerHTML = Lines.map(function (Line) {
-			return '<span class="line" style="--hang: ' + Hang(Line) + 'ch">' + (Line.length ? Highlight(Line, Lang) : " ") + "</span>";
+			var Shown = Line.replace(/(\S)[ \t]+\\$/, "$1 \\");
+			return '<span class="line" style="--hang: ' + Hang(Shown) + 'ch">' + (Shown.length ? Highlight(Shown, Lang) : " ") + "</span>";
 		}).join("");
 		if (Pre.dataset.start) {
 			Pre.classList.add("numbered");
@@ -1249,7 +1248,7 @@ details.diff-file summary .why { color: var(--slate); }
 			}
 			if (Line.charAt(0) === "\\") { return; }
 			var Sign = Line.charAt(0);
-			var Body = Line.slice(1);
+			var Body = Line.slice(1).replace(/(\S)[ \t]+\\$/, "$1 \\");
 			var Kind = Sign === "+" ? "add" : (Sign === "-" ? "del" : "ctx");
 			var Old = Kind === "add" ? "" : OldNumber++;
 			var New = Kind === "del" ? "" : NewNumber++;
@@ -1302,8 +1301,8 @@ details.diff-file summary .why { color: var(--slate); }
 
 	document.querySelectorAll("figure.code .copy").forEach(function (Button) {
 		Button.addEventListener("click", function () {
-			var Lines = Button.closest("figure").querySelectorAll("pre .line");
-			var Text = Array.prototype.map.call(Lines, function (Line) { return Line.textContent === " " ? "" : Line.textContent; }).join("\n");
+			var Pres = Button.closest("figure").querySelectorAll("pre.src, pre.snip");
+			var Text = Array.prototype.map.call(Pres, function (Pre) { return Pre.SourceText; }).join("\n");
 			try {
 				navigator.clipboard.writeText(Text).then(function () {
 					Button.textContent = "복사함";
