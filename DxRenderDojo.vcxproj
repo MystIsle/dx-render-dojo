@@ -67,13 +67,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\Main.cpp" />
+    <ClCompile Include="Source\App\FApplication.cpp" />
+    <ClCompile Include="Source\Core\FInput.cpp" />
     <ClCompile Include="Source\Core\FSystem.cpp" />
     <ClCompile Include="Source\Core\FWindow.cpp" />
     <ClCompile Include="Source\Utility\Check.cpp" />
     <ClCompile Include="Source\Utility\FLog.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\App\FApplication.h" />
     <ClInclude Include="Source\Core\FDisplaySettings.h" />
+    <ClInclude Include="Source\Core\FInput.h" />
     <ClInclude Include="Source\Core\FSystem.h" />
     <ClInclude Include="Source\Core\FWindow.h" />
     <ClInclude Include="Source\Utility\Check.h" />

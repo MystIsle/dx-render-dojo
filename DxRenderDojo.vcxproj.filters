@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Filter Include="App">
+      <UniqueIdentifier>{9D3C5E21-7A4B-4F16-B8E2-3C1A6D5F9B07}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Core">
       <UniqueIdentifier>{2F8B6A43-1E5D-4C79-A3B1-7E4D2C9F6A18}</UniqueIdentifier>
     </Filter>
@@ -10,6 +13,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Main.cpp" />
+    <ClCompile Include="Source\App\FApplication.cpp">
+      <Filter>App</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\FInput.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Core\FSystem.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -24,7 +33,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\App\FApplication.h">
+      <Filter>App</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Core\FDisplaySettings.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\FInput.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Source\Core\FSystem.h">
