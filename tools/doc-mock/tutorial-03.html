@@ -623,13 +623,16 @@ namespace Return
  #include &lt;string_view&gt;
  
  #include "Core/TSingleton.h"
-@@ -16,11 +15,8 @@ public:
- 	static void Warning(std::wstring_view Message);
- 	static void Error(std::wstring_view Message);
- 
+@@ -9,8 +8,6 @@
+ class FLog : public TSingleton&lt;FLog&gt;
+ {
+ public:
 -	static const std::wstring&amp; GetLastErrorMessage();
 -
- private:
+ 	static void Info(std::wstring_view Message);
+ 	static void Warning(std::wstring_view Message);
+ 	static void Error(std::wstring_view Message);
+@@ -22,5 +19,4 @@ private:
  	void Write(std::wstring_view Prefix, std::wstring_view Message);
  
  	HANDLE ConsoleOutput = nullptr;
@@ -741,30 +744,28 @@ namespace Return
 					</details>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FLog.cpp</span><span class="badge mod">바꿈</span><span class="badge">tut02 → tut03</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -1,5 +1,7 @@
+<pre class="diff" data-lang="cpp">@@ -1,9 +1,6 @@
  #include "Core/FLog.h"
  
+-const std::wstring&amp; FLog::GetLastErrorMessage()
+-{
+-	return Get().LastErrorMessage;
+-}
 +#include &lt;string&gt;
-+
- FLog::FLog()
+ 
+ void FLog::Info(std::wstring_view Message)
  {
- #ifndef NDEBUG
-@@ -31,14 +33,7 @@ void FLog::Warning(std::wstring_view Message)
+@@ -17,9 +14,7 @@ void FLog::Warning(std::wstring_view Message)
  
  void FLog::Error(std::wstring_view Message)
  {
 -	FLog&amp; Log = Get();
 -	Log.LastErrorMessage.assign(Message);
 -	Log.Write(L"[에러] ", Message);
--}
--
--const std::wstring&amp; FLog::GetLastErrorMessage()
--{
--	return Get().LastErrorMessage;
 +	Get().Write(L"[에러] ", Message);
  }
  
- void FLog::Write(std::wstring_view Prefix, std::wstring_view Message)</pre>
+ FLog::FLog()</pre>
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/Main.cpp</span><span class="badge mod">바꿈</span><span class="badge">tut02 → tut03</span></figcaption>
@@ -830,6 +831,7 @@ public:
 	~FD3D11Graphics();
 
 	void Initialize(const FWindow&amp; Window, const FDisplaySettings&amp; Settings);
+
 	void Resize(int Width, int Height);
 
 	void BeginScene(const std::array&lt;float, 4&gt;&amp; Color);
@@ -872,10 +874,10 @@ private:
  public:
 -	bool Initialize(int ShowCmd);
 +	void Initialize(int ShowCmd);
- 	int Run();
- 	void RequestExit();
  
-@@ -24,9 +25,10 @@ private:
+ 	const FWindow&amp; GetWindow() const { return Window; }
+ 	const FInput&amp; GetInput() const { return Input; }
+@@ -26,9 +27,10 @@ private:
  	void OnResize(int NewWidth, int NewHeight);
  
  	// 선언 순서가 곧 생성 순서이고 소멸은 그 역순이다.
@@ -1191,12 +1193,14 @@ using Microsoft::WRL::ComPtr;</pre>
  class FApplication
  {
  public:
-@@ -9,4 +11,9 @@ public:
+@@ -7,6 +9,11 @@ public:
+ 	FApplication(const FApplication&amp; Other) = delete;
+ 	FApplication&amp; operator=(const FApplication&amp; Other) = delete;
  
++	const std::array&lt;float, 4&gt;&amp; GetClearColor() const { return ClearColor; }
++
  	void Update();
  	void Render();
-+
-+	const std::array&lt;float, 4&gt;&amp; GetClearColor() const { return ClearColor; }
 +
 +private:
 +	std::array&lt;float, 4&gt; ClearColor = {0.5f, 0.5f, 0.5f, 1.0f};
@@ -1348,21 +1352,21 @@ using Microsoft::WRL::ComPtr;</pre>
 						<summary>배율을 처리하는 코드</summary>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FWindow.h</span><span class="badge mod">바꿈</span><span class="badge">tut02 → tut03 · 전체 화면 멤버도 함께</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -16,7 +16,7 @@ public:
+<pre class="diff" data-lang="cpp">@@ -16,11 +16,12 @@ public:
  	FWindow&amp; operator=(const FWindow&amp; Other) = delete;
  	~FWindow();
  
 -	bool Initialize(const FDisplaySettings&amp; Settings, int ShowCmd);
 +	void Initialize(const FDisplaySettings&amp; Settings, int ShowCmd);
  
- 	void SetMessageCallback(std::function&lt;void(UINT, WPARAM, LPARAM)&gt; Callback);
- 	void SetResizeCallback(std::function&lt;void(int, int)&gt; Callback);
-@@ -24,16 +24,23 @@ public:
  	HWND GetHandle() const { return Handle; }
  	int GetWidth() const { return Width; }
  	int GetHeight() const { return Height; }
 +	UINT GetDpi() const { return Dpi; }
  
+ 	void SetMessageCallback(std::function&lt;void(UINT, WPARAM, LPARAM)&gt; Callback);
+ 	void SetResizeCallback(std::function&lt;void(int, int)&gt; Callback);
+@@ -28,12 +29,18 @@ public:
  private:
  	LRESULT HandleMessage(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam);
  	void NotifyResize();
@@ -1822,7 +1826,7 @@ void FWindow::ToggleFullScreen()
 		<div class="file-group">
 			<h3>그래픽</h3>
 			<details class="diff-file">
-				<summary><span class="path">Source/Graphics/FD3D11Graphics.h</span><span class="stat"><span class="plus">+37</span></span><span class="why">디바이스·컨텍스트·스왑체인·RTV 와 디버그 큐</span></summary>
+				<summary><span class="path">Source/Graphics/FD3D11Graphics.h</span><span class="stat"><span class="plus">+38</span></span><span class="why">디바이스·컨텍스트·스왑체인·RTV 와 디버그 큐</span></summary>
 <pre class="src" data-lang="cpp">#pragma once
 
 #include &lt;array&gt;
@@ -1843,6 +1847,7 @@ public:
 	~FD3D11Graphics();
 
 	void Initialize(const FWindow&amp; Window, const FDisplaySettings&amp; Settings);
+
 	void Resize(int Width, int Height);
 
 	void BeginScene(const std::array&lt;float, 4&gt;&amp; Color);
@@ -2219,13 +2224,16 @@ void FD3D11Graphics::FlushDebugMessages()
  #include &lt;string_view&gt;
  
  #include "Core/TSingleton.h"
-@@ -16,11 +15,8 @@ public:
- 	static void Warning(std::wstring_view Message);
- 	static void Error(std::wstring_view Message);
- 
+@@ -9,8 +8,6 @@
+ class FLog : public TSingleton&lt;FLog&gt;
+ {
+ public:
 -	static const std::wstring&amp; GetLastErrorMessage();
 -
- private:
+ 	static void Info(std::wstring_view Message);
+ 	static void Warning(std::wstring_view Message);
+ 	static void Error(std::wstring_view Message);
+@@ -22,5 +19,4 @@ private:
  	void Write(std::wstring_view Prefix, std::wstring_view Message);
  
  	HANDLE ConsoleOutput = nullptr;
@@ -2233,31 +2241,29 @@ void FD3D11Graphics::FlushDebugMessages()
  };</pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">Source/Core/FLog.cpp</span><span class="stat"><span class="plus">+3</span> <span class="minus">−8</span></span><span class="why">같은 변경</span></summary>
-<pre class="diff" data-lang="cpp">@@ -1,5 +1,7 @@
+				<summary><span class="path">Source/Core/FLog.cpp</span><span class="stat"><span class="plus">+2</span> <span class="minus">−7</span></span><span class="why">같은 변경</span></summary>
+<pre class="diff" data-lang="cpp">@@ -1,9 +1,6 @@
  #include "Core/FLog.h"
  
+-const std::wstring&amp; FLog::GetLastErrorMessage()
+-{
+-	return Get().LastErrorMessage;
+-}
 +#include &lt;string&gt;
-+
- FLog::FLog()
+ 
+ void FLog::Info(std::wstring_view Message)
  {
- #ifndef NDEBUG
-@@ -31,14 +33,7 @@ void FLog::Warning(std::wstring_view Message)
+@@ -17,9 +14,7 @@ void FLog::Warning(std::wstring_view Message)
  
  void FLog::Error(std::wstring_view Message)
  {
 -	FLog&amp; Log = Get();
 -	Log.LastErrorMessage.assign(Message);
 -	Log.Write(L"[에러] ", Message);
--}
--
--const std::wstring&amp; FLog::GetLastErrorMessage()
--{
--	return Get().LastErrorMessage;
 +	Get().Write(L"[에러] ", Message);
  }
  
- void FLog::Write(std::wstring_view Prefix, std::wstring_view Message)</pre>
+ FLog::FLog()</pre>
 			</details>
 			<details class="diff-file">
 				<summary><span class="path">Source/Main.cpp</span><span class="stat"><span class="plus">+1</span> <span class="minus">−7</span></span><span class="why">실패 분기와 상자를 뺌</span></summary>
@@ -2288,21 +2294,21 @@ void FD3D11Graphics::FlushDebugMessages()
 			<h3>창</h3>
 			<details class="diff-file">
 				<summary><span class="path">Source/Core/FWindow.h</span><span class="stat"><span class="plus">+8</span> <span class="minus">−1</span></span><span class="why">DPI 와 전체 화면 상태</span></summary>
-<pre class="diff" data-lang="cpp">@@ -16,7 +16,7 @@ public:
+<pre class="diff" data-lang="cpp">@@ -16,11 +16,12 @@ public:
  	FWindow&amp; operator=(const FWindow&amp; Other) = delete;
  	~FWindow();
  
 -	bool Initialize(const FDisplaySettings&amp; Settings, int ShowCmd);
 +	void Initialize(const FDisplaySettings&amp; Settings, int ShowCmd);
  
- 	void SetMessageCallback(std::function&lt;void(UINT, WPARAM, LPARAM)&gt; Callback);
- 	void SetResizeCallback(std::function&lt;void(int, int)&gt; Callback);
-@@ -24,16 +24,23 @@ public:
  	HWND GetHandle() const { return Handle; }
  	int GetWidth() const { return Width; }
  	int GetHeight() const { return Height; }
 +	UINT GetDpi() const { return Dpi; }
  
+ 	void SetMessageCallback(std::function&lt;void(UINT, WPARAM, LPARAM)&gt; Callback);
+ 	void SetResizeCallback(std::function&lt;void(int, int)&gt; Callback);
+@@ -28,12 +29,18 @@ public:
  private:
  	LRESULT HandleMessage(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam);
  	void NotifyResize();
@@ -2600,10 +2606,10 @@ void FD3D11Graphics::FlushDebugMessages()
  public:
 -	bool Initialize(int ShowCmd);
 +	void Initialize(int ShowCmd);
- 	int Run();
- 	void RequestExit();
  
-@@ -24,9 +25,10 @@ private:
+ 	const FWindow&amp; GetWindow() const { return Window; }
+ 	const FInput&amp; GetInput() const { return Input; }
+@@ -26,9 +27,10 @@ private:
  	void OnResize(int NewWidth, int NewHeight);
  
  	// 선언 순서가 곧 생성 순서이고 소멸은 그 역순이다.
@@ -2673,12 +2679,14 @@ void FD3D11Graphics::FlushDebugMessages()
  class FApplication
  {
  public:
-@@ -9,4 +11,9 @@ public:
+@@ -7,6 +9,11 @@ public:
+ 	FApplication(const FApplication&amp; Other) = delete;
+ 	FApplication&amp; operator=(const FApplication&amp; Other) = delete;
  
++	const std::array&lt;float, 4&gt;&amp; GetClearColor() const { return ClearColor; }
++
  	void Update();
  	void Render();
-+
-+	const std::array&lt;float, 4&gt;&amp; GetClearColor() const { return ClearColor; }
 +
 +private:
 +	std::array&lt;float, 4&gt; ClearColor = {0.5f, 0.5f, 0.5f, 1.0f};

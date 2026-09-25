@@ -582,14 +582,14 @@ namespace Return
 class FLog : public TSingleton&lt;FLog&gt;
 {
 public:
-	FLog();
-	~FLog();
+	static const std::wstring&amp; GetLastErrorMessage();
 
 	static void Info(std::wstring_view Message);
 	static void Warning(std::wstring_view Message);
 	static void Error(std::wstring_view Message);
 
-	static const std::wstring&amp; GetLastErrorMessage();
+	FLog();
+	~FLog();
 
 private:
 	void Write(std::wstring_view Prefix, std::wstring_view Message);
@@ -609,21 +609,7 @@ private:
 
 template &lt;typename T&gt; class TSingleton
 {
-private:
-	static std::unique_ptr&lt;T&gt; Instance;
-	static bool bReleased;
-
 public:
-	static T&amp; Get()
-	{
-		if (Instance == nullptr)
-		{
-			Prepare();
-		}
-
-		return *Instance;
-	}
-
 	// 생성 비용이 크거나 생성 시점을 잡아야 하는 싱글톤만 부른다. 나머지는 첫 Get() 에 맡긴다.
 	static void Prepare()
 	{
@@ -645,6 +631,20 @@ public:
 		Instance.reset();
 		bReleased = true;
 	}
+
+	static T&amp; Get()
+	{
+		if (Instance == nullptr)
+		{
+			Prepare();
+		}
+
+		return *Instance;
+	}
+
+private:
+	static std::unique_ptr&lt;T&gt; Instance;
+	static bool bReleased;
 
 protected:
 	TSingleton() = default;
@@ -684,23 +684,9 @@ namespace Return
 						<figcaption><span class="path">Source/Core/FLog.cpp</span><span class="badge new">새로</span><span class="badge">파일 전체</span></figcaption>
 <pre class="src" data-lang="cpp">#include "Core/FLog.h"
 
-FLog::FLog()
+const std::wstring&amp; FLog::GetLastErrorMessage()
 {
-#ifndef NDEBUG
-	if (AllocConsole())
-	{
-		ConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-		SetConsoleTitleW(L"DxRenderDojo");
-	}
-#endif
-}
-
-FLog::~FLog()
-{
-	if (ConsoleOutput != nullptr)
-	{
-		FreeConsole();
-	}
+	return Get().LastErrorMessage;
 }
 
 void FLog::Info(std::wstring_view Message)
@@ -720,9 +706,23 @@ void FLog::Error(std::wstring_view Message)
 	Log.Write(L"[에러] ", Message);
 }
 
-const std::wstring&amp; FLog::GetLastErrorMessage()
+FLog::FLog()
 {
-	return Get().LastErrorMessage;
+#ifndef NDEBUG
+	if (AllocConsole())
+	{
+		ConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+		SetConsoleTitleW(L"DxRenderDojo");
+	}
+#endif
+}
+
+FLog::~FLog()
+{
+	if (ConsoleOutput != nullptr)
+	{
+		FreeConsole();
+	}
 }
 
 void FLog::Write(std::wstring_view Prefix, std::wstring_view Message)
@@ -804,12 +804,12 @@ public:
 
 	bool Initialize(const FDisplaySettings&amp; Settings, int ShowCmd);
 
-	void SetMessageCallback(std::function&lt;void(UINT, WPARAM, LPARAM)&gt; Callback);
-	void SetResizeCallback(std::function&lt;void(int, int)&gt; Callback);
-
 	HWND GetHandle() const { return Handle; }
 	int GetWidth() const { return Width; }
 	int GetHeight() const { return Height; }
+
+	void SetMessageCallback(std::function&lt;void(UINT, WPARAM, LPARAM)&gt; Callback);
+	void SetResizeCallback(std::function&lt;void(int, int)&gt; Callback);
 
 private:
 	LRESULT HandleMessage(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam);
@@ -1022,9 +1022,10 @@ public:
 	FInput(const FInput&amp; Other) = delete;
 	FInput&amp; operator=(const FInput&amp; Other) = delete;
 
+	bool IsKeyDown(unsigned int Key) const { return Keys[Key]; }
+
 	void KeyDown(unsigned int Key);
 	void KeyUp(unsigned int Key);
-	bool IsKeyDown(unsigned int Key) const { return Keys[Key]; }
 
 private:
 	std::array&lt;bool, 256&gt; Keys = {};
@@ -1046,14 +1047,16 @@ class FSystem : public TSingleton&lt;FSystem&gt;
 {
 public:
 	bool Initialize(int ShowCmd);
-	int Run();
-	void RequestExit();
 
 	const FWindow&amp; GetWindow() const { return Window; }
 	const FInput&amp; GetInput() const { return Input; }
 
+	int Run();
+	void RequestExit();
+
 private:
 	void Frame();
+
 	void OnWindowMessage(UINT Message, WPARAM WParam, LPARAM LParam);
 	void OnResize(int NewWidth, int NewHeight);
 
@@ -1682,7 +1685,7 @@ struct FDisplaySettings
 };</pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">Source/Core/FInput.h</span><span class="stat"><span class="plus">+18</span></span><span class="why">키 256개의 눌림 상태</span></summary>
+				<summary><span class="path">Source/Core/FInput.h</span><span class="stat"><span class="plus">+19</span></span><span class="why">키 256개의 눌림 상태</span></summary>
 <pre class="src" data-lang="cpp">#pragma once
 
 #include &lt;array&gt;
@@ -1694,9 +1697,10 @@ public:
 	FInput(const FInput&amp; Other) = delete;
 	FInput&amp; operator=(const FInput&amp; Other) = delete;
 
+	bool IsKeyDown(unsigned int Key) const { return Keys[Key]; }
+
 	void KeyDown(unsigned int Key);
 	void KeyUp(unsigned int Key);
-	bool IsKeyDown(unsigned int Key) const { return Keys[Key]; }
 
 private:
 	std::array&lt;bool, 256&gt; Keys = {};
@@ -1731,21 +1735,7 @@ void FInput::KeyUp(unsigned int Key)
 
 template &lt;typename T&gt; class TSingleton
 {
-private:
-	static std::unique_ptr&lt;T&gt; Instance;
-	static bool bReleased;
-
 public:
-	static T&amp; Get()
-	{
-		if (Instance == nullptr)
-		{
-			Prepare();
-		}
-
-		return *Instance;
-	}
-
 	// 생성 비용이 크거나 생성 시점을 잡아야 하는 싱글톤만 부른다. 나머지는 첫 Get() 에 맡긴다.
 	static void Prepare()
 	{
@@ -1767,6 +1757,20 @@ public:
 		Instance.reset();
 		bReleased = true;
 	}
+
+	static T&amp; Get()
+	{
+		if (Instance == nullptr)
+		{
+			Prepare();
+		}
+
+		return *Instance;
+	}
+
+private:
+	static std::unique_ptr&lt;T&gt; Instance;
+	static bool bReleased;
 
 protected:
 	TSingleton() = default;
@@ -1792,14 +1796,14 @@ template &lt;typename T&gt; bool TSingleton&lt;T&gt;::bReleased = false;</pre>
 class FLog : public TSingleton&lt;FLog&gt;
 {
 public:
-	FLog();
-	~FLog();
+	static const std::wstring&amp; GetLastErrorMessage();
 
 	static void Info(std::wstring_view Message);
 	static void Warning(std::wstring_view Message);
 	static void Error(std::wstring_view Message);
 
-	static const std::wstring&amp; GetLastErrorMessage();
+	FLog();
+	~FLog();
 
 private:
 	void Write(std::wstring_view Prefix, std::wstring_view Message);
@@ -1812,23 +1816,9 @@ private:
 				<summary><span class="path">Source/Core/FLog.cpp</span><span class="stat"><span class="plus">+57</span></span><span class="why">출력 창과 디버그 콘솔</span></summary>
 <pre class="src" data-lang="cpp">#include "Core/FLog.h"
 
-FLog::FLog()
+const std::wstring&amp; FLog::GetLastErrorMessage()
 {
-#ifndef NDEBUG
-	if (AllocConsole())
-	{
-		ConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-		SetConsoleTitleW(L"DxRenderDojo");
-	}
-#endif
-}
-
-FLog::~FLog()
-{
-	if (ConsoleOutput != nullptr)
-	{
-		FreeConsole();
-	}
+	return Get().LastErrorMessage;
 }
 
 void FLog::Info(std::wstring_view Message)
@@ -1848,9 +1838,23 @@ void FLog::Error(std::wstring_view Message)
 	Log.Write(L"[에러] ", Message);
 }
 
-const std::wstring&amp; FLog::GetLastErrorMessage()
+FLog::FLog()
 {
-	return Get().LastErrorMessage;
+#ifndef NDEBUG
+	if (AllocConsole())
+	{
+		ConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+		SetConsoleTitleW(L"DxRenderDojo");
+	}
+#endif
+}
+
+FLog::~FLog()
+{
+	if (ConsoleOutput != nullptr)
+	{
+		FreeConsole();
+	}
 }
 
 void FLog::Write(std::wstring_view Prefix, std::wstring_view Message)
@@ -1956,12 +1960,12 @@ public:
 
 	bool Initialize(const FDisplaySettings&amp; Settings, int ShowCmd);
 
-	void SetMessageCallback(std::function&lt;void(UINT, WPARAM, LPARAM)&gt; Callback);
-	void SetResizeCallback(std::function&lt;void(int, int)&gt; Callback);
-
 	HWND GetHandle() const { return Handle; }
 	int GetWidth() const { return Width; }
 	int GetHeight() const { return Height; }
+
+	void SetMessageCallback(std::function&lt;void(UINT, WPARAM, LPARAM)&gt; Callback);
+	void SetResizeCallback(std::function&lt;void(int, int)&gt; Callback);
 
 private:
 	LRESULT HandleMessage(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam);
@@ -2168,7 +2172,7 @@ void FWindow::NotifyResize()
 		<div class="file-group">
 			<h3>루프와 장면</h3>
 			<details class="diff-file">
-				<summary><span class="path">Source/Core/FSystem.h</span><span class="stat"><span class="plus">+32</span></span><span class="why">멤버 넷과 선언 순서</span></summary>
+				<summary><span class="path">Source/Core/FSystem.h</span><span class="stat"><span class="plus">+34</span></span><span class="why">멤버 넷과 선언 순서</span></summary>
 <pre class="src" data-lang="cpp">#pragma once
 
 #include &lt;Windows.h&gt;
@@ -2183,14 +2187,16 @@ class FSystem : public TSingleton&lt;FSystem&gt;
 {
 public:
 	bool Initialize(int ShowCmd);
-	int Run();
-	void RequestExit();
 
 	const FWindow&amp; GetWindow() const { return Window; }
 	const FInput&amp; GetInput() const { return Input; }
 
+	int Run();
+	void RequestExit();
+
 private:
 	void Frame();
+
 	void OnWindowMessage(UINT Message, WPARAM WParam, LPARAM LParam);
 	void OnResize(int NewWidth, int NewHeight);
 
