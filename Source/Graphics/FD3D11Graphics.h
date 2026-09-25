@@ -17,10 +17,13 @@ public:
 
 	void Initialize(const FWindow& Window, const FDisplaySettings& Settings);
 
+	void Resize(int Width, int Height);
+
 	void BeginScene(const std::array<float, 4>& Color);
 	void EndScene();
 
 private:
+	// 창 크기를 따라가는 자원은 여기서 만든다. Initialize 와 Resize 가 같이 부른다.
 	void CreateSizeDependentResources();
 
 	Microsoft::WRL::ComPtr<ID3D11Device> Device;

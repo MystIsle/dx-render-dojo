@@ -68,4 +68,5 @@ void FSystem::OnWindowMessage(UINT Message, WPARAM WParam, LPARAM LParam)
 void FSystem::OnResize(int NewWidth, int NewHeight)
 {
 	FLog::Info(std::format(L"창 크기 변경 : {}x{}", NewWidth, NewHeight));
+	Graphics.Resize(NewWidth, NewHeight);
 }

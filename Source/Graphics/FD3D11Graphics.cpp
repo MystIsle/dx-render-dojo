@@ -63,6 +63,17 @@ void FD3D11Graphics::Initialize(const FWindow& Window, const FDisplaySettings& S
 	CreateSizeDependentResources();
 }
 
+void FD3D11Graphics::Resize(int Width, int Height)
+{
+	// 백 버퍼를 가리키는 뷰가 남아 있으면 ResizeBuffers 가 실패한다. Flush 는 D3D 가 미뤄 둔 해제를 지금 끝낸다.
+	RenderTargetView.Reset();
+	Context->Flush();
+
+	CHECK_FATAL(
+	    SwapChain->ResizeBuffers(0, static_cast<UINT>(Width), static_cast<UINT>(Height), DXGI_FORMAT_UNKNOWN, 0));
+	CreateSizeDependentResources();
+}
+
 void FD3D11Graphics::BeginScene(const std::array<float, 4>& Color)
 {
 	Context->ClearRenderTargetView(RenderTargetView.Get(), Color.data());
