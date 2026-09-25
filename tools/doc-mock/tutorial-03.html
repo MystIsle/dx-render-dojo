@@ -253,6 +253,9 @@ details.fold .walk { padding-left: 2.4rem; }
 .learn { display: grid; gap: 0.45rem; margin: 0; padding: 0.95rem 1.15rem; border-radius: var(--radius); background: var(--amber-soft); }
 .learn .box-label { color: var(--amber); }
 .learn details.fold { border-color: var(--amber); background: var(--paper); }
+#quiz .learn { grid-template-columns: 1.4rem minmax(0, 1fr); column-gap: 0.35rem; align-items: baseline; }
+#quiz .learn .box-label { grid-row: 1 / span 2; }
+#quiz .learn > :not(.box-label) { grid-column: 2; }
 .concept, .ue { display: grid; gap: 0.45rem; margin: 0; padding: 0.95rem 1.15rem; border-radius: var(--radius); }
 .concept { border: 1px solid var(--rule); }
 .ue { background: var(--accent-soft); }
