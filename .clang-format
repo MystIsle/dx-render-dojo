@@ -4,6 +4,8 @@ UseTab: ForIndentation
 AccessModifierOffset: -4
 ColumnLimit: 120
 MaxEmptyLinesToKeep: 1
+NamespaceIndentation: All
+PointerAlignment: Left
 AllowShortFunctionsOnASingleLine: InlineOnly
 BinPackArguments: false
 BinPackParameters: false

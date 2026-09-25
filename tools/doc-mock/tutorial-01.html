@@ -1,0 +1,668 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>01 개발 환경 셋업</title>
+<script>
+(function () {
+	try {
+		var Theme = localStorage.getItem("dojo-theme");
+		if (Theme === "light" || Theme === "dark") { document.documentElement.setAttribute("data-theme", Theme); }
+	} catch (E) {}
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Nanum+Gothic+Coding&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+/* ===== 토큰 : A 잔잔한 문서형 ===== */
+:root {
+	color-scheme: light;
+	--paper: #FFFFFF;
+	--raised: #F6F7F9;
+	--ink: #1E2430;
+	--slate: #555E6E;
+	--rule: #E3E6EB;
+	--accent: #3456C8;
+	--accent-soft: #EDF1FC;
+	--amber: #8F5A10;
+	--amber-soft: #FDF5E8;
+	--cell-optional: #E3E6EB;
+	--body-weight: 450;
+	--radius: 8px;
+
+	--code-bg: #F6F8FA;
+	--code-rule: #E8EBEF;
+	--code-ink: #1F2328;
+	--code-muted: #59636E;
+	--code-add: #1A7F37;
+	--tok-key: #CF222E;
+	--tok-const: #0550AE;
+	--tok-str: #0A3069;
+	--tok-fn: #8250DF;
+	--tok-com: #59636E;
+
+	--font-body: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+	--font-mono: "IBM Plex Mono", "Nanum Gothic Coding", ui-monospace, Consolas, monospace;
+	--column: 54rem;
+	--rail: 11rem;
+	--rail-gap: 3.5rem;
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) {
+		color-scheme: dark;
+		--paper: #16181D; --raised: #1E2127; --ink: #DADFE8; --slate: #9AA2B1; --rule: #2C3038;
+		--accent: #8FA8F0; --accent-soft: #232A3D;
+		--amber: #E2AB5E; --amber-soft: #2A2419;
+		--cell-optional: #2C3038; --body-weight: 400;
+		--code-bg: #1E2127; --code-rule: #2C3038; --code-ink: #E6EDF3; --code-muted: #8B949E; --code-add: #3FB950;
+		--tok-key: #FF7B72; --tok-const: #79C0FF; --tok-str: #A5D6FF; --tok-fn: #D2A8FF; --tok-com: #8B949E;
+	}
+	:root:not([data-theme="light"]) body { -webkit-font-smoothing: antialiased; }
+}
+:root[data-theme="dark"] {
+	color-scheme: dark;
+	--paper: #16181D; --raised: #1E2127; --ink: #DADFE8; --slate: #9AA2B1; --rule: #2C3038;
+	--accent: #8FA8F0; --accent-soft: #232A3D;
+	--amber: #E2AB5E; --amber-soft: #2A2419;
+	--cell-optional: #2C3038; --body-weight: 400;
+	--code-bg: #1E2127; --code-rule: #2C3038; --code-ink: #E6EDF3; --code-muted: #8B949E; --code-add: #3FB950;
+	--tok-key: #FF7B72; --tok-const: #79C0FF; --tok-str: #A5D6FF; --tok-fn: #D2A8FF; --tok-com: #8B949E;
+}
+:root[data-theme="dark"] body { -webkit-font-smoothing: antialiased; }
+
+/* ===== 공통 ===== */
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 1.5rem; }
+body {
+	margin: 0;
+	background: var(--paper);
+	color: var(--ink);
+	font-family: var(--font-body);
+	font-size: 1.0625rem;
+	font-weight: var(--body-weight);
+	line-height: 1.75;
+	word-break: keep-all;
+	overflow-wrap: break-word;
+}
+p, li, dd, dt { text-wrap: pretty; }
+a { color: var(--accent); text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+code { font-family: var(--font-mono); font-size: 0.875em; font-weight: 400; background: var(--raised); padding: 0.1em 0.38em; border-radius: 4px; }
+kbd { font-family: var(--font-mono); font-size: 0.875em; padding: 0.05em 0.45em; border: 1px solid var(--rule); border-bottom-width: 2px; border-radius: 4px; background: var(--raised); }
+h1, h2, h3 { text-wrap: balance; line-height: 1.3; margin: 0; }
+p { margin: 0; }
+b, strong { font-weight: 650; }
+
+/* 시안 띠 : 최종 페이지에는 없음 */
+.mock-strip {
+	display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem;
+	padding: 0.6rem 1.5rem;
+	background: #FFF4DB; border-bottom: 1px solid #E9CFA2;
+	color: #6B4309; font-size: 0.875rem; line-height: 1.5;
+}
+.mock-strip strong { font-weight: 700; }
+.mock-strip button {
+	margin-left: auto; font: 600 0.875rem/1 var(--font-body);
+	color: #6B4309; background: #FFFBF2; border: 1px solid #E0C08A;
+	padding: 0.45rem 0.7rem; border-radius: 4px; cursor: pointer;
+}
+.mock-strip button[aria-pressed="true"] { background: #6B4309; color: #FFFBF2; border-color: #6B4309; }
+
+/* 상단 */
+.topbar {
+	display: flex; align-items: center; gap: 1.25rem;
+	max-width: calc(var(--column) + 3rem); margin: 0 auto; padding: 0.9rem 1.5rem;
+	border-bottom: 1px solid var(--rule);
+}
+.brand { font-weight: 750; font-size: 1.125rem; letter-spacing: -0.02em; color: var(--ink); text-decoration: none; }
+.topbar nav { margin-left: auto; display: flex; gap: 1.25rem; font-size: 0.9375rem; }
+.topbar nav a { color: var(--slate); text-decoration: none; }
+.topbar nav a:hover { color: var(--ink); }
+.theme-toggle {
+	font: 600 0.875rem/1 var(--font-body);
+	color: var(--ink); background: var(--raised); border: 1px solid var(--rule);
+	padding: 0.5rem 0.8rem; border-radius: 6px; cursor: pointer;
+}
+.theme-toggle:hover { border-color: var(--accent); }
+
+.shell { max-width: calc(var(--column) + 3rem); margin: 0 auto; padding: 2.75rem 1.5rem 5rem; }
+main { min-width: 0; }
+.rail { display: none; }
+
+/* 넓은 화면 : 오른쪽에 이 페이지 목차 */
+@media (min-width: 1200px) {
+	.topbar, .shell { max-width: calc(var(--column) + var(--rail-gap) + var(--rail) + 3rem); }
+	.shell { display: grid; grid-template-columns: minmax(0, var(--column)) var(--rail); gap: var(--rail-gap); }
+	.rail { display: block; position: sticky; top: 2rem; align-self: start; font-size: 0.875rem; }
+	.rail ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.05rem; border-left: 1px solid var(--rule); }
+	.rail a { display: block; padding: 0.3rem 0 0.3rem 0.9rem; margin-left: -1px; border-left: 2px solid transparent; color: var(--slate); text-decoration: none; line-height: 1.45; }
+	.rail a:hover { color: var(--ink); }
+	.rail a[aria-current="true"] { color: var(--accent); font-weight: 600; border-left-color: var(--accent); }
+}
+
+/* 편 머리 */
+.lesson-head { display: grid; gap: 1.1rem; padding-bottom: 1.5rem; }
+.eyebrow { font-size: 0.9375rem; font-weight: 600; color: var(--slate); }
+.eyebrow b { color: var(--accent); font-weight: 700; }
+.title-row { display: flex; align-items: baseline; gap: 1rem; }
+.title-row .num { font-family: var(--font-mono); font-weight: 500; font-size: clamp(2rem, 1.35rem + 2.2vw, 2.75rem); color: var(--accent); line-height: 1; font-variant-numeric: tabular-nums; }
+h1 { font-size: clamp(2rem, 1.35rem + 2.2vw, 2.75rem); font-weight: 750; letter-spacing: -0.025em; }
+.lede { font-size: 1.1875rem; line-height: 1.7; }
+.meta { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.35rem 1.5rem; font-size: 0.9375rem; color: var(--slate); }
+.meta b { color: var(--ink); font-weight: 600; margin-right: 0.4rem; }
+
+.scanline { display: grid; gap: 0.5rem; margin-top: 0.3rem; }
+.scanline-cells { display: flex; flex-wrap: wrap; gap: 3px; align-items: center; }
+.cell { width: 10px; height: 16px; background: var(--cell-optional); border-radius: 2px; }
+.cell.common { background: color-mix(in srgb, var(--accent) 42%, var(--paper)); }
+.cell.current { background: var(--accent); box-shadow: 0 0 0 2px var(--paper), 0 0 0 3.5px var(--accent); }
+.cell.gap { width: 6px; background: transparent; }
+.scanline-legend { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; font-size: 0.875rem; color: var(--slate); line-height: 1.5; font-variant-numeric: tabular-nums; }
+.scanline-legend span { display: inline-flex; align-items: center; gap: 0.45rem; }
+.scanline-legend i { display: inline-block; width: 10px; height: 16px; border-radius: 2px; }
+
+/* 절 */
+section { margin-top: 3.5rem; }
+h2 { font-size: 1.625rem; font-weight: 700; letter-spacing: -0.015em; margin-bottom: 1.1rem; }
+.section-note { color: var(--slate); margin: -0.35rem 0 1.25rem; font-size: 0.9375rem; }
+
+.labeled { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.55rem; }
+.labeled li { display: grid; grid-template-columns: 6rem minmax(0, 1fr); gap: 1rem; align-items: baseline; }
+.labeled .label { font-weight: 650; }
+
+/* 원문과 다른 점 */
+.diverge { display: grid; }
+.diverge-row { display: grid; grid-template-columns: 8rem minmax(0, 1fr) minmax(0, 1.4fr); gap: 1.25rem; padding: 0.8rem 0; border-bottom: 1px solid var(--rule); align-items: baseline; }
+.diverge-head { padding: 0 0 0.45rem; font-size: 0.9375rem; font-weight: 600; color: var(--slate); }
+.diverge-row .topic { font-weight: 650; }
+.diverge-row .orig { color: var(--slate); }
+
+/* 따라 하기 */
+.steps { list-style: none; margin: 0; padding: 0; counter-reset: step; }
+.step { display: grid; grid-template-columns: 3rem minmax(0, 1fr); column-gap: 1rem; position: relative; padding-bottom: 2.5rem; }
+.step::before {
+	counter-increment: step; content: counter(step, decimal-leading-zero);
+	font-family: var(--font-mono); font-weight: 500; font-size: 0.9375rem; color: var(--accent);
+	width: 2.25rem; height: 2.25rem; display: grid; place-items: center;
+	background: var(--accent-soft); border-radius: 50%;
+	font-variant-numeric: tabular-nums; position: relative; z-index: 1;
+}
+.step::after { content: ""; position: absolute; left: 1.125rem; top: 2.5rem; bottom: 0.3rem; width: 1px; background: var(--rule); }
+.step:last-child::after { display: none; }
+.step-body { display: grid; gap: 1rem; min-width: 0; padding-top: 0.2rem; }
+.step h3 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.01em; }
+
+.tabs { display: grid; gap: 0.9rem; }
+.tablist { display: inline-flex; border: 1px solid var(--rule); border-radius: 8px; padding: 3px; justify-self: start; background: var(--raised); }
+.tablist button {
+	font: 600 0.9375rem/1 var(--font-body);
+	color: var(--slate); background: transparent; border: 0; padding: 0.55rem 1rem; border-radius: 6px; cursor: pointer;
+}
+.tablist button[aria-selected="true"] { background: var(--accent); color: var(--paper); }
+.tabpanel { display: grid; gap: 0.9rem; }
+.tabpanel[hidden] { display: none; }
+
+.settings { display: grid; border-top: 1px solid var(--rule); margin: 0; }
+.settings div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1rem; padding: 0.6rem 0; border-bottom: 1px solid var(--rule); align-items: baseline; }
+.settings dt { font-weight: 600; }
+.settings dt small { display: block; font-size: 0.875rem; color: var(--slate); font-weight: 400; line-height: 1.5; }
+.settings dd { margin: 0; font-family: var(--font-mono); font-size: 0.9375rem; text-align: right; }
+
+details.why { border-radius: var(--radius); background: var(--raised); }
+details.why summary { cursor: pointer; padding: 0.8rem 1.1rem; font-weight: 650; list-style: none; display: flex; gap: 0.6rem; align-items: baseline; }
+details.why summary::-webkit-details-marker { display: none; }
+details.why summary::before { content: "+"; font-family: var(--font-mono); color: var(--accent); width: 1ch; }
+details.why[open] summary::before { content: "−"; }
+details.why .why-body { padding: 0 1.1rem 1.1rem 2.7rem; display: grid; gap: 0.75rem; }
+
+.read-first { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+.read-first li { display: grid; grid-template-columns: 13rem minmax(0, 1fr); gap: 1rem; align-items: baseline; }
+.read-first a { font-family: var(--font-mono); font-size: 0.9375rem; font-weight: 400; }
+.read-first span { color: var(--slate); }
+
+/* 코드 : GitHub 테마 색 (최종은 Shiki) */
+figure.code { margin: 0; border-radius: var(--radius); overflow: hidden; background: var(--code-bg); border: 1px solid var(--code-rule); }
+figure.code figcaption { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.55rem 0 1rem; font-size: 0.875rem; color: var(--code-muted); }
+figure.code figcaption .path { font-family: var(--font-mono); color: var(--code-ink); font-weight: 500; }
+.badge { font-size: 0.875rem; font-weight: 600; color: var(--code-muted); }
+.badge.new { color: var(--code-add); }
+.copy { margin-left: auto; font: 600 0.8125rem/1 var(--font-body); color: var(--code-muted); background: transparent; border: 1px solid var(--code-rule); padding: 0.4rem 0.6rem; border-radius: 6px; cursor: pointer; }
+.copy:hover { color: var(--code-ink); }
+pre { margin: 0; padding: 0.6rem 0 0.9rem; font-family: var(--font-mono); font-size: 0.9375rem; font-weight: 400; line-height: 1.65; color: var(--code-ink); tab-size: 4; }
+pre .line { display: block; white-space: pre-wrap; overflow-wrap: anywhere; padding: 0 1rem 0 calc(1rem + 4ch); text-indent: -4ch; }
+.k { color: var(--tok-key); }
+.c { color: var(--tok-const); }
+.s { color: var(--tok-str); }
+.f { color: var(--tok-fn); }
+.m { color: var(--tok-com); }
+
+/* 흔한 실수 */
+.pitfalls { display: grid; margin: 0; background: var(--amber-soft); border-radius: var(--radius); }
+.pitfall { display: grid; gap: 0.3rem; padding: 1.1rem 1.3rem; }
+.pitfall + .pitfall { border-top: 1px solid color-mix(in srgb, var(--amber) 18%, transparent); }
+.pitfall .symptom { font-weight: 700; line-height: 1.55; margin-bottom: 0.25rem; }
+.pitfall .symptom code { background: color-mix(in srgb, var(--amber) 12%, transparent); }
+.pitfall .row { display: grid; grid-template-columns: 3rem minmax(0, 1fr); gap: 0.5rem; align-items: baseline; }
+.pitfall .row b { color: var(--amber); }
+
+/* 자동 생성 : 파일 */
+.file-list { list-style: none; margin: 0 0 1.25rem; padding: 0; display: grid; border-top: 1px solid var(--rule); }
+.file-list li { display: grid; grid-template-columns: 1.5rem minmax(0, 1fr) auto; gap: 0.75rem; padding: 0.45rem 0; border-bottom: 1px solid var(--rule); align-items: baseline; }
+.file-list .plus { font-family: var(--font-mono); color: var(--code-add); font-weight: 500; }
+.file-list .name { font-family: var(--font-mono); font-size: 0.9375rem; font-weight: 400; }
+.file-list .note { font-size: 0.9375rem; color: var(--slate); }
+.files-code { display: grid; gap: 1rem; }
+
+/* 확인 */
+.checks { list-style: none; margin: 0; padding: 0; display: grid; border-top: 1px solid var(--rule); }
+.checks li { border-bottom: 1px solid var(--rule); }
+.checks label { display: grid; grid-template-columns: 1.5rem 6rem minmax(0, 1fr); gap: 0.6rem; align-items: baseline; padding: 0.55rem 0; cursor: pointer; }
+.checks input { accent-color: var(--accent); width: 1.05rem; height: 1.05rem; transform: translateY(0.15rem); }
+.checks .label { font-weight: 650; }
+.checks input:checked ~ .what { color: var(--slate); text-decoration: line-through; text-decoration-color: var(--rule); }
+
+/* 페이저 */
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 3.5rem; }
+.pager a { display: grid; gap: 0.2rem; padding: 1rem 1.2rem; border: 1px solid var(--rule); border-radius: var(--radius); text-decoration: none; color: var(--ink); }
+.pager a:hover { border-color: var(--accent); }
+.pager .dir { font-size: 0.9375rem; color: var(--slate); }
+.pager .name { font-weight: 700; font-size: 1.25rem; letter-spacing: -0.01em; }
+.pager .next { text-align: right; }
+
+.site-foot { margin-top: 3rem; padding-top: 1.25rem; border-top: 1px solid var(--rule); color: var(--slate); font-size: 0.9375rem; line-height: 1.7; }
+
+/* 블록 경계 보기 (시안 검토용) */
+.show-blocks [data-block] { outline: 1px dashed #C77F1A; outline-offset: 8px; position: relative; }
+.show-blocks [data-block]::before {
+	content: attr(data-block) " · " attr(data-source);
+	position: absolute; top: -1.7rem; right: -8px; z-index: 2;
+	font: 600 0.8125rem/1 var(--font-body);
+	color: #FFFBF2; background: #C77F1A; padding: 0.3rem 0.5rem; border-radius: 3px;
+}
+
+@media (max-width: 720px) {
+	.shell { padding: 2rem 1.1rem 4rem; }
+	.topbar { padding: 0.9rem 1.1rem; }
+	.topbar nav { display: none; }
+	.theme-toggle { margin-left: auto; }
+	.mock-strip { padding: 0.6rem 1.1rem; }
+	.diverge-head { display: none; }
+	.diverge-row { grid-template-columns: minmax(0, 1fr); gap: 0.15rem; }
+	.diverge-row .orig::before { content: "원문 : "; }
+	.labeled li, .read-first li { grid-template-columns: minmax(0, 1fr); gap: 0; }
+	.checks label { grid-template-columns: 1.5rem minmax(0, 1fr); }
+	.checks .label, .checks .what { grid-column: 2; }
+	.pager { grid-template-columns: minmax(0, 1fr); }
+	.step { grid-template-columns: 2.75rem minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+	html { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body>
+
+<div class="mock-strip" role="note">
+	<span><strong>시안 v5</strong> : A 잔잔한 문서형. 문장마다 줄을 바꿨고, 화면 폭이 1200px 이상이면 오른쪽에 목차가 나옵니다.</span>
+	<button type="button" id="toggle-blocks" aria-pressed="false">블록 경계 보기</button>
+</div>
+
+<header class="topbar" data-block="site-header" data-source="자동">
+	<a class="brand" href="#">렌더러 공부방</a>
+	<nav aria-label="사이트">
+		<a href="#">목차</a>
+		<a href="https://github.com/MystIsle/dx-render-dojo">GitHub</a>
+	</nav>
+	<button type="button" class="theme-toggle" id="theme-toggle">테마 · 시스템</button>
+</header>
+
+<div class="shell">
+<main>
+
+	<header class="lesson-head" data-block="lesson-head" data-source="제목·요약 직접 · 나머지 자동">
+		<p class="eyebrow"><b>STAGE 1</b> · 공통 진도</p>
+		<div class="title-row">
+			<span class="num" aria-hidden="true">01</span>
+			<h1>개발 환경 셋업</h1>
+		</div>
+		<p class="lede">튜토리얼 코드를 쓰기 전에, 같은 빈 프로젝트가 Windows와 macOS 양쪽에서 빌드되는 상태를 만듭니다.</p>
+		<ul class="meta">
+			<li><b>태그</b><code>tut01</code></li>
+			<li><b>원문</b><a href="https://www.rastertek.com/dx11win10tut01.html">Tutorial 1</a></li>
+			<li><b>플랫폼</b>Windows · macOS</li>
+		</ul>
+		<div class="scanline" aria-label="전체 진도에서 이 편의 위치">
+			<div class="scanline-cells" id="scanline"></div>
+			<div class="scanline-legend">
+				<span><i style="background: var(--accent)"></i>이 편 (1 / 61)</span>
+				<span><i style="background: color-mix(in srgb, var(--accent) 42%, var(--paper))"></i>공통 진도 : 01~30, 41~45, 스키닝(α)</span>
+				<span><i style="background: var(--cell-optional)"></i>각자 선택</span>
+			</div>
+		</div>
+	</header>
+
+	<section id="goal" data-block="goal" data-source="직접">
+		<h2>이 편을 마치면</h2>
+		<ul class="labeled">
+			<li><span class="label">Windows</span><span>Visual Studio에서 x64 Debug 빌드가 경고 없이 끝납니다</span></li>
+			<li><span class="label">macOS</span><span>같은 코드를 mingw-w64로 Windows용 <code>.exe</code>로 빌드하고, Wine으로 실행합니다</span></li>
+			<li><span class="label">공통</span><span>이 리포에서 코드를 쓰기 전에 볼 규약 파일이 어디 있는지 압니다</span></li>
+		</ul>
+	</section>
+
+	<section id="diverge" data-block="diverge" data-source="직접">
+		<h2>원문과 다른 점</h2>
+		<p class="section-note">원문을 옆에 펴 놓고 따라온다면 이 표부터 보세요.<br>코드를 새로 쓰기 때문에 원문 그대로가 아닌 곳이 있습니다.</p>
+		<div class="diverge">
+			<div class="diverge-row diverge-head"><span>항목</span><span>원문</span><span>이 리포</span></div>
+			<div class="diverge-row"><span class="topic">IDE</span><span class="orig">Visual Studio 2022</span><span>Visual Studio 2022 이상<br>작성 PC는 Visual Studio 2026</span></div>
+			<div class="diverge-row"><span class="topic">프로젝트</span><span class="orig">템플릿으로 새로 만들고 기본 파일을 지움</span><span>리포에 들어 있는 프로젝트 파일을 엶</span></div>
+			<div class="diverge-row"><span class="topic">macOS</span><span class="orig">다루지 않음</span><span>CMake + mingw-w64로 빌드<br>Wine(Game Porting Toolkit)으로 실행</span></div>
+			<div class="diverge-row"><span class="topic">소스 인코딩</span><span class="orig">다루지 않음</span><span>BOM 없는 UTF-8<br>MSVC에는 <code>/utf-8</code></span></div>
+			<div class="diverge-row"><span class="topic">코드 규약</span><span class="orig">없음</span><span><code>CODING_STYLE.md</code>, clang-format, clang-tidy</span></div>
+		</div>
+	</section>
+
+	<section id="steps" data-block="steps" data-source="직접">
+		<h2>따라 하기</h2>
+		<ol class="steps">
+
+			<li class="step">
+				<div class="step-body">
+					<h3>도구 설치</h3>
+					<div class="tabs" data-platform-tabs>
+						<div class="tablist" role="tablist" aria-label="플랫폼">
+							<button type="button" role="tab" data-platform="win" aria-selected="true">Windows</button>
+							<button type="button" role="tab" data-platform="mac" aria-selected="false">macOS</button>
+						</div>
+						<div class="tabpanel" role="tabpanel" data-platform="win">
+							<p>Visual Studio 설치 관리자에서 <b>C++를 사용한 게임 개발</b> 워크로드를 고릅니다.<br>Windows SDK가 이 워크로드에 같이 들어옵니다.</p>
+							<p><code>d3d11.h</code>와 DirectXMath가 Windows SDK 안에 있어서, 예전 튜토리얼이 쓰던 DirectX SDK(June 2010)는 받지 않습니다.</p>
+						</div>
+						<div class="tabpanel" role="tabpanel" data-platform="mac" hidden>
+							<p>빌드 도구와 Wine을 Homebrew로 설치합니다.<br>Wine은 D3D11을 Metal로 옮겨 주는 D3DMetal이 들어 있는 Game Porting Toolkit을 씁니다.</p>
+							<figure class="code">
+								<figcaption><span class="badge">터미널</span><button type="button" class="copy">복사</button></figcaption>
+<pre><span class="line">brew install cmake ninja mingw-w64</span><span class="line">brew trust gcenx/wine</span><span class="line">brew install --cask game-porting-toolkit</span></pre>
+							</figure>
+							<p>설치가 끝나면 <code>x86_64-w64-mingw32-g++ --version</code>으로 컴파일러가 잡히는지 확인합니다.</p>
+						</div>
+					</div>
+				</div>
+			</li>
+
+			<li class="step">
+				<div class="step-body">
+					<h3>리포 받기</h3>
+					<figure class="code">
+						<figcaption><span class="badge">터미널</span><button type="button" class="copy">복사</button></figcaption>
+<pre><span class="line">git clone https://github.com/MystIsle/dx-render-dojo.git</span><span class="line">cd dx-render-dojo</span></pre>
+					</figure>
+					<p>받은 리포에서 코드를 쓰기 전에 아래 세 파일을 한 번 열어 둡니다.</p>
+					<ul class="read-first">
+						<li><a href="https://github.com/MystIsle/dx-render-dojo/blob/main/docs/CODING_STYLE.md">docs/CODING_STYLE.md</a><span>이름 짓기, 소유, 에러 처리 규약</span></li>
+						<li><a href="https://github.com/MystIsle/dx-render-dojo/blob/main/.clang-format">.clang-format</a><span>중괄호·탭·120자 같은 서식을 맞춤</span></li>
+						<li><a href="https://github.com/MystIsle/dx-render-dojo/blob/main/.clang-tidy">.clang-tidy</a><span><code>FModel</code>, <code>bReady</code> 같은 이름 규칙을 검사</span></li>
+					</ul>
+				</div>
+			</li>
+
+			<li class="step">
+				<div class="step-body">
+					<h3>프로젝트 설정 확인</h3>
+					<div class="tabs" data-platform-tabs>
+						<div class="tablist" role="tablist" aria-label="플랫폼">
+							<button type="button" role="tab" data-platform="win" aria-selected="true">Windows</button>
+							<button type="button" role="tab" data-platform="mac" aria-selected="false">macOS</button>
+						</div>
+						<div class="tabpanel" role="tabpanel" data-platform="win">
+							<p><code>DxRenderDojo.sln</code>을 열고, 프로젝트 속성에서 아래 다섯 값이 맞는지 봅니다.<br>리포의 프로젝트 파일에 이미 들어 있으니 고칠 곳은 없어야 합니다.</p>
+							<dl class="settings">
+								<div><dt>솔루션 플랫폼<small>도구 모음</small></dt><dd>x64</dd></div>
+								<div><dt>문자 집합<small>구성 속성 › 고급</small></dt><dd>유니코드</dd></div>
+								<div><dt>C++ 언어 표준<small>C/C++ › 언어</small></dt><dd>/std:c++20</dd></div>
+								<div><dt>추가 옵션<small>C/C++ › 명령줄</small></dt><dd>/utf-8</dd></div>
+								<div><dt>하위 시스템<small>링커 › 시스템</small></dt><dd>/SUBSYSTEM:WINDOWS</dd></div>
+							</dl>
+							<details class="why">
+								<summary>원문은 왜 x64를 요구하나</summary>
+								<div class="why-body">
+									<p><code>XMMATRIX</code>는 SSE 명령으로 한 번에 계산하려고 16바이트 경계에 맞춰진 메모리를 기대합니다.</p>
+									<p>64비트 Windows의 힙 할당은 기본이 16바이트 정렬이지만 32비트는 8바이트입니다.<br>그래서 x86으로 빌드하면 <code>XMMATRIX</code>를 멤버로 가진 객체의 정렬이 어긋나, 행렬을 쓰기 시작하는 03편 이후에 크래시가 날 수 있습니다.</p>
+								</div>
+							</details>
+						</div>
+						<div class="tabpanel" role="tabpanel" data-platform="mac" hidden>
+							<p>macOS에서는 CMake가 <code>cmake/toolchain-mingw-x86_64.cmake</code>로 mingw-w64 컴파일러를 고릅니다.<br>손댈 설정은 없습니다.</p>
+							<p><code>/utf-8</code>은 MSVC 전용 옵션이라 macOS 빌드에는 들어가지 않습니다.<br>GCC는 소스를 기본으로 UTF-8로 읽습니다.</p>
+						</div>
+					</div>
+				</div>
+			</li>
+
+			<li class="step">
+				<div class="step-body">
+					<h3>빌드하고 실행</h3>
+					<div class="tabs" data-platform-tabs>
+						<div class="tablist" role="tablist" aria-label="플랫폼">
+							<button type="button" role="tab" data-platform="win" aria-selected="true">Windows</button>
+							<button type="button" role="tab" data-platform="mac" aria-selected="false">macOS</button>
+						</div>
+						<div class="tabpanel" role="tabpanel" data-platform="win">
+							<p>구성을 <b>Debug · x64</b>로 두고 <kbd>F5</kbd>로 실행합니다.<br>창은 뜨지 않고 바로 끝나며, 출력 창에 코드 0으로 종료했다는 줄이 남으면 정상입니다.<br>창은 02편에서 띄웁니다.</p>
+						</div>
+						<div class="tabpanel" role="tabpanel" data-platform="mac" hidden>
+							<figure class="code">
+								<figcaption><span class="badge">터미널</span><button type="button" class="copy">복사</button></figcaption>
+<pre><span class="line">./scripts/mac-build.sh     <span class="m"># build-mac/DxRenderDojo.exe 가 생김</span></span><span class="line">./scripts/mac-run.sh       <span class="m"># Wine 으로 실행. 창 없이 바로 끝나면 정상</span></span></pre>
+							</figure>
+						</div>
+					</div>
+				</div>
+			</li>
+
+		</ol>
+	</section>
+
+	<section id="pitfalls" data-block="pitfalls" data-source="직접">
+		<h2>흔한 실수</h2>
+		<div class="pitfalls">
+			<div class="pitfall">
+				<p class="symptom">03편 이후 <code>XMMATRIX</code>를 쓰는 곳에서 이유 없이 크래시가 난다</p>
+				<p class="row"><b>원인</b><span>솔루션 플랫폼이 x86으로 남아 있습니다.<br>01편에서는 증상이 없어서 늦게 발견됩니다.</span></p>
+				<p class="row"><b>해결</b><span>도구 모음에서 x64로 바꾸고 다시 빌드합니다.</span></p>
+			</div>
+			<div class="pitfall">
+				<p class="symptom">경고 C4819 : 파일에 현재 코드 페이지(949)에서 표시할 수 없는 문자가 있다</p>
+				<p class="row"><b>원인</b><span><code>/utf-8</code>이 빠져서 MSVC가 BOM 없는 소스를 CP949로 읽었습니다.<br>한글 주석과 문자열이 깨집니다.</span></p>
+				<p class="row"><b>해결</b><span>C/C++ › 명령줄 › 추가 옵션에 <code>/utf-8</code>을 넣습니다.</span></p>
+			</div>
+			<div class="pitfall">
+				<p class="symptom">macOS에서 <code>wine: command not found</code></p>
+				<p class="row"><b>원인</b><span>Game Porting Toolkit은 <code>wine</code>이 아니라 <code>wine64</code> 명령을 설치합니다.</span></p>
+				<p class="row"><b>해결</b><span><code>./scripts/mac-run.sh</code>로 실행합니다.<br>스크립트가 <code>wine64</code>를 찾아서 씁니다.</span></p>
+			</div>
+		</div>
+	</section>
+
+	<!-- code:begin -->
+	<section id="files" data-block="files" data-source="자동 : tut01 태그">
+		<h2>이 편에서 추가된 파일</h2>
+		<p class="section-note">첫 편이라 모든 파일이 새 파일입니다.<br>02편부터는 바뀐 부분만 접이식 diff로 보입니다.</p>
+		<ul class="file-list">
+			<li><span class="plus">+</span><span class="name">Source/Main.cpp</span><span class="note">아래 전체</span></li>
+			<li><span class="plus">+</span><span class="name">CMakeLists.txt</span><span class="note">아래 전체</span></li>
+			<li><span class="plus">+</span><span class="name">cmake/toolchain-mingw-x86_64.cmake</span><span class="note">macOS 빌드용</span></li>
+			<li><span class="plus">+</span><span class="name">scripts/mac-build.sh</span><span class="note">macOS 빌드용</span></li>
+			<li><span class="plus">+</span><span class="name">scripts/mac-run.sh</span><span class="note">macOS 빌드용</span></li>
+			<li><span class="plus">+</span><span class="name">DxRenderDojo.sln</span><span class="note">VS가 관리. 본문 생략</span></li>
+			<li><span class="plus">+</span><span class="name">DxRenderDojo.vcxproj</span><span class="note">VS가 관리. 본문 생략</span></li>
+		</ul>
+		<div class="files-code">
+			<figure class="code">
+				<figcaption><span class="path">Source/Main.cpp</span><span class="badge new">새 파일</span><button type="button" class="copy">복사</button></figcaption>
+<pre><span class="line"><span class="k">#include</span> <span class="s">&lt;Windows.h&gt;</span></span><span class="line"> </span><span class="line"><span class="k">int</span> <span class="c">WINAPI</span> <span class="f">WinMain</span>(<span class="c">_In_</span> HINSTANCE Instance, <span class="c">_In_opt_</span> HINSTANCE PrevInstance, <span class="c">_In_</span> PSTR CmdLine, <span class="c">_In_</span> <span class="k">int</span> ShowCmd)</span><span class="line">{</span><span class="line">	<span class="k">return</span> <span class="c">0</span>;</span><span class="line">}</span></pre>
+			</figure>
+			<figure class="code">
+				<figcaption><span class="path">CMakeLists.txt</span><span class="badge new">새 파일</span><button type="button" class="copy">복사</button></figcaption>
+<pre><span class="line"><span class="f">cmake_minimum_required</span>(<span class="c">VERSION</span> <span class="c">3.25</span>)</span><span class="line"><span class="f">project</span>(DxRenderDojo <span class="c">LANGUAGES</span> CXX)</span><span class="line"> </span><span class="line"><span class="f">add_executable</span>(DxRenderDojo <span class="c">WIN32</span> Source/Main.cpp)</span><span class="line"><span class="f">target_compile_features</span>(DxRenderDojo <span class="c">PRIVATE</span> cxx_std_20)</span><span class="line"><span class="f">target_compile_definitions</span>(DxRenderDojo <span class="c">PRIVATE</span> UNICODE _UNICODE)</span><span class="line"> </span><span class="line"><span class="k">if</span>(MSVC)</span><span class="line">	<span class="f">target_compile_options</span>(DxRenderDojo <span class="c">PRIVATE</span> /W3 /utf-8)</span><span class="line"><span class="k">else</span>()</span><span class="line">	<span class="f">target_compile_options</span>(DxRenderDojo <span class="c">PRIVATE</span> -Wall)</span><span class="line"><span class="k">endif</span>()</span><span class="line"> </span><span class="line"><span class="k">if</span>(MINGW)</span><span class="line">	<span class="f">target_link_options</span>(DxRenderDojo <span class="c">PRIVATE</span> -static -static-libgcc -static-libstdc++)</span><span class="line"><span class="k">endif</span>()</span></pre>
+			</figure>
+		</div>
+	</section>
+	<!-- code:end -->
+
+	<section id="check" data-block="check" data-source="직접">
+		<h2>다 됐는지 확인</h2>
+		<ul class="checks">
+			<li><label><input type="checkbox"><span class="label">Windows</span><span class="what">x64 Debug 빌드가 경고 없이 끝남</span></label></li>
+			<li><label><input type="checkbox"><span class="label">Windows</span><span class="what">실행하면 창 없이 코드 0으로 종료</span></label></li>
+			<li><label><input type="checkbox"><span class="label">macOS</span><span class="what"><code>build-mac/DxRenderDojo.exe</code>가 생김</span></label></li>
+			<li><label><input type="checkbox"><span class="label">macOS</span><span class="what"><code>mac-run.sh</code>가 오류 없이 끝남</span></label></li>
+			<li><label><input type="checkbox"><span class="label">공통</span><span class="what">규약 파일 세 개를 한 번씩 열어 봄</span></label></li>
+		</ul>
+	</section>
+
+	<section id="next" data-block="continue" data-source="자동">
+		<h2>여기서 이어 가기</h2>
+		<p class="section-note">02편을 직접 써 보려면 이 편이 끝난 시점의 태그에서 내 브랜치를 땁니다.</p>
+		<figure class="code">
+			<figcaption><span class="badge">터미널</span><button type="button" class="copy">복사</button></figcaption>
+<pre><span class="line">git switch -c my-tut02 tut01</span></pre>
+		</figure>
+	</section>
+
+	<nav class="pager" aria-label="이전·다음 편" data-block="pager" data-source="자동 : 목차">
+		<a href="#"><span class="dir">← 목차</span><span class="name">렌더러 공부방</span></a>
+		<a class="next" href="#"><span class="dir">다음 편 →</span><span class="name">02 프레임워크와 창</span></a>
+	</nav>
+
+	<footer class="site-foot" data-block="site-foot" data-source="자동">
+		원문 : <a href="https://www.rastertek.com/dx11win10tut01.html">Rastertek DirectX 11 Tutorial 1 · Setting up DirectX 11 with Visual Studio</a><br>
+		코드는 MIT 라이선스입니다.<br>
+		Rastertek 원문을 바탕으로 한 글은 라이선스에 포함되지 않습니다.
+	</footer>
+
+</main>
+
+<nav class="rail" aria-label="이 페이지" data-block="rail-outline" data-source="자동">
+	<ol id="page-outline">
+		<li><a href="#goal">이 편을 마치면</a></li>
+		<li><a href="#diverge">원문과 다른 점</a></li>
+		<li><a href="#steps">따라 하기</a></li>
+		<li><a href="#pitfalls">흔한 실수</a></li>
+		<li><a href="#files">추가된 파일</a></li>
+		<li><a href="#check">다 됐는지 확인</a></li>
+		<li><a href="#next">여기서 이어 가기</a></li>
+	</ol>
+</nav>
+</div>
+
+<script>
+(function () {
+	var Root = document.documentElement;
+
+	var Scanline = document.getElementById("scanline");
+	var IsCommon = function (N) { return N <= 30 || (N >= 41 && N <= 45); };
+	var AddGap = function () {
+		var Gap = document.createElement("span");
+		Gap.className = "cell gap";
+		Scanline.appendChild(Gap);
+	};
+	for (var N = 1; N <= 61; N++) {
+		var Cell = document.createElement("span");
+		Cell.className = "cell " + (N === 1 ? "current" : (IsCommon(N) ? "common" : ""));
+		Cell.title = "tut" + (N < 10 ? "0" + N : N);
+		Scanline.appendChild(Cell);
+		if (N === 30 || N === 45) { AddGap(); }
+	}
+	AddGap();
+	var Alpha = document.createElement("span");
+	Alpha.className = "cell common";
+	Alpha.title = "tutalpha01 · 스키닝 (원문에 없음)";
+	Scanline.appendChild(Alpha);
+
+	var SetPlatform = function (Platform) {
+		document.querySelectorAll("[data-platform-tabs]").forEach(function (Group) {
+			Group.querySelectorAll("[role=tab]").forEach(function (Tab) {
+				Tab.setAttribute("aria-selected", Tab.dataset.platform === Platform ? "true" : "false");
+			});
+			Group.querySelectorAll("[role=tabpanel]").forEach(function (Panel) {
+				Panel.hidden = Panel.dataset.platform !== Platform;
+			});
+		});
+		try { localStorage.setItem("dojo-platform", Platform); } catch (E) {}
+	};
+	document.querySelectorAll("[data-platform-tabs] [role=tab]").forEach(function (Tab) {
+		Tab.addEventListener("click", function () { SetPlatform(Tab.dataset.platform); });
+	});
+	try {
+		var SavedPlatform = localStorage.getItem("dojo-platform");
+		if (SavedPlatform === "win" || SavedPlatform === "mac") { SetPlatform(SavedPlatform); }
+	} catch (E) {}
+
+	var ThemeButton = document.getElementById("theme-toggle");
+	var ThemeNames = { system: "시스템", light: "라이트", dark: "다크" };
+	var NextTheme = { system: "light", light: "dark", dark: "system" };
+	var CurrentTheme = function () {
+		var Theme = Root.getAttribute("data-theme");
+		return Theme === "light" || Theme === "dark" ? Theme : "system";
+	};
+	var ShowTheme = function (Theme) {
+		ThemeButton.textContent = "테마 · " + ThemeNames[Theme];
+		ThemeButton.setAttribute("aria-label", "테마 바꾸기, 지금은 " + ThemeNames[Theme]);
+	};
+	ThemeButton.addEventListener("click", function () {
+		var Theme = NextTheme[CurrentTheme()];
+		if (Theme === "system") { Root.removeAttribute("data-theme"); }
+		else { Root.setAttribute("data-theme", Theme); }
+		try {
+			if (Theme === "system") { localStorage.removeItem("dojo-theme"); }
+			else { localStorage.setItem("dojo-theme", Theme); }
+		} catch (E) {}
+		ShowTheme(Theme);
+	});
+	ShowTheme(CurrentTheme());
+
+	document.querySelectorAll("figure.code .copy").forEach(function (Button) {
+		Button.addEventListener("click", function () {
+			var Lines = Button.closest("figure").querySelectorAll("pre .line");
+			var Text = Array.prototype.map.call(Lines, function (Line) { return Line.textContent === " " ? "" : Line.textContent; }).join("\n");
+			try {
+				navigator.clipboard.writeText(Text).then(function () {
+					Button.textContent = "복사함";
+					setTimeout(function () { Button.textContent = "복사"; }, 1400);
+				});
+			} catch (E) {}
+		});
+	});
+
+	var OutlineLinks = document.querySelectorAll("#page-outline a");
+	if ("IntersectionObserver" in window) {
+		var Observer = new IntersectionObserver(function (Entries) {
+			Entries.forEach(function (Entry) {
+				if (!Entry.isIntersecting) { return; }
+				OutlineLinks.forEach(function (Link) {
+					Link.setAttribute("aria-current", Link.getAttribute("href") === "#" + Entry.target.id ? "true" : "false");
+				});
+			});
+		}, { rootMargin: "0px 0px -70% 0px" });
+		OutlineLinks.forEach(function (Link) {
+			var Target = document.querySelector(Link.getAttribute("href"));
+			if (Target) { Observer.observe(Target); }
+		});
+	}
+
+	var BlockToggle = document.getElementById("toggle-blocks");
+	BlockToggle.addEventListener("click", function () {
+		var bOn = document.body.classList.toggle("show-blocks");
+		BlockToggle.setAttribute("aria-pressed", bOn ? "true" : "false");
+	});
+})();
+</script>
+</body>
+</html>

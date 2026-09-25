@@ -17,6 +17,9 @@ cmake-build-*/
 *.suo
 .idea/
 
+# JetBrains Air · clangd 색인
+.cache/
+
 # 맥 Wine
 .wineprefix/
 

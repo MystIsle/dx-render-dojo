@@ -1,4 +1,5 @@
 Checks: '-*,readability-identifier-naming'
+HeaderFilterRegex: '.*[/\\]Source[/\\].*'
 CheckOptions:
   readability-identifier-naming.ClassCase: CamelCase
   readability-identifier-naming.ClassPrefix: F

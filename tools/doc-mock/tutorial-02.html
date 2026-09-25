@@ -1,0 +1,1648 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>02 프레임워크와 창</title>
+<script>
+(function () {
+	try {
+		var Theme = localStorage.getItem("dojo-theme");
+		if (Theme === "light" || Theme === "dark") { document.documentElement.setAttribute("data-theme", Theme); }
+	} catch (E) {}
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Nanum+Gothic+Coding&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cmake.min.js"></script>
+<style>
+/* ===== 토큰 : A 잔잔한 문서형 ===== */
+:root {
+	color-scheme: light;
+	--paper: #FFFFFF;
+	--raised: #F6F7F9;
+	--ink: #1E2430;
+	--slate: #555E6E;
+	--rule: #E3E6EB;
+	--accent: #3456C8;
+	--accent-soft: #EDF1FC;
+	--amber: #8F5A10;
+	--amber-soft: #FDF5E8;
+	--cell-optional: #E3E6EB;
+	--body-weight: 450;
+	--radius: 8px;
+
+	--code-bg: #F6F8FA;
+	--code-rule: #E8EBEF;
+	--code-ink: #1F2328;
+	--code-muted: #59636E;
+	--code-add: #1A7F37;
+	--code-del: #CF222E;
+	--diff-add-bg: #E6FFEC;
+	--diff-del-bg: #FFEBE9;
+	--diff-hunk-bg: #DDF4FF;
+	--tok-key: #CF222E;
+	--tok-const: #0550AE;
+	--tok-str: #0A3069;
+	--tok-fn: #8250DF;
+	--tok-tag: #116329;
+	--tok-com: #59636E;
+
+	--font-body: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+	--font-mono: "IBM Plex Mono", "Nanum Gothic Coding", ui-monospace, Consolas, monospace;
+	--column: 54rem;
+	--rail: 11rem;
+	--rail-gap: 3.5rem;
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) {
+		color-scheme: dark;
+		--paper: #16181D; --raised: #1E2127; --ink: #DADFE8; --slate: #9AA2B1; --rule: #2C3038;
+		--accent: #8FA8F0; --accent-soft: #232A3D;
+		--amber: #E2AB5E; --amber-soft: #2A2419;
+		--cell-optional: #2C3038; --body-weight: 400;
+		--code-bg: #1E2127; --code-rule: #2C3038; --code-ink: #E6EDF3; --code-muted: #8B949E;
+		--code-add: #3FB950; --code-del: #F85149;
+		--diff-add-bg: rgba(46, 160, 67, 0.16); --diff-del-bg: rgba(248, 81, 73, 0.14); --diff-hunk-bg: rgba(56, 139, 253, 0.12);
+		--tok-key: #FF7B72; --tok-const: #79C0FF; --tok-str: #A5D6FF; --tok-fn: #D2A8FF; --tok-tag: #7EE787; --tok-com: #8B949E;
+	}
+	:root:not([data-theme="light"]) body { -webkit-font-smoothing: antialiased; }
+}
+:root[data-theme="dark"] {
+	color-scheme: dark;
+	--paper: #16181D; --raised: #1E2127; --ink: #DADFE8; --slate: #9AA2B1; --rule: #2C3038;
+	--accent: #8FA8F0; --accent-soft: #232A3D;
+	--amber: #E2AB5E; --amber-soft: #2A2419;
+	--cell-optional: #2C3038; --body-weight: 400;
+	--code-bg: #1E2127; --code-rule: #2C3038; --code-ink: #E6EDF3; --code-muted: #8B949E;
+	--code-add: #3FB950; --code-del: #F85149;
+	--diff-add-bg: rgba(46, 160, 67, 0.16); --diff-del-bg: rgba(248, 81, 73, 0.14); --diff-hunk-bg: rgba(56, 139, 253, 0.12);
+	--tok-key: #FF7B72; --tok-const: #79C0FF; --tok-str: #A5D6FF; --tok-fn: #D2A8FF; --tok-tag: #7EE787; --tok-com: #8B949E;
+}
+:root[data-theme="dark"] body { -webkit-font-smoothing: antialiased; }
+
+/* ===== 공통 ===== */
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 1.5rem; }
+body {
+	margin: 0;
+	background: var(--paper);
+	color: var(--ink);
+	font-family: var(--font-body);
+	font-size: 1.0625rem;
+	font-weight: var(--body-weight);
+	line-height: 1.75;
+	word-break: keep-all;
+	overflow-wrap: break-word;
+}
+p, li, dd, dt { text-wrap: pretty; }
+a { color: var(--accent); text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+code { font-family: var(--font-mono); font-size: 0.875em; font-weight: 400; background: var(--raised); padding: 0.1em 0.38em; border-radius: 4px; }
+kbd { font-family: var(--font-mono); font-size: 0.875em; padding: 0.05em 0.45em; border: 1px solid var(--rule); border-bottom-width: 2px; border-radius: 4px; background: var(--raised); }
+h1, h2, h3 { text-wrap: balance; line-height: 1.3; margin: 0; }
+p { margin: 0; }
+b, strong { font-weight: 650; }
+
+.mock-strip {
+	display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem;
+	padding: 0.6rem 1.5rem;
+	background: #FFF4DB; border-bottom: 1px solid #E9CFA2;
+	color: #6B4309; font-size: 0.875rem; line-height: 1.5;
+}
+.mock-strip strong { font-weight: 700; }
+.mock-strip button {
+	margin-left: auto; font: 600 0.875rem/1 var(--font-body);
+	color: #6B4309; background: #FFFBF2; border: 1px solid #E0C08A;
+	padding: 0.45rem 0.7rem; border-radius: 4px; cursor: pointer;
+}
+.mock-strip button[aria-pressed="true"] { background: #6B4309; color: #FFFBF2; border-color: #6B4309; }
+
+.topbar {
+	display: flex; align-items: center; gap: 1.25rem;
+	max-width: calc(var(--column) + 3rem); margin: 0 auto; padding: 0.9rem 1.5rem;
+	border-bottom: 1px solid var(--rule);
+}
+.brand { font-weight: 750; font-size: 1.125rem; letter-spacing: -0.02em; color: var(--ink); text-decoration: none; }
+.topbar nav { margin-left: auto; display: flex; gap: 1.25rem; font-size: 0.9375rem; }
+.topbar nav a { color: var(--slate); text-decoration: none; }
+.topbar nav a:hover { color: var(--ink); }
+.theme-toggle {
+	font: 600 0.875rem/1 var(--font-body);
+	color: var(--ink); background: var(--raised); border: 1px solid var(--rule);
+	padding: 0.5rem 0.8rem; border-radius: 6px; cursor: pointer;
+}
+.theme-toggle:hover { border-color: var(--accent); }
+
+.shell { max-width: calc(var(--column) + 3rem); margin: 0 auto; padding: 2.75rem 1.5rem 5rem; }
+main { min-width: 0; }
+.rail { display: none; }
+@media (min-width: 1200px) {
+	.topbar, .shell { max-width: calc(var(--column) + var(--rail-gap) + var(--rail) + 3rem); }
+	.shell { display: grid; grid-template-columns: minmax(0, var(--column)) var(--rail); gap: var(--rail-gap); }
+	.rail { display: block; position: sticky; top: 2rem; align-self: start; font-size: 0.875rem; }
+	.rail ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.05rem; border-left: 1px solid var(--rule); }
+	.rail a { display: block; padding: 0.3rem 0 0.3rem 0.9rem; margin-left: -1px; border-left: 2px solid transparent; color: var(--slate); text-decoration: none; line-height: 1.45; }
+	.rail a:hover { color: var(--ink); }
+	.rail a[aria-current="true"] { color: var(--accent); font-weight: 600; border-left-color: var(--accent); }
+}
+
+.lesson-head { display: grid; gap: 1.1rem; padding-bottom: 1.5rem; }
+.eyebrow { font-size: 0.9375rem; font-weight: 600; color: var(--slate); }
+.eyebrow b { color: var(--accent); font-weight: 700; }
+.title-row { display: flex; align-items: baseline; gap: 1rem; }
+.title-row .num { font-family: var(--font-mono); font-weight: 500; font-size: clamp(2rem, 1.35rem + 2.2vw, 2.75rem); color: var(--accent); line-height: 1; font-variant-numeric: tabular-nums; }
+h1 { font-size: clamp(2rem, 1.35rem + 2.2vw, 2.75rem); font-weight: 750; letter-spacing: -0.025em; }
+.lede { font-size: 1.1875rem; line-height: 1.7; }
+.meta { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.35rem 1.5rem; font-size: 0.9375rem; color: var(--slate); }
+.meta b { color: var(--ink); font-weight: 600; margin-right: 0.4rem; }
+
+.scanline { display: grid; gap: 0.5rem; margin-top: 0.3rem; }
+.scanline-cells { display: flex; flex-wrap: wrap; gap: 3px; align-items: center; }
+.cell { width: 10px; height: 16px; background: var(--cell-optional); border-radius: 2px; }
+.cell.common { background: color-mix(in srgb, var(--accent) 42%, var(--paper)); }
+.cell.done { background: color-mix(in srgb, var(--accent) 75%, var(--paper)); }
+.cell.current { background: var(--accent); box-shadow: 0 0 0 2px var(--paper), 0 0 0 3.5px var(--accent); }
+.cell.gap { width: 6px; background: transparent; }
+.scanline-legend { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; font-size: 0.875rem; color: var(--slate); line-height: 1.5; font-variant-numeric: tabular-nums; }
+.scanline-legend span { display: inline-flex; align-items: center; gap: 0.45rem; }
+.scanline-legend i { display: inline-block; width: 10px; height: 16px; border-radius: 2px; }
+
+section { margin-top: 3.5rem; }
+h2 { font-size: 1.625rem; font-weight: 700; letter-spacing: -0.015em; margin-bottom: 1.1rem; }
+.section-note { color: var(--slate); margin: -0.35rem 0 1.25rem; font-size: 0.9375rem; }
+
+.labeled { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.55rem; }
+.labeled li { display: grid; grid-template-columns: 6rem minmax(0, 1fr); gap: 1rem; align-items: baseline; }
+.labeled .label { font-weight: 650; }
+
+.diverge { display: grid; }
+.diverge-row { display: grid; grid-template-columns: 8rem minmax(0, 1fr) minmax(0, 1.4fr); gap: 1.25rem; padding: 0.8rem 0; border-bottom: 1px solid var(--rule); align-items: baseline; }
+.diverge-head { padding: 0 0 0.45rem; font-size: 0.9375rem; font-weight: 600; color: var(--slate); }
+.diverge-row .topic { font-weight: 650; }
+.diverge-row .orig { color: var(--slate); }
+
+/* 한눈에 보기 */
+.flow { display: grid; gap: 1rem; padding: 1.1rem 1.25rem; background: var(--raised); border-radius: var(--radius); }
+.flow-row { display: grid; grid-template-columns: 6rem minmax(0, 1fr); gap: 1rem; align-items: baseline; }
+.flow-row .label { font-weight: 650; }
+.flow-steps { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem 0.4rem; }
+.flow-steps .node { font-family: var(--font-mono); font-size: 0.875rem; line-height: 1.4; padding: 0.3rem 0.6rem; border-radius: 6px; background: var(--paper); border: 1px solid var(--rule); }
+.flow-steps .node.loop { border-style: dashed; border-color: var(--accent); }
+.flow-steps .arrow { color: var(--slate); }
+.flow-steps .aside { font-size: 0.9375rem; color: var(--slate); }
+
+/* 따라 하기 */
+.steps { list-style: none; margin: 0; padding: 0; counter-reset: step; }
+.step { display: grid; grid-template-columns: 3rem minmax(0, 1fr); column-gap: 1rem; position: relative; padding-bottom: 2.5rem; }
+.step::before {
+	counter-increment: step; content: counter(step, decimal-leading-zero);
+	font-family: var(--font-mono); font-weight: 500; font-size: 0.9375rem; color: var(--accent);
+	width: 2.25rem; height: 2.25rem; display: grid; place-items: center;
+	background: var(--accent-soft); border-radius: 50%;
+	font-variant-numeric: tabular-nums; position: relative; z-index: 1;
+}
+.step::after { content: ""; position: absolute; left: 1.125rem; top: 2.5rem; bottom: 0.3rem; width: 1px; background: var(--rule); }
+.step:last-child::after { display: none; }
+.step-body { display: grid; gap: 1rem; min-width: 0; padding-top: 0.2rem; }
+.step h3 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.01em; }
+.step h3 code { font-size: 0.8em; }
+.order { margin: 0; padding-left: 1.35rem; display: grid; gap: 0.2rem; }
+.order li::marker { color: var(--accent); font-family: var(--font-mono); font-weight: 500; }
+
+/* 코드 */
+figure.code { margin: 0; border-radius: var(--radius); overflow: hidden; background: var(--code-bg); border: 1px solid var(--code-rule); }
+figure.code figcaption { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.55rem 0 1rem; font-size: 0.875rem; color: var(--code-muted); }
+figure.code figcaption .path { font-family: var(--font-mono); color: var(--code-ink); font-weight: 500; }
+.badge { font-size: 0.875rem; font-weight: 600; color: var(--code-muted); }
+.badge.new { color: var(--code-add); }
+.copy { margin-left: auto; font: 600 0.8125rem/1 var(--font-body); color: var(--code-muted); background: transparent; border: 1px solid var(--code-rule); padding: 0.4rem 0.6rem; border-radius: 6px; cursor: pointer; }
+.copy:hover { color: var(--code-ink); }
+pre { margin: 0; padding: 0.6rem 0 0.9rem; font-family: var(--font-mono); font-size: 0.9375rem; font-weight: 400; line-height: 1.65; color: var(--code-ink); tab-size: 4; }
+pre .line { display: block; position: relative; white-space: pre-wrap; overflow-wrap: anywhere; padding: 0 1rem 0 calc(1rem + 4ch); text-indent: -4ch; }
+pre.src, pre.numbered { counter-reset: ln; }
+pre.src .line, pre.numbered .line { padding-left: calc(3.6rem + 4ch); }
+pre.src .line::before, pre.numbered .line::before { counter-increment: ln; content: counter(ln); position: absolute; left: 0; width: 2.6rem; text-align: right; text-indent: 0; color: var(--code-muted); opacity: 0.75; font-size: 0.8125rem; user-select: none; }
+
+/* 상세판 */
+.variant[hidden] { display: none; }
+.mock-strip .group { display: inline-flex; gap: 0.35rem; }
+.mock-strip .group button { margin-left: 0; }
+.step-body .what { font-weight: 600; }
+.step-body .sub { font-weight: 700; margin-bottom: -0.5rem; }
+.walk { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.45rem; }
+.walk li::marker { color: var(--slate); }
+.concept, .ue { display: grid; gap: 0.45rem; margin: 0; padding: 0.95rem 1.15rem; border-radius: var(--radius); }
+.concept { border: 1px solid var(--rule); }
+.ue { background: var(--accent-soft); }
+.box-label { font-weight: 700; font-size: 0.9375rem; }
+.concept .box-label { color: var(--slate); }
+.ue .box-label { color: var(--accent); }
+.files-code { display: grid; gap: 1rem; }
+.file-group { display: grid; gap: 1rem; margin-top: 1.75rem; }
+.file-group h3 { font-size: 1.125rem; font-weight: 700; }
+
+.hljs-keyword, .hljs-type, .hljs-meta { color: var(--tok-key); }
+.hljs-string, .hljs-meta .hljs-string { color: var(--tok-str); }
+.hljs-number, .hljs-literal, .hljs-attr, .hljs-variable.language_ { color: var(--tok-const); }
+.hljs-title, .hljs-built_in, .hljs-section { color: var(--tok-fn); }
+.hljs-name, .hljs-tag { color: var(--tok-tag); }
+.hljs-comment { color: var(--tok-com); }
+
+/* diff */
+details.diff-file { border: 1px solid var(--code-rule); border-radius: var(--radius); background: var(--code-bg); overflow: hidden; }
+details.diff-file summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.3rem 0.8rem; padding: 0.65rem 1rem; cursor: pointer; list-style: none; font-size: 0.9375rem; color: var(--code-muted); }
+details.diff-file summary::-webkit-details-marker { display: none; }
+details.diff-file summary::before { content: "▸"; color: var(--code-muted); width: 1ch; }
+details.diff-file[open] summary::before { content: "▾"; }
+details.diff-file summary .path { font-family: var(--font-mono); color: var(--code-ink); font-weight: 500; }
+details.diff-file summary .stat { font-family: var(--font-mono); font-size: 0.875rem; }
+details.diff-file summary .plus { color: var(--code-add); }
+details.diff-file summary .minus { color: var(--code-del); }
+details.diff-file summary .why { color: var(--slate); }
+.diff-view { font-family: var(--font-mono); font-size: 0.9375rem; line-height: 1.6; border-top: 1px solid var(--code-rule); padding: 0.35rem 0 0.5rem; color: var(--code-ink); tab-size: 4; }
+.dl { display: grid; grid-template-columns: 2.75rem 2.75rem minmax(0, 1fr); }
+.dl .no { text-align: right; padding-right: 0.55rem; color: var(--code-muted); opacity: 0.75; font-size: 0.8125rem; user-select: none; }
+.dl .code { white-space: pre-wrap; overflow-wrap: anywhere; padding: 0 1rem 0 2.6ch; text-indent: -2ch; }
+.dl .sign { user-select: none; }
+.dl.add { background: var(--diff-add-bg); }
+.dl.add .sign { color: var(--code-add); }
+.dl.del { background: var(--diff-del-bg); }
+.dl.del .sign { color: var(--code-del); }
+.dl.hunk { background: var(--diff-hunk-bg); color: var(--code-muted); }
+.dl.hunk .code { text-indent: 0; padding-left: 0.6ch; }
+
+.pitfalls { display: grid; margin: 0; background: var(--amber-soft); border-radius: var(--radius); }
+.pitfall { display: grid; gap: 0.3rem; padding: 1.1rem 1.3rem; }
+.pitfall + .pitfall { border-top: 1px solid color-mix(in srgb, var(--amber) 18%, transparent); }
+.pitfall .symptom { font-weight: 700; line-height: 1.55; margin-bottom: 0.25rem; }
+.pitfall .symptom code { background: color-mix(in srgb, var(--amber) 12%, transparent); }
+.pitfall .row { display: grid; grid-template-columns: 3rem minmax(0, 1fr); gap: 0.5rem; align-items: baseline; }
+.pitfall .row b { color: var(--amber); }
+.pitfall .row code { background: color-mix(in srgb, var(--amber) 12%, transparent); }
+
+.file-list { list-style: none; margin: 0; padding: 0; display: grid; border-top: 1px solid var(--rule); }
+.file-list li { display: grid; grid-template-columns: 1.5rem minmax(0, 1fr) auto; gap: 0.75rem; padding: 0.45rem 0; border-bottom: 1px solid var(--rule); align-items: baseline; }
+.file-list .mark { font-family: var(--font-mono); font-weight: 500; }
+.file-list .mark.a { color: var(--code-add); }
+.file-list .mark.m { color: var(--accent); }
+.file-list .mark.o { color: var(--slate); }
+.file-list .name { font-family: var(--font-mono); font-size: 0.9375rem; font-weight: 400; }
+.file-list .note { font-size: 0.9375rem; color: var(--slate); font-variant-numeric: tabular-nums; }
+
+.checks { list-style: none; margin: 0; padding: 0; display: grid; border-top: 1px solid var(--rule); }
+.checks li { border-bottom: 1px solid var(--rule); }
+.checks label { display: grid; grid-template-columns: 1.5rem 6rem minmax(0, 1fr); gap: 0.6rem; align-items: baseline; padding: 0.55rem 0; cursor: pointer; }
+.checks input { accent-color: var(--accent); width: 1.05rem; height: 1.05rem; transform: translateY(0.15rem); }
+.checks .label { font-weight: 650; }
+.checks input:checked ~ .what { color: var(--slate); text-decoration: line-through; text-decoration-color: var(--rule); }
+
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 3.5rem; }
+.pager a { display: grid; gap: 0.2rem; padding: 1rem 1.2rem; border: 1px solid var(--rule); border-radius: var(--radius); text-decoration: none; color: var(--ink); }
+.pager a:hover { border-color: var(--accent); }
+.pager .dir { font-size: 0.9375rem; color: var(--slate); }
+.pager .name { font-weight: 700; font-size: 1.25rem; letter-spacing: -0.01em; }
+.pager .next { text-align: right; }
+
+.site-foot { margin-top: 3rem; padding-top: 1.25rem; border-top: 1px solid var(--rule); color: var(--slate); font-size: 0.9375rem; line-height: 1.7; }
+
+.show-blocks [data-block] { outline: 1px dashed #C77F1A; outline-offset: 8px; position: relative; }
+.show-blocks [data-block]::before {
+	content: attr(data-block) " · " attr(data-source);
+	position: absolute; top: -1.7rem; right: -8px; z-index: 2;
+	font: 600 0.8125rem/1 var(--font-body);
+	color: #FFFBF2; background: #C77F1A; padding: 0.3rem 0.5rem; border-radius: 3px;
+}
+
+@media (max-width: 720px) {
+	.shell { padding: 2rem 1.1rem 4rem; }
+	.topbar { padding: 0.9rem 1.1rem; }
+	.topbar nav { display: none; }
+	.theme-toggle { margin-left: auto; }
+	.mock-strip { padding: 0.6rem 1.1rem; }
+	.diverge-head { display: none; }
+	.diverge-row { grid-template-columns: minmax(0, 1fr); gap: 0.15rem; }
+	.diverge-row .orig::before { content: "원문 : "; }
+	.labeled li, .flow-row { grid-template-columns: minmax(0, 1fr); gap: 0.3rem; }
+	.checks label { grid-template-columns: 1.5rem minmax(0, 1fr); }
+	.checks .label, .checks .what { grid-column: 2; }
+	.pager { grid-template-columns: minmax(0, 1fr); }
+	.step { grid-template-columns: 2.75rem minmax(0, 1fr); }
+	pre.src .line { padding-left: calc(2.6rem + 4ch); }
+	pre.src .line::before { width: 1.9rem; }
+	.dl { grid-template-columns: 2.1rem 2.1rem minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+	html { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body>
+
+<div class="mock-strip" role="note">
+	<span><strong>시안 · tut02</strong> : 코드는 git 에서 그대로 뽑았습니다. 색은 highlight.js 임시, 최종은 Shiki 입니다.</span>
+	<span class="group" role="group" aria-label="따라 하기 설명 깊이">
+		<button type="button" data-variant-button="brief" aria-pressed="false">간결판</button>
+		<button type="button" data-variant-button="detail" aria-pressed="true">상세판</button>
+	</span>
+	<button type="button" id="toggle-blocks" aria-pressed="false">블록 경계 보기</button>
+</div>
+
+<header class="topbar" data-block="site-header" data-source="자동">
+	<a class="brand" href="#">렌더러 공부방</a>
+	<nav aria-label="사이트">
+		<a href="#">목차</a>
+		<a href="https://github.com/MystIsle/dx-render-dojo">GitHub</a>
+	</nav>
+	<button type="button" class="theme-toggle" id="theme-toggle">테마 · 시스템</button>
+</header>
+
+<div class="shell">
+<main>
+
+	<header class="lesson-head" data-block="lesson-head" data-source="제목·요약 직접 · 나머지 자동">
+		<p class="eyebrow"><b>STAGE 1</b> · 공통 진도</p>
+		<div class="title-row">
+			<span class="num" aria-hidden="true">02</span>
+			<h1>프레임워크와 창</h1>
+		</div>
+		<p class="lede">앞으로 모든 편이 올라탈 뼈대를 만듭니다.<br>창을 띄우고, 메시지를 처리하고, ESC 를 누르면 끝나는 프로그램입니다.</p>
+		<ul class="meta">
+			<li><b>태그</b><code>tut02</code></li>
+			<li><b>원문</b><a href="https://www.rastertek.com/dx11win10tut02.html">Tutorial 2</a></li>
+			<li><b>이전 태그</b><code>tut01</code></li>
+		</ul>
+		<div class="scanline" aria-label="전체 진도에서 이 편의 위치">
+			<div class="scanline-cells" id="scanline"></div>
+			<div class="scanline-legend">
+				<span><i style="background: var(--accent)"></i>이 편 (2 / 61)</span>
+				<span><i style="background: color-mix(in srgb, var(--accent) 75%, var(--paper))"></i>지난 편</span>
+				<span><i style="background: color-mix(in srgb, var(--accent) 42%, var(--paper))"></i>공통 진도 : 01~30, 41~45, 스키닝(α)</span>
+				<span><i style="background: var(--cell-optional)"></i>각자 선택</span>
+			</div>
+		</div>
+	</header>
+
+	<section id="goal" data-block="goal" data-source="직접">
+		<h2>이 편을 마치면</h2>
+		<ul class="labeled">
+			<li><span class="label">실행</span><span>800×600 검은 창이 화면 가운데에 뜨고, ESC 를 누르면 닫힙니다</span></li>
+			<li><span class="label">구조</span><span><code>FSystem</code>·<code>FInput</code>·<code>FApplication</code> 이 각각 무엇을 맡는지 압니다</span></li>
+			<li><span class="label">메시지</span><span>전역 변수 없이 창 메시지를 객체의 멤버 함수로 보내는 방법을 압니다</span></li>
+		</ul>
+	</section>
+
+	<section id="diverge" data-block="diverge" data-source="직접">
+		<h2>원문과 다른 점</h2>
+		<p class="section-note">동작은 원문과 같습니다.<br>코드 모양이 규약에 맞춰 바뀐 곳입니다.</p>
+		<div class="diverge">
+			<div class="diverge-row diverge-head"><span>항목</span><span>원문</span><span>이 리포</span></div>
+			<div class="diverge-row"><span class="topic">클래스</span><span class="orig"><code>SystemClass</code>, <code>InputClass</code>, <code>ApplicationClass</code></span><span><code>FSystem</code>, <code>FInput</code> 은 <code>Core/</code><br><code>FApplication</code> 은 <code>App/</code></span></div>
+			<div class="diverge-row"><span class="topic">설정 상수</span><span class="orig"><code>applicationclass.h</code> 의 전역 상수 4개</span><span><code>FDisplaySettings</code> 구조체를 <code>FSystem</code> 멤버로<br>VSync·화면 깊이 값은 쓰기 시작하는 03편에서 추가</span></div>
+			<div class="diverge-row"><span class="topic">생성과 해제</span><span class="orig"><code>new</code> / <code>delete</code>, <code>Shutdown</code></span><span><code>std::make_unique</code>, 소멸자</span></div>
+			<div class="diverge-row"><span class="topic">창 만들기</span><span class="orig"><code>InitializeWindows</code>, <code>ShutdownWindows</code></span><span><code>Initialize</code> 안에서 직접<br>정리는 소멸자에서</span></div>
+			<div class="diverge-row"><span class="topic">메시지 전달</span><span class="orig">전역 포인터 <code>ApplicationHandle</code></span><span>창에 <code>FSystem</code> 주소를 저장 (<code>GWLP_USERDATA</code>)</span></div>
+			<div class="diverge-row"><span class="topic">메시지 루프</span><span class="orig">프레임마다 메시지 하나</span><span>쌓인 메시지를 모두 처리한 뒤 프레임</span></div>
+			<div class="diverge-row"><span class="topic">실패 검사</span><span class="orig"><code>if (!result) return false;</code></span><span><code>CHECK_RETURN</code></span></div>
+		</div>
+	</section>
+
+	<section id="overview" data-block="overview" data-source="직접">
+		<h2>한눈에 보기</h2>
+		<div class="flow">
+			<div class="flow-row">
+				<span class="label">실행</span>
+				<div class="flow-steps">
+					<span class="node">WinMain</span><span class="arrow">→</span>
+					<span class="node">FSystem::Initialize</span><span class="arrow">→</span>
+					<span class="node loop">FSystem::Run ⟲ Frame</span><span class="arrow">→</span>
+					<span class="node">~FSystem</span>
+				</div>
+			</div>
+			<div class="flow-row">
+				<span class="label">프레임</span>
+				<div class="flow-steps">
+					<span class="node">FSystem::Frame</span><span class="arrow">→</span>
+					<span class="aside">ESC 면 끝</span><span class="arrow">·</span>
+					<span class="aside">아니면</span>
+					<span class="node">FApplication::Frame</span>
+				</div>
+			</div>
+			<div class="flow-row">
+				<span class="label">메시지</span>
+				<div class="flow-steps">
+					<span class="node">Windows</span><span class="arrow">→</span>
+					<span class="node">WndProc (static)</span><span class="arrow">→</span>
+					<span class="node">HandleMessage</span><span class="arrow">→</span>
+					<span class="node">FInput::KeyDown / KeyUp</span>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section id="steps" data-block="steps" data-source="직접">
+		<h2>따라 하기</h2>
+		<div class="variant" data-variant="detail">
+		<ol class="steps">
+
+			<li class="step">
+				<div class="step-body">
+					<h3>설정과 입력 : <code>FDisplaySettings</code>, <code>FInput</code></h3>
+					<p class="what">창 크기·전체 화면 설정과 키 상태를 담을 작은 타입 두 개를 만듭니다.</p>
+					<p class="sub">왜 필요한가</p>
+					<p>원문은 <code>FULL_SCREEN</code>, <code>VSYNC_ENABLED</code> 같은 상수를 <code>applicationclass.h</code> 전역에 둡니다.<br>전역 상수는 어느 파일에서든 읽을 수 있어서, 값이 어디서 쓰이는지 따라가기 어렵습니다.<br>그래서 설정을 구조체로 묶고, 쓰는 클래스인 <code>FSystem</code> 이 멤버로 들고 있게 합니다.</p>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/FDisplaySettings.h</span><span class="badge">3–8줄</span></figcaption>
+<pre class="snip" data-lang="cpp" data-start="3">struct FDisplaySettings
+{
+	int Width = 800;
+	int Height = 600;
+	bool bFullScreen = false;
+};</pre>
+					</figure>
+					<ul class="walk">
+						<li><code>int Width = 800;</code> : 멤버를 선언하면서 바로 기본값을 줍니다. 생성자에서 값을 넣을 필요가 없습니다</li>
+						<li><code>bFullScreen</code> : bool 변수라 <code>b</code> 접두를 붙입니다</li>
+					</ul>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/FInput.h</span><span class="badge">5–18줄</span></figcaption>
+<pre class="snip" data-lang="cpp" data-start="5">class FInput
+{
+public:
+	FInput() = default;
+	FInput(const FInput &amp;Other) = delete;
+	FInput &amp;operator=(const FInput &amp;Other) = delete;
+
+	void KeyDown(unsigned int Key);
+	void KeyUp(unsigned int Key);
+	bool IsKeyDown(unsigned int Key) const { return Keys[Key]; }
+
+private:
+	std::array&lt;bool, 256&gt; Keys = {};
+};</pre>
+					</figure>
+					<ul class="walk">
+						<li><code>std::array&lt;bool, 256&gt; Keys = {};</code> : 가상 키 코드(0~255)마다 눌림 여부를 담습니다. <code>= {}</code> 로 전부 <code>false</code> 가 됩니다</li>
+						<li><code>IsKeyDown</code> : 한 줄 게터라 헤더에 인라인 <code>const</code> 로 둡니다</li>
+						<li><code>FInput() = default;</code> : 바로 아래에서 복사를 막으면 컴파일러가 기본 생성자를 만들지 않으므로 되살립니다</li>
+					</ul>
+					<p class="sub">원문과 비교</p>
+					<p>원문 <code>InputClass</code> 는 <code>bool m_keys[256]</code> 배열을 <code>Initialize</code> 에서 반복문으로 <code>false</code> 로 채웁니다.<br>헤더의 초기화 한 줄이 그 일을 대신합니다.</p>
+					<aside class="ue">
+						<p class="box-label">언리얼로 치면</p>
+						<p><code>FDisplaySettings</code> 는 <code>UGameUserSettings</code> 가 들고 있는 해상도·전체 화면 설정의 아주 작은 버전입니다.<br><code>FInput</code> 은 <code>UPlayerInput</code> 이 키 상태를 추적하는 일을 가장 단순하게 줄인 것입니다.</p>
+					</aside>
+				</div>
+			</li>
+
+			<li class="step">
+				<div class="step-body">
+					<h3>실패 검사 : <code>CHECK_RETURN</code></h3>
+					<p class="what">실패하면 로그를 남기고 바로 반환하는 매크로를 만듭니다.</p>
+					<p class="sub">왜 필요한가</p>
+					<p>Win32 와 D3D 함수는 대부분 실패를 반환값으로 알립니다.<br>매번 <code>if</code> 문으로 확인하면 코드가 길어지고, 로그를 빠뜨리기 쉽습니다.</p>
+					<aside class="concept">
+						<p class="box-label">Win32 개념 · 실패를 알리는 방식</p>
+						<ul class="walk">
+							<li><code>HRESULT</code> : 32비트 결과 코드. 최상위 비트가 1 이면 실패라 음수로 읽힘. D3D 함수 대부분</li>
+							<li><code>BOOL</code>·<code>ATOM</code> : 0 이면 실패. <code>RegisterClassExW</code> 등</li>
+							<li>핸들(<code>HWND</code> 등) : <code>nullptr</code> 이면 실패. <code>CreateWindowExW</code> 등</li>
+						</ul>
+					</aside>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/Check.h</span><span class="badge">9–28줄</span></figcaption>
+<pre class="snip" data-lang="cpp" data-start="9">inline bool Succeeded(HRESULT Result)
+{
+	return SUCCEEDED(Result);
+}
+
+inline bool Succeeded(bool bResult)
+{
+	return bResult;
+}
+
+template &lt;typename T&gt; bool Succeeded(T *Pointer)
+{
+	return Pointer != nullptr;
+}
+
+inline void ReportFailure(const char *Expression, const char *File, int Line)
+{
+	const std::string Message = std::format("[CHECK FAILED] {}\n    {}({})\n", Expression, File, Line);
+	OutputDebugStringA(Message.c_str());
+}</pre>
+					</figure>
+					<ul class="walk">
+						<li><code>Succeeded</code> 오버로드 세 개 : 넘긴 값의 타입에 따라 판정 방식을 고릅니다</li>
+						<li><code>BOOL</code>·<code>ATOM</code> 을 그대로 넘기면 : 딱 맞는 오버로드가 없어 컴파일 에러가 납니다. 0 이 성공인 정수를 실수로 성공 처리하지 않게 하려는 것입니다</li>
+						<li><code>ReportFailure</code> : 실패한 식·파일·줄 번호를 <code>OutputDebugStringA</code> 로 Visual Studio 출력 창에 남깁니다</li>
+					</ul>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/Check.h</span><span class="badge">31–39줄</span></figcaption>
+<pre class="snip" data-lang="cpp" data-start="31">#define CHECK_RETURN(Expression, ...)                                                                                  \
+	do                                                                                                                 \
+	{                                                                                                                  \
+		if (!::Return::Succeeded(Expression))                                                                          \
+		{                                                                                                              \
+			::Return::ReportFailure(#Expression, __FILE__, __LINE__);                                                  \
+			return __VA_ARGS__;                                                                                        \
+		}                                                                                                              \
+	} while (false)</pre>
+					</figure>
+					<ul class="walk">
+						<li><code>#Expression</code> : 식을 문자열로 바꿔 로그에 그대로 찍습니다</li>
+						<li><code>__VA_ARGS__</code> : 반환값 자리. <code>CHECK_RETURN(식)</code> 처럼 비우면 <code>return;</code> 이 되어 void 함수에서도 씁니다</li>
+						<li><code>do { ... } while (false)</code> : 매크로가 <code>if</code>·<code>else</code> 사이에서도 문장 하나처럼 동작하게 하는 관용구입니다</li>
+					</ul>
+					<aside class="ue">
+						<p class="box-label">언리얼로 치면</p>
+						<p><code>if (!ensureMsgf(식, ...)) { return false; }</code> 를 한 줄로 줄인 것에 가깝습니다.<br><code>ensure</code> 처럼 로그를 남기고 프로그램을 멈추지 않지만, 콜스택은 남기지 않고 그 자리에서 반환합니다.<br>실패하면 멈추는 <code>check</code> 와는 다릅니다.</p>
+					</aside>
+				</div>
+			</li>
+
+			<li class="step">
+				<div class="step-body">
+					<h3>누가 무엇을 들고 있나 : <code>FSystem</code> 선언</h3>
+					<p class="what">창과 메시지 루프를 맡는 <code>FSystem</code> 의 모양을 정합니다.</p>
+					<p class="sub">왜 필요한가</p>
+					<p>누가 무엇을 만들고 지우는지가 헤더에 드러나면, 이후 편에서 클래스가 늘어나도 수명을 따라가기 쉽습니다.</p>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/FSystem.h</span><span class="badge">11–35줄</span></figcaption>
+<pre class="snip" data-lang="cpp" data-start="11">class FSystem
+{
+private:
+	static LRESULT CALLBACK WndProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam);
+
+public:
+	FSystem() = default;
+	FSystem(const FSystem &amp;Other) = delete;
+	FSystem &amp;operator=(const FSystem &amp;Other) = delete;
+	~FSystem();
+
+	bool Initialize();
+	void Run();
+
+private:
+	bool Frame();
+	LRESULT HandleMessage(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam);
+
+	std::wstring ApplicationName = L"DxRenderDojo";
+	HINSTANCE Instance = nullptr;
+	HWND Window = nullptr;
+	FDisplaySettings Display;
+	std::unique_ptr&lt;FInput&gt; Input;
+	std::unique_ptr&lt;FApplication&gt; Application;
+};</pre>
+					</figure>
+					<ul class="walk">
+						<li><code>static ... WndProc</code> : 창 메시지를 받는 함수입니다. <code>static</code> 멤버라 규약대로 맨 위에 둡니다. 왜 <code>static</code> 이어야 하는지는 5단계에서 봅니다</li>
+						<li><code>FSystem(const FSystem &amp;Other) = delete;</code> : 복사를 막습니다. 창에 이 객체의 주소를 저장하므로, 복사본이 생기면 창이 엉뚱한 객체를 가리킵니다</li>
+						<li><code>FSystem() = default;</code> : 복사 생성자를 선언하면 컴파일러가 기본 생성자를 만들지 않으므로 되살립니다</li>
+						<li><code>~FSystem();</code> : 창·창 클래스·해상도는 스마트 포인터가 정리하지 못해 소멸자에서 돌려놓습니다</li>
+						<li><code>ApplicationName</code> : 창 클래스 이름과 창 제목으로 함께 씁니다</li>
+						<li><code>Instance</code>, <code>Window</code> : 이 exe 와 만든 창을 가리키는 핸들</li>
+						<li><code>Input</code>, <code>Application</code> : <code>unique_ptr</code> 로 소유합니다. <code>FSystem</code> 이 지워질 때 함께 지워집니다</li>
+					</ul>
+					<aside class="ue">
+						<p class="box-label">언리얼로 치면</p>
+						<p><code>FSystem</code> 은 <code>FEngineLoop</code> 자리입니다.<br><code>Initialize</code> 가 <code>PreInit</code>·<code>Init</code> 에, <code>Run</code> 이 매 프레임 <code>Tick</code> 을 부르는 바깥 루프에 해당합니다.<br><code>std::unique_ptr</code> 는 <code>TUniquePtr</code> 이고, 복사를 막는 두 줄은 <code>UE_NONCOPYABLE</code> 매크로가 하는 일과 비슷합니다.</p>
+					</aside>
+				</div>
+			</li>
+
+			<li class="step">
+				<div class="step-body">
+					<h3>창 만들기 : <code>Initialize</code></h3>
+					<p class="what">창 클래스를 등록하고, 그 클래스로 창을 하나 만듭니다.</p>
+					<aside class="concept">
+						<p class="box-label">Win32 개념 · 창 클래스와 창</p>
+						<p>창 클래스는 "이 창들은 메시지를 이 함수로 보내고, 커서와 배경은 이것을 쓴다" 같은 공통 설정에 이름을 붙여 OS 에 등록한 것입니다.<br>창은 <code>CreateWindowExW</code> 에 그 이름을 넘겨서 만듭니다.<br>같은 클래스로 창을 여러 개 만들 수 있습니다.</p>
+					</aside>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge">39–56줄</span></figcaption>
+<pre class="snip" data-lang="cpp" data-start="39">bool FSystem::Initialize()
+{
+	Input = std::make_unique&lt;FInput&gt;();
+	Application = std::make_unique&lt;FApplication&gt;();
+
+	Instance = GetModuleHandleW(nullptr);
+
+	WNDCLASSEXW WindowClass = {};
+	WindowClass.cbSize = sizeof(WindowClass);
+	WindowClass.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+	WindowClass.lpfnWndProc = &amp;FSystem::WndProc;
+	WindowClass.hInstance = Instance;
+	WindowClass.hIcon = LoadIconW(nullptr, IDI_WINLOGO);
+	WindowClass.hIconSm = WindowClass.hIcon;
+	WindowClass.hCursor = LoadCursorW(nullptr, IDC_ARROW);
+	WindowClass.hbrBackground = static_cast&lt;HBRUSH&gt;(GetStockObject(BLACK_BRUSH));
+	WindowClass.lpszClassName = ApplicationName.c_str();
+	CHECK_RETURN(RegisterClassExW(&amp;WindowClass) != 0, false);</pre>
+					</figure>
+					<ul class="walk">
+						<li><code>std::make_unique</code> : 입력과 앱 객체를 먼저 만듭니다. 창이 생기는 순간부터 메시지가 들어오기 때문입니다</li>
+						<li><code>GetModuleHandleW(nullptr)</code> : 지금 실행 중인 exe 의 인스턴스 핸들입니다. <code>WinMain</code> 이 받는 <code>Instance</code> 와 같은 값입니다</li>
+						<li><code>CS_HREDRAW | CS_VREDRAW</code> : 창 크기가 바뀌면 전체를 다시 그립니다</li>
+						<li><code>CS_OWNDC</code> : 창마다 전용 그리기 컨텍스트(DC)를 둡니다</li>
+						<li><code>lpfnWndProc</code> : 이 클래스의 창이 받는 메시지를 넘길 함수입니다</li>
+						<li><code>hbrBackground</code> : 창 배경을 칠할 브러시. 검은색입니다</li>
+						<li><code>RegisterClassExW(...) != 0</code> : <code>ATOM</code> 을 돌려주고 0 이면 실패라 비교식으로 넘깁니다</li>
+					</ul>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge">58–80줄</span></figcaption>
+<pre class="snip" data-lang="cpp" data-start="58">	const int ScreenWidth = GetSystemMetrics(SM_CXSCREEN);
+	const int ScreenHeight = GetSystemMetrics(SM_CYSCREEN);
+	int PositionX = 0;
+	int PositionY = 0;
+
+	if (Display.bFullScreen)
+	{
+		DEVMODEW ScreenSettings = {};
+		ScreenSettings.dmSize = sizeof(ScreenSettings);
+		ScreenSettings.dmPelsWidth = static_cast&lt;DWORD&gt;(ScreenWidth);
+		ScreenSettings.dmPelsHeight = static_cast&lt;DWORD&gt;(ScreenHeight);
+		ScreenSettings.dmBitsPerPel = 32;
+		ScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+		CHECK_RETURN(ChangeDisplaySettingsW(&amp;ScreenSettings, CDS_FULLSCREEN) == DISP_CHANGE_SUCCESSFUL, false);
+
+		Display.Width = ScreenWidth;
+		Display.Height = ScreenHeight;
+	}
+	else
+	{
+		PositionX = (ScreenWidth - Display.Width) / 2;
+		PositionY = (ScreenHeight - Display.Height) / 2;
+	}</pre>
+					</figure>
+					<ul class="walk">
+						<li>창 모드 : 화면 크기에서 창 크기를 빼고 반으로 나눠 가운데 위치를 구합니다</li>
+						<li>전체 화면 : <code>ChangeDisplaySettingsW</code> 로 해상도를 바꾸고, 창 크기를 화면 크기에 맞춥니다. 02편 기본값은 창 모드입니다</li>
+					</ul>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge">82–100줄</span></figcaption>
+<pre class="snip" data-lang="cpp" data-start="82">	Window = CreateWindowExW(WS_EX_APPWINDOW,
+	                         ApplicationName.c_str(),
+	                         ApplicationName.c_str(),
+	                         WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP,
+	                         PositionX,
+	                         PositionY,
+	                         Display.Width,
+	                         Display.Height,
+	                         nullptr,
+	                         nullptr,
+	                         Instance,
+	                         this);
+	CHECK_RETURN(Window, false);
+
+	ShowWindow(Window, SW_SHOW);
+	SetForegroundWindow(Window);
+	SetFocus(Window);
+	ShowCursor(FALSE);
+	return true;</pre>
+					</figure>
+					<ul class="walk">
+						<li><code>WS_EX_APPWINDOW</code> : 작업 표시줄에 버튼을 표시합니다</li>
+						<li><code>WS_POPUP</code> : 제목 표시줄과 테두리가 없는 창입니다</li>
+						<li><code>WS_CLIPSIBLINGS | WS_CLIPCHILDREN</code> : 겹친 형제 창과 자식 창의 영역에는 그리지 않습니다</li>
+						<li>부모 창·메뉴 자리의 <code>nullptr</code> : 최상위 창이고 메뉴가 없습니다</li>
+						<li>마지막 인자 <code>this</code> : 창을 만드는 동안 <code>WM_NCCREATE</code> 메시지에 실려 돌아옵니다. 다음 단계에서 이 값을 씁니다</li>
+						<li><code>ShowCursor(FALSE)</code> : 커서 표시 카운터를 하나 줄여 이 창 위에서 커서를 숨깁니다. 소멸자의 <code>ShowCursor(TRUE)</code> 와 짝입니다</li>
+					</ul>
+					<p class="sub">원문과 비교</p>
+					<p>원문은 이 코드를 <code>InitializeWindows</code> 로 따로 뺍니다.<br>규약상 <code>Initialize</code> 가 직접 일하므로 한 함수에 둡니다.</p>
+					<aside class="ue">
+						<p class="box-label">언리얼로 치면</p>
+						<p><code>FWindowsWindow::Initialize</code> 가 같은 일을 합니다.<br>창 스타일을 고르고 <code>CreateWindowEx</code> 로 창을 만듭니다.</p>
+					</aside>
+				</div>
+			</li>
+
+			<li class="step">
+				<div class="step-body">
+					<h3>메시지를 객체로 보내기 : <code>WndProc</code>, <code>HandleMessage</code></h3>
+					<p class="what">OS 가 부르는 <code>static</code> 함수에서, 이 창을 만든 <code>FSystem</code> 객체를 찾아 멤버 함수로 넘깁니다.</p>
+					<aside class="concept">
+						<p class="box-label">Win32 개념 · 창 프로시저와 메시지</p>
+						<p>키 입력이나 창 닫기 같은 사건은 메시지(<code>WM_KEYDOWN</code>, <code>WM_CLOSE</code> 등)로 전달됩니다.<br>메시지를 받는 함수가 창 프로시저이고, 창 클래스를 등록할 때 지정합니다.<br>메시지마다 뜻이 다른 값 두 개가 <code>WPARAM</code>·<code>LPARAM</code> 으로 따라옵니다. <code>WM_KEYDOWN</code> 이면 <code>WPARAM</code> 이 가상 키 코드(<code>VK_ESCAPE</code> 등)입니다.</p>
+					</aside>
+					<p class="sub">왜 static 이어야 하나</p>
+					<p>OS 는 창 프로시저를 일반 함수로 부르므로 <code>this</code> 를 넘겨주지 않습니다.<br>그래서 멤버 함수를 바로 지정할 수 없고, <code>static</code> 함수가 먼저 받아 객체를 찾아야 합니다.</p>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge">5–20줄</span></figcaption>
+<pre class="snip" data-lang="cpp" data-start="5">LRESULT CALLBACK FSystem::WndProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam)
+{
+	if (Message == WM_NCCREATE)
+	{
+		const CREATESTRUCTW *CreateInfo = reinterpret_cast&lt;const CREATESTRUCTW *&gt;(LParam);
+		SetWindowLongPtrW(WindowHandle, GWLP_USERDATA, reinterpret_cast&lt;LONG_PTR&gt;(CreateInfo-&gt;lpCreateParams));
+	}
+
+	FSystem *System = reinterpret_cast&lt;FSystem *&gt;(GetWindowLongPtrW(WindowHandle, GWLP_USERDATA));
+	if (System == nullptr)
+	{
+		return DefWindowProcW(WindowHandle, Message, WParam, LParam);
+	}
+
+	return System-&gt;HandleMessage(WindowHandle, Message, WParam, LParam);
+}</pre>
+					</figure>
+					<ul class="walk">
+						<li><code>WM_NCCREATE</code> : 창을 만드는 도중, <code>CreateWindowExW</code> 가 돌아오기 전에 오는 메시지입니다. <code>LParam</code> 이 <code>CREATESTRUCTW</code> 를 가리키고, 그 <code>lpCreateParams</code> 가 <code>CreateWindowExW</code> 에 넘긴 <code>this</code> 입니다</li>
+						<li><code>SetWindowLongPtrW(..., GWLP_USERDATA, ...)</code> : 창마다 앱이 자유롭게 쓰는 칸 하나에 주소를 저장합니다</li>
+						<li><code>GetWindowLongPtrW</code> : 이후 메시지마다 그 주소를 꺼냅니다</li>
+						<li><code>System == nullptr</code> : <code>WM_NCCREATE</code> 보다 먼저 오는 메시지가 있습니다. 그때는 저장한 주소가 없으므로 기본 처리 <code>DefWindowProcW</code> 로 넘깁니다</li>
+					</ul>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge">132–149줄</span></figcaption>
+<pre class="snip" data-lang="cpp" data-start="132">LRESULT FSystem::HandleMessage(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam)
+{
+	switch (Message)
+	{
+	case WM_KEYDOWN:
+		Input-&gt;KeyDown(static_cast&lt;unsigned int&gt;(WParam));
+		return 0;
+	case WM_KEYUP:
+		Input-&gt;KeyUp(static_cast&lt;unsigned int&gt;(WParam));
+		return 0;
+	case WM_CLOSE:
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		return 0;
+	default:
+		return DefWindowProcW(WindowHandle, Message, WParam, LParam);
+	}
+}</pre>
+					</figure>
+					<ul class="walk">
+						<li><code>WM_KEYDOWN</code>·<code>WM_KEYUP</code> : 키 상태를 <code>FInput</code> 에 기록합니다</li>
+						<li><code>WM_CLOSE</code>·<code>WM_DESTROY</code> : <code>PostQuitMessage(0)</code> 으로 메시지 큐에 종료 신호 <code>WM_QUIT</code> 을 넣습니다</li>
+						<li><code>DefWindowProcW</code> : 직접 처리하지 않는 메시지는 OS 기본 동작(창 이동, 크기 조절 등)에 맡깁니다</li>
+					</ul>
+					<p class="sub">원문과 비교</p>
+					<p>원문은 전역 포인터 <code>ApplicationHandle</code> 에 객체 주소를 넣고, 창 프로시저에서 꺼냅니다.<br>이 리포는 전역을 두지 않으므로 창 자체에 저장합니다.</p>
+					<aside class="ue">
+						<p class="box-label">언리얼로 치면</p>
+						<p><code>FWindowsApplication::AppWndProc</code> 가 <code>static</code> 창 프로시저이고, 받은 메시지를 <code>ProcessMessage</code> 멤버 함수로 넘깁니다. 구조가 같습니다.<br>언리얼은 앱 객체가 하나뿐이라 원문처럼 전역 포인터로 객체를 찾습니다.</p>
+					</aside>
+				</div>
+			</li>
+
+			<li class="step">
+				<div class="step-body">
+					<h3>메시지 루프와 종료 : <code>Run</code>, <code>Frame</code>, 소멸자</h3>
+					<p class="what">메시지를 처리하면서 매 프레임 일을 하고, 끝나면 OS 자원을 돌려놓습니다.</p>
+					<aside class="concept">
+						<p class="box-label">Win32 개념 · 메시지 큐와 PeekMessage</p>
+						<p>OS 는 스레드마다 메시지 큐를 두고 키 입력 같은 메시지를 쌓습니다.<br><code>GetMessageW</code> 는 메시지가 올 때까지 기다리므로, 입력이 없으면 프레임도 멈춥니다.<br><code>PeekMessageW</code> 는 메시지가 없으면 바로 돌아오므로 그 틈에 프레임을 돌 수 있습니다. 게임 루프가 <code>PeekMessageW</code> 를 쓰는 이유입니다.</p>
+					</aside>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge">103–130줄</span></figcaption>
+<pre class="snip" data-lang="cpp" data-start="103">void FSystem::Run()
+{
+	MSG Message = {};
+	while (Message.message != WM_QUIT)
+	{
+		if (PeekMessageW(&amp;Message, nullptr, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&amp;Message);
+			DispatchMessageW(&amp;Message);
+			continue;
+		}
+
+		if (!Frame())
+		{
+			break;
+		}
+	}
+}
+
+bool FSystem::Frame()
+{
+	if (Input-&gt;IsKeyDown(VK_ESCAPE))
+	{
+		return false;
+	}
+
+	return Application-&gt;Frame();
+}</pre>
+					</figure>
+					<ul class="walk">
+						<li><code>PM_REMOVE</code> : 꺼낸 메시지를 큐에서 지웁니다</li>
+						<li><code>TranslateMessage</code> : 키 입력 메시지에서 문자 입력 메시지(<code>WM_CHAR</code>)를 만들어 큐에 더합니다</li>
+						<li><code>DispatchMessageW</code> : 메시지를 그 창의 창 프로시저로 보냅니다</li>
+						<li><code>continue</code> : 큐가 빌 때까지 메시지부터 처리하고, 비면 <code>Frame</code> 을 돕니다</li>
+						<li><code>Message.message != WM_QUIT</code> : <code>PostQuitMessage</code> 가 넣은 종료 신호를 꺼내면 루프가 끝납니다</li>
+						<li><code>Frame</code> : ESC 가 눌렸으면 <code>false</code> 로 루프를 끝내고, 아니면 <code>FApplication::Frame</code> 에 맡깁니다. 02편에서는 늘 <code>true</code> 이고, 03편부터 여기서 그립니다</li>
+					</ul>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge">22–37줄</span></figcaption>
+<pre class="snip" data-lang="cpp" data-start="22">FSystem::~FSystem()
+{
+	ShowCursor(TRUE);
+
+	if (Display.bFullScreen)
+	{
+		ChangeDisplaySettingsW(nullptr, 0);
+	}
+
+	if (Window != nullptr)
+	{
+		DestroyWindow(Window);
+	}
+
+	UnregisterClassW(ApplicationName.c_str(), Instance);
+}</pre>
+					</figure>
+					<ul class="walk">
+						<li><code>ShowCursor(TRUE)</code> : 숨겼던 커서를 되돌립니다</li>
+						<li><code>ChangeDisplaySettingsW(nullptr, 0)</code> : 전체 화면으로 바꿨던 해상도를 원래대로 돌립니다</li>
+						<li><code>DestroyWindow</code>, <code>UnregisterClassW</code> : 만든 순서의 반대로 창과 창 클래스를 정리합니다</li>
+					</ul>
+					<p class="sub">원문과 비교</p>
+					<p>원문은 프레임마다 메시지를 하나만 처리합니다.<br>메시지가 몰리면 입력 반영이 늦어질 수 있어, 쌓인 메시지를 먼저 비우도록 바꿨습니다.</p>
+					<aside class="ue">
+						<p class="box-label">언리얼로 치면</p>
+						<p><code>FWindowsPlatformApplicationMisc::PumpMessages</code> 가 같은 <code>PeekMessage</code> 루프로 메시지를 비웁니다.<br><code>Run</code> 의 바깥 루프는 <code>GuardedMain</code> 에서 <code>IsEngineExitRequested()</code> 가 참이 될 때까지 매 프레임 <code>EngineTick</code> 을 부르는 부분에 해당합니다.</p>
+					</aside>
+				</div>
+			</li>
+
+			<li class="step">
+				<div class="step-body">
+					<h3><code>WinMain</code> 과 빌드 등록</h3>
+					<p class="what"><code>WinMain</code> 에서 <code>FSystem</code> 을 만들어 돌리고, 새 소스를 두 빌드에 등록합니다.</p>
+					<figure class="code">
+						<figcaption><span class="path">Source/Main.cpp</span><span class="badge">7–14줄</span></figcaption>
+<pre class="snip" data-lang="cpp" data-start="7">int WINAPI WinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _In_ PSTR CmdLine, _In_ int ShowCmd)
+{
+	const auto System = std::make_unique&lt;FSystem&gt;();
+	CHECK_RETURN(System-&gt;Initialize(), 1);
+
+	System-&gt;Run();
+	return 0;
+}</pre>
+					</figure>
+					<ul class="walk">
+						<li><code>std::make_unique&lt;FSystem&gt;()</code> : 규약상 <code>new</code> 를 직접 쓰지 않습니다</li>
+						<li><code>CHECK_RETURN(System-&gt;Initialize(), 1)</code> : 초기화에 실패하면 종료 코드 1 로 끝냅니다</li>
+						<li><code>WinMain</code> 이 끝나면 <code>System</code> 이 지워지면서 소멸자가 불립니다</li>
+					</ul>
+					<figure class="code">
+						<figcaption><span class="path">CMakeLists.txt</span><span class="badge">4–12줄</span></figcaption>
+<pre class="snip" data-lang="cmake" data-start="4">add_executable(DxRenderDojo WIN32
+	Source/Main.cpp
+	Source/App/FApplication.cpp
+	Source/Core/FInput.cpp
+	Source/Core/FSystem.cpp
+)
+target_include_directories(DxRenderDojo PRIVATE Source)
+target_compile_features(DxRenderDojo PRIVATE cxx_std_20)
+target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN)</pre>
+					</figure>
+					<ul class="walk">
+						<li><code>WIN32</code> : 콘솔이 아닌 창 프로그램(<code>/SUBSYSTEM:WINDOWS</code>)으로 링크합니다</li>
+						<li><code>target_include_directories(... Source)</code> : <code>#include "Core/FSystem.h"</code> 처럼 <code>Source/</code> 기준 경로로 include 합니다</li>
+						<li><code>WIN32_LEAN_AND_MEAN</code> : <code>Windows.h</code> 에서 잘 쓰지 않는 헤더(암호화, RPC, 셸 등)를 빼서 컴파일을 가볍게 합니다. 원문은 헤더에서 <code>#define</code> 합니다</li>
+						<li><code>DxRenderDojo.vcxproj</code> 에도 같은 내용이 들어갔습니다. 아래 "바뀐 파일" 의 diff 에서 확인합니다</li>
+					</ul>
+					<aside class="ue">
+						<p class="box-label">언리얼로 치면</p>
+						<p>언리얼은 UBT 가 모듈 폴더의 소스를 알아서 모읍니다.<br>이 리포는 빌드가 두 벌이라 새 파일을 직접 등록합니다.</p>
+					</aside>
+				</div>
+			</li>
+
+		</ol>
+
+		</div>
+		<div class="variant" data-variant="brief" hidden>
+		<ol class="steps">
+
+			<li class="step">
+				<div class="step-body">
+					<h3>설정과 입력 : <code>FDisplaySettings</code>, <code>FInput</code></h3>
+					<p>원문은 <code>FULL_SCREEN</code> 같은 상수를 헤더의 전역에 둡니다.<br>여기서는 창 크기와 전체 화면 여부를 <code>FDisplaySettings</code> 구조체로 묶고, 쓰는 클래스인 <code>FSystem</code> 의 멤버로 둡니다.</p>
+					<p><code>FInput</code> 은 키 256개의 눌림 상태를 <code>std::array&lt;bool, 256&gt;</code> 로 들고 있습니다.<br>헤더에서 전부 <code>false</code> 로 초기화하므로 원문의 <code>Initialize</code> 가 필요 없습니다.</p>
+				</div>
+			</li>
+
+			<li class="step">
+				<div class="step-body">
+					<h3>실패 검사 : <code>CHECK_RETURN</code></h3>
+					<p><code>CHECK_RETURN(식, 반환값)</code> 은 식이 실패면 출력 창에 위치를 남기고 바로 반환합니다.<br><code>HRESULT</code>·<code>bool</code>·포인터만 받습니다.</p>
+					<p>0 이면 실패인 <code>ATOM</code> 이나 <code>BOOL</code> 은 성공 조건을 비교식으로 적어 넘깁니다.</p>
+					<figure class="code">
+						<figcaption><span class="badge">FSystem.cpp 에서</span></figcaption>
+<pre class="snip" data-lang="cpp">CHECK_RETURN(RegisterClassExW(&amp;WindowClass) != 0, false);
+CHECK_RETURN(Window, false);</pre>
+					</figure>
+				</div>
+			</li>
+
+			<li class="step">
+				<div class="step-body">
+					<h3>누가 무엇을 들고 있나 : <code>FSystem</code> 선언</h3>
+					<p><code>FInput</code> 과 <code>FApplication</code> 은 <code>std::unique_ptr</code> 로 들고 있어, <code>FSystem</code> 이 사라질 때 함께 지워집니다.<br>창·창 클래스·디스플레이 설정은 스마트 포인터가 맡지 못하므로 소멸자에서 돌려놓습니다.</p>
+					<p><code>FSystem</code> 은 창에 자기 주소를 저장하므로 복사되면 안 됩니다.<br>복사를 <code>= delete</code> 로 막고, 그러면 사라지는 기본 생성자를 <code>= default</code> 로 적습니다.</p>
+				</div>
+			</li>
+
+			<li class="step">
+				<div class="step-body">
+					<h3>창 만들기와 메시지 연결 : <code>Initialize</code>, <code>WndProc</code></h3>
+					<p><code>Initialize</code> 는 이 순서로 일합니다.</p>
+					<ol class="order">
+						<li>입력과 앱 객체를 만듦</li>
+						<li>창 클래스를 등록하고, 메시지를 받을 함수로 <code>WndProc</code> 를 지정</li>
+						<li>창 위치를 화면 가운데로 계산</li>
+						<li><code>CreateWindowExW</code> 의 마지막 인자로 <code>this</code> 를 넘겨 창을 만듦</li>
+						<li>창을 보이고 커서를 숨김</li>
+					</ol>
+					<p>창 프로시저는 <code>this</code> 없이 불리므로 멤버 함수를 쓸 수 없고 <code>static</code> 이어야 합니다.<br>그래서 <code>CreateWindowExW</code> 에 넘긴 <code>this</code> 가 <code>WM_NCCREATE</code> 로 돌아오면 창에 저장해 두고, 이후 메시지마다 꺼내서 <code>HandleMessage</code> 로 보냅니다.<br>원문의 전역 포인터가 하던 일입니다.</p>
+					<figure class="code">
+						<figcaption><span class="badge">FSystem.cpp 에서</span></figcaption>
+<pre class="snip" data-lang="cpp">if (Message == WM_NCCREATE)
+{
+	const CREATESTRUCTW *CreateInfo = reinterpret_cast&lt;const CREATESTRUCTW *&gt;(LParam);
+	SetWindowLongPtrW(WindowHandle, GWLP_USERDATA, reinterpret_cast&lt;LONG_PTR&gt;(CreateInfo-&gt;lpCreateParams));
+}
+
+FSystem *System = reinterpret_cast&lt;FSystem *&gt;(GetWindowLongPtrW(WindowHandle, GWLP_USERDATA));</pre>
+					</figure>
+				</div>
+			</li>
+
+			<li class="step">
+				<div class="step-body">
+					<h3>메시지 루프와 종료 : <code>Run</code>, <code>Frame</code>, 소멸자</h3>
+					<p><code>Run</code> 은 쌓인 메시지를 모두 처리한 뒤 한 프레임을 돕니다.<br><code>WM_QUIT</code> 이 오거나 <code>Frame</code> 이 <code>false</code> 를 돌려주면 끝납니다.</p>
+					<p><code>Frame</code> 은 ESC 가 눌렸으면 <code>false</code>, 아니면 <code>FApplication::Frame</code> 의 결과를 돌려줍니다.<br>02편의 <code>FApplication::Frame</code> 은 늘 <code>true</code> 이고, 03편부터 여기서 그립니다.</p>
+					<p><code>WinMain</code> 이 끝나면 <code>unique_ptr</code> 가 <code>FSystem</code> 을 지우고, 소멸자가 커서·해상도·창·창 클래스를 돌려놓습니다.</p>
+				</div>
+			</li>
+
+			<li class="step">
+				<div class="step-body">
+					<h3>빌드에 등록</h3>
+					<p>새 <code>.cpp</code> 는 <code>DxRenderDojo.vcxproj</code> 와 <code>CMakeLists.txt</code> 양쪽에 등록합니다.<br>include 는 <code>Source/</code> 를 기준으로 폴더까지 적습니다. 예) <code>#include "Core/FSystem.h"</code></p>
+					<p>원문이 헤더에 적던 <code>WIN32_LEAN_AND_MEAN</code> 은 두 빌드 설정에 넣었습니다.</p>
+				</div>
+			</li>
+
+		</ol>
+		</div>
+	</section>
+
+	<section id="pitfalls" data-block="pitfalls" data-source="직접">
+		<h2>흔한 실수</h2>
+		<div class="pitfalls">
+			<div class="pitfall">
+				<p class="symptom"><code>error C2027: 정의되지 않은 형식 'FApplication'을(를) 사용했습니다</code><br><code>can't delete an incomplete type</code></p>
+				<p class="row"><b>원인</b><span><code>FSystem.h</code> 에서 <code>class FApplication;</code> 전방 선언만 하고 <code>std::unique_ptr&lt;FApplication&gt;</code> 멤버를 두었습니다.<br>헤더의 <code>FSystem() = default;</code> 가 <code>unique_ptr</code> 소멸자를 만들어야 하는데, 그 자리에서는 <code>FApplication</code> 을 어떻게 지우는지 모릅니다.</span></p>
+				<p class="row"><b>해결</b><span>멤버 타입의 헤더를 <code>FSystem.h</code> 에서 include 합니다.<br>생성자와 소멸자를 <code>.cpp</code> 에서 정의해도 풀립니다.</span></p>
+			</div>
+			<div class="pitfall">
+				<p class="symptom"><code>CHECK_RETURN(RegisterClassExW(&amp;WindowClass), false)</code> 에서 <code>error C2668</code> : 오버로드된 함수 호출이 모호함</p>
+				<p class="row"><b>원인</b><span><code>RegisterClassExW</code> 는 <code>ATOM</code> 을 돌려주고 0 이면 실패입니다.<br><code>CHECK_RETURN</code> 은 이런 정수를 <code>HRESULT</code> 로 잘못 판정하지 않도록 받지 않게 막아 두었습니다.</span></p>
+				<p class="row"><b>해결</b><span><code>RegisterClassExW(&amp;WindowClass) != 0</code> 처럼 성공 조건을 비교식으로 적습니다.</span></p>
+			</div>
+			<div class="pitfall">
+				<p class="symptom">창을 만드는 순간 <code>WndProc</code> 에서 크래시가 난다</p>
+				<p class="row"><b>원인</b><span><code>WM_NCCREATE</code> 보다 먼저 오는 메시지(<code>WM_GETMINMAXINFO</code>)가 있습니다.<br>그때는 아직 창에 <code>FSystem</code> 주소를 저장하기 전이라 꺼낸 값이 <code>nullptr</code> 입니다.</span></p>
+				<p class="row"><b>해결</b><span>주소를 꺼내지 못했으면 <code>DefWindowProcW</code> 로 넘깁니다.<br><code>WndProc</code> 의 <code>nullptr</code> 검사가 그 일입니다.</span></p>
+			</div>
+		</div>
+	</section>
+
+	<!-- code:begin -->
+	<section id="files" data-block="files" data-source="자동 : tut01 → tut02 diff">
+		<h2>이 편에서 바뀐 파일</h2>
+		<p class="section-note">새 파일은 전체 코드, 바뀐 파일은 접어 둔 diff 로 보입니다.<br>순서는 헤더 → 소스 → 호출부 → 빌드 파일입니다.</p>
+		<ul class="file-list">
+			<li><span class="mark a">+</span><span class="name">Source/Core/FDisplaySettings.h</span><span class="note">+8</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/Core/FInput.h</span><span class="note">+18</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/Core/FInput.cpp</span><span class="note">+11</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/App/FApplication.h</span><span class="note">+11</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/App/FApplication.cpp</span><span class="note">+6</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/Core/Check.h</span><span class="note">+39</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/Core/FSystem.h</span><span class="note">+35</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/Core/FSystem.cpp</span><span class="note">+149</span></li>
+			<li><span class="mark m">~</span><span class="name">Source/Main.cpp</span><span class="note">+8</span></li>
+			<li><span class="mark m">~</span><span class="name">CMakeLists.txt</span><span class="note">+8 −2</span></li>
+			<li><span class="mark m">~</span><span class="name">DxRenderDojo.vcxproj</span><span class="note">+13 −2</span></li>
+			<li><span class="mark a">+</span><span class="name">DxRenderDojo.vcxproj.filters</span><span class="note">VS 폴더 표시. 본문 생략</span></li>
+			<li><span class="mark o">·</span><span class="name">CLAUDE.md, docs/CODING_STYLE.md, .clang-tidy</span><span class="note">규약·도구. 본문 생략</span></li>
+		</ul>
+
+		<div class="file-group">
+			<h3>설정과 입력</h3>
+			<figure class="code">
+				<figcaption><span class="path">Source/Core/FDisplaySettings.h</span><span class="badge new">새 파일</span><button type="button" class="copy">복사</button></figcaption>
+<pre class="src" data-lang="cpp">#pragma once
+
+struct FDisplaySettings
+{
+	int Width = 800;
+	int Height = 600;
+	bool bFullScreen = false;
+};</pre>
+			</figure>
+			<figure class="code">
+				<figcaption><span class="path">Source/Core/FInput.h</span><span class="badge new">새 파일</span><button type="button" class="copy">복사</button></figcaption>
+<pre class="src" data-lang="cpp">#pragma once
+
+#include &lt;array&gt;
+
+class FInput
+{
+public:
+	FInput() = default;
+	FInput(const FInput &amp;Other) = delete;
+	FInput &amp;operator=(const FInput &amp;Other) = delete;
+
+	void KeyDown(unsigned int Key);
+	void KeyUp(unsigned int Key);
+	bool IsKeyDown(unsigned int Key) const { return Keys[Key]; }
+
+private:
+	std::array&lt;bool, 256&gt; Keys = {};
+};</pre>
+			</figure>
+			<figure class="code">
+				<figcaption><span class="path">Source/Core/FInput.cpp</span><span class="badge new">새 파일</span><button type="button" class="copy">복사</button></figcaption>
+<pre class="src" data-lang="cpp">#include "Core/FInput.h"
+
+void FInput::KeyDown(unsigned int Key)
+{
+	Keys[Key] = true;
+}
+
+void FInput::KeyUp(unsigned int Key)
+{
+	Keys[Key] = false;
+}</pre>
+			</figure>
+		</div>
+
+		<div class="file-group">
+			<h3>앱 자리</h3>
+			<figure class="code">
+				<figcaption><span class="path">Source/App/FApplication.h</span><span class="badge new">새 파일</span><button type="button" class="copy">복사</button></figcaption>
+<pre class="src" data-lang="cpp">#pragma once
+
+class FApplication
+{
+public:
+	FApplication() = default;
+	FApplication(const FApplication &amp;Other) = delete;
+	FApplication &amp;operator=(const FApplication &amp;Other) = delete;
+
+	bool Frame();
+};</pre>
+			</figure>
+			<figure class="code">
+				<figcaption><span class="path">Source/App/FApplication.cpp</span><span class="badge new">새 파일</span><button type="button" class="copy">복사</button></figcaption>
+<pre class="src" data-lang="cpp">#include "App/FApplication.h"
+
+bool FApplication::Frame()
+{
+	return true;
+}</pre>
+			</figure>
+		</div>
+
+		<div class="file-group">
+			<h3>실패 검사</h3>
+			<figure class="code">
+				<figcaption><span class="path">Source/Core/Check.h</span><span class="badge new">새 파일</span><button type="button" class="copy">복사</button></figcaption>
+<pre class="src" data-lang="cpp">#pragma once
+
+#include &lt;Windows.h&gt;
+#include &lt;format&gt;
+#include &lt;string&gt;
+
+namespace Return
+{
+inline bool Succeeded(HRESULT Result)
+{
+	return SUCCEEDED(Result);
+}
+
+inline bool Succeeded(bool bResult)
+{
+	return bResult;
+}
+
+template &lt;typename T&gt; bool Succeeded(T *Pointer)
+{
+	return Pointer != nullptr;
+}
+
+inline void ReportFailure(const char *Expression, const char *File, int Line)
+{
+	const std::string Message = std::format("[CHECK FAILED] {}\n    {}({})\n", Expression, File, Line);
+	OutputDebugStringA(Message.c_str());
+}
+} // namespace Return
+
+#define CHECK_RETURN(Expression, ...)                                                                                  \
+	do                                                                                                                 \
+	{                                                                                                                  \
+		if (!::Return::Succeeded(Expression))                                                                          \
+		{                                                                                                              \
+			::Return::ReportFailure(#Expression, __FILE__, __LINE__);                                                  \
+			return __VA_ARGS__;                                                                                        \
+		}                                                                                                              \
+	} while (false)</pre>
+			</figure>
+		</div>
+
+		<div class="file-group">
+			<h3>창과 메시지 루프</h3>
+			<figure class="code">
+				<figcaption><span class="path">Source/Core/FSystem.h</span><span class="badge new">새 파일</span><button type="button" class="copy">복사</button></figcaption>
+<pre class="src" data-lang="cpp">#pragma once
+
+#include &lt;Windows.h&gt;
+#include &lt;memory&gt;
+#include &lt;string&gt;
+
+#include "App/FApplication.h"
+#include "Core/FDisplaySettings.h"
+#include "Core/FInput.h"
+
+class FSystem
+{
+private:
+	static LRESULT CALLBACK WndProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam);
+
+public:
+	FSystem() = default;
+	FSystem(const FSystem &amp;Other) = delete;
+	FSystem &amp;operator=(const FSystem &amp;Other) = delete;
+	~FSystem();
+
+	bool Initialize();
+	void Run();
+
+private:
+	bool Frame();
+	LRESULT HandleMessage(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam);
+
+	std::wstring ApplicationName = L"DxRenderDojo";
+	HINSTANCE Instance = nullptr;
+	HWND Window = nullptr;
+	FDisplaySettings Display;
+	std::unique_ptr&lt;FInput&gt; Input;
+	std::unique_ptr&lt;FApplication&gt; Application;
+};</pre>
+			</figure>
+			<figure class="code">
+				<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge new">새 파일</span><button type="button" class="copy">복사</button></figcaption>
+<pre class="src" data-lang="cpp">#include "Core/FSystem.h"
+
+#include "Core/Check.h"
+
+LRESULT CALLBACK FSystem::WndProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam)
+{
+	if (Message == WM_NCCREATE)
+	{
+		const CREATESTRUCTW *CreateInfo = reinterpret_cast&lt;const CREATESTRUCTW *&gt;(LParam);
+		SetWindowLongPtrW(WindowHandle, GWLP_USERDATA, reinterpret_cast&lt;LONG_PTR&gt;(CreateInfo-&gt;lpCreateParams));
+	}
+
+	FSystem *System = reinterpret_cast&lt;FSystem *&gt;(GetWindowLongPtrW(WindowHandle, GWLP_USERDATA));
+	if (System == nullptr)
+	{
+		return DefWindowProcW(WindowHandle, Message, WParam, LParam);
+	}
+
+	return System-&gt;HandleMessage(WindowHandle, Message, WParam, LParam);
+}
+
+FSystem::~FSystem()
+{
+	ShowCursor(TRUE);
+
+	if (Display.bFullScreen)
+	{
+		ChangeDisplaySettingsW(nullptr, 0);
+	}
+
+	if (Window != nullptr)
+	{
+		DestroyWindow(Window);
+	}
+
+	UnregisterClassW(ApplicationName.c_str(), Instance);
+}
+
+bool FSystem::Initialize()
+{
+	Input = std::make_unique&lt;FInput&gt;();
+	Application = std::make_unique&lt;FApplication&gt;();
+
+	Instance = GetModuleHandleW(nullptr);
+
+	WNDCLASSEXW WindowClass = {};
+	WindowClass.cbSize = sizeof(WindowClass);
+	WindowClass.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+	WindowClass.lpfnWndProc = &amp;FSystem::WndProc;
+	WindowClass.hInstance = Instance;
+	WindowClass.hIcon = LoadIconW(nullptr, IDI_WINLOGO);
+	WindowClass.hIconSm = WindowClass.hIcon;
+	WindowClass.hCursor = LoadCursorW(nullptr, IDC_ARROW);
+	WindowClass.hbrBackground = static_cast&lt;HBRUSH&gt;(GetStockObject(BLACK_BRUSH));
+	WindowClass.lpszClassName = ApplicationName.c_str();
+	CHECK_RETURN(RegisterClassExW(&amp;WindowClass) != 0, false);
+
+	const int ScreenWidth = GetSystemMetrics(SM_CXSCREEN);
+	const int ScreenHeight = GetSystemMetrics(SM_CYSCREEN);
+	int PositionX = 0;
+	int PositionY = 0;
+
+	if (Display.bFullScreen)
+	{
+		DEVMODEW ScreenSettings = {};
+		ScreenSettings.dmSize = sizeof(ScreenSettings);
+		ScreenSettings.dmPelsWidth = static_cast&lt;DWORD&gt;(ScreenWidth);
+		ScreenSettings.dmPelsHeight = static_cast&lt;DWORD&gt;(ScreenHeight);
+		ScreenSettings.dmBitsPerPel = 32;
+		ScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+		CHECK_RETURN(ChangeDisplaySettingsW(&amp;ScreenSettings, CDS_FULLSCREEN) == DISP_CHANGE_SUCCESSFUL, false);
+
+		Display.Width = ScreenWidth;
+		Display.Height = ScreenHeight;
+	}
+	else
+	{
+		PositionX = (ScreenWidth - Display.Width) / 2;
+		PositionY = (ScreenHeight - Display.Height) / 2;
+	}
+
+	Window = CreateWindowExW(WS_EX_APPWINDOW,
+	                         ApplicationName.c_str(),
+	                         ApplicationName.c_str(),
+	                         WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP,
+	                         PositionX,
+	                         PositionY,
+	                         Display.Width,
+	                         Display.Height,
+	                         nullptr,
+	                         nullptr,
+	                         Instance,
+	                         this);
+	CHECK_RETURN(Window, false);
+
+	ShowWindow(Window, SW_SHOW);
+	SetForegroundWindow(Window);
+	SetFocus(Window);
+	ShowCursor(FALSE);
+	return true;
+}
+
+void FSystem::Run()
+{
+	MSG Message = {};
+	while (Message.message != WM_QUIT)
+	{
+		if (PeekMessageW(&amp;Message, nullptr, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&amp;Message);
+			DispatchMessageW(&amp;Message);
+			continue;
+		}
+
+		if (!Frame())
+		{
+			break;
+		}
+	}
+}
+
+bool FSystem::Frame()
+{
+	if (Input-&gt;IsKeyDown(VK_ESCAPE))
+	{
+		return false;
+	}
+
+	return Application-&gt;Frame();
+}
+
+LRESULT FSystem::HandleMessage(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam)
+{
+	switch (Message)
+	{
+	case WM_KEYDOWN:
+		Input-&gt;KeyDown(static_cast&lt;unsigned int&gt;(WParam));
+		return 0;
+	case WM_KEYUP:
+		Input-&gt;KeyUp(static_cast&lt;unsigned int&gt;(WParam));
+		return 0;
+	case WM_CLOSE:
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		return 0;
+	default:
+		return DefWindowProcW(WindowHandle, Message, WParam, LParam);
+	}
+}</pre>
+			</figure>
+		</div>
+
+		<div class="file-group">
+			<h3>호출부와 빌드</h3>
+			<details class="diff-file">
+				<summary><span class="path">Source/Main.cpp</span><span class="stat"><span class="plus">+8</span></span><span class="why">FSystem 을 만들고 돌림</span></summary>
+<pre class="diff" data-lang="cpp">@@ -1,6 +1,14 @@
+ #include &lt;Windows.h&gt;
++#include &lt;memory&gt;
++
++#include "Core/Check.h"
++#include "Core/FSystem.h"
+ 
+ int WINAPI WinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _In_ PSTR CmdLine, _In_ int ShowCmd)
+ {
++	const auto System = std::make_unique&lt;FSystem&gt;();
++	CHECK_RETURN(System-&gt;Initialize(), 1);
++
++	System-&gt;Run();
+ 	return 0;
+ }</pre>
+			</details>
+			<details class="diff-file">
+				<summary><span class="path">CMakeLists.txt</span><span class="stat"><span class="plus">+8</span> <span class="minus">−2</span></span><span class="why">새 소스, include 경로, WIN32_LEAN_AND_MEAN</span></summary>
+<pre class="diff" data-lang="cmake">@@ -1,9 +1,15 @@
+ cmake_minimum_required(VERSION 3.25)
+ project(DxRenderDojo LANGUAGES CXX)
+ 
+-add_executable(DxRenderDojo WIN32 Source/Main.cpp)
++add_executable(DxRenderDojo WIN32
++	Source/Main.cpp
++	Source/App/FApplication.cpp
++	Source/Core/FInput.cpp
++	Source/Core/FSystem.cpp
++)
++target_include_directories(DxRenderDojo PRIVATE Source)
+ target_compile_features(DxRenderDojo PRIVATE cxx_std_20)
+-target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE)
++target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN)
+ 
+ if(MSVC)
+ 	target_compile_options(DxRenderDojo PRIVATE /W3 /utf-8)</pre>
+			</details>
+			<details class="diff-file">
+				<summary><span class="path">DxRenderDojo.vcxproj</span><span class="stat"><span class="plus">+13</span> <span class="minus">−2</span></span><span class="why">같은 내용을 VS 프로젝트에</span></summary>
+<pre class="diff" data-lang="xml">@@ -42,6 +42,7 @@
+       &lt;ConformanceMode&gt;true&lt;/ConformanceMode&gt;
+       &lt;LanguageStandard&gt;stdcpp20&lt;/LanguageStandard&gt;
+       &lt;AdditionalOptions&gt;/utf-8 %(AdditionalOptions)&lt;/AdditionalOptions&gt;
++      &lt;AdditionalIncludeDirectories&gt;$(ProjectDir)Source;%(AdditionalIncludeDirectories)&lt;/AdditionalIncludeDirectories&gt;
+     &lt;/ClCompile&gt;
+     &lt;Link&gt;
+       &lt;SubSystem&gt;Windows&lt;/SubSystem&gt;
+@@ -50,14 +51,14 @@
+   &lt;/ItemDefinitionGroup&gt;
+   &lt;ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'"&gt;
+     &lt;ClCompile&gt;
+-      &lt;PreprocessorDefinitions&gt;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)&lt;/PreprocessorDefinitions&gt;
++      &lt;PreprocessorDefinitions&gt;_DEBUG;_WINDOWS;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)&lt;/PreprocessorDefinitions&gt;
+     &lt;/ClCompile&gt;
+   &lt;/ItemDefinitionGroup&gt;
+   &lt;ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'"&gt;
+     &lt;ClCompile&gt;
+       &lt;FunctionLevelLinking&gt;true&lt;/FunctionLevelLinking&gt;
+       &lt;IntrinsicFunctions&gt;true&lt;/IntrinsicFunctions&gt;
+-      &lt;PreprocessorDefinitions&gt;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)&lt;/PreprocessorDefinitions&gt;
++      &lt;PreprocessorDefinitions&gt;NDEBUG;_WINDOWS;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)&lt;/PreprocessorDefinitions&gt;
+     &lt;/ClCompile&gt;
+     &lt;Link&gt;
+       &lt;EnableCOMDATFolding&gt;true&lt;/EnableCOMDATFolding&gt;
+@@ -66,6 +67,16 @@
+   &lt;/ItemDefinitionGroup&gt;
+   &lt;ItemGroup&gt;
+     &lt;ClCompile Include="Source\Main.cpp" /&gt;
++    &lt;ClCompile Include="Source\App\FApplication.cpp" /&gt;
++    &lt;ClCompile Include="Source\Core\FInput.cpp" /&gt;
++    &lt;ClCompile Include="Source\Core\FSystem.cpp" /&gt;
++  &lt;/ItemGroup&gt;
++  &lt;ItemGroup&gt;
++    &lt;ClInclude Include="Source\App\FApplication.h" /&gt;
++    &lt;ClInclude Include="Source\Core\Check.h" /&gt;
++    &lt;ClInclude Include="Source\Core\FDisplaySettings.h" /&gt;
++    &lt;ClInclude Include="Source\Core\FInput.h" /&gt;
++    &lt;ClInclude Include="Source\Core\FSystem.h" /&gt;
+   &lt;/ItemGroup&gt;
+   &lt;Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" /&gt;
+ &lt;/Project&gt;</pre>
+			</details>
+		</div>
+	</section>
+	<!-- code:end -->
+
+	<section id="check" data-block="check" data-source="직접">
+		<h2>다 됐는지 확인</h2>
+		<ul class="checks">
+			<li><label><input type="checkbox"><span class="label">실행</span><span class="what">800×600 검은 창이 화면 가운데에 뜸 (창 위에서는 커서가 숨겨짐)</span></label></li>
+			<li><label><input type="checkbox"><span class="label">종료</span><span class="what">ESC 를 누르면 창이 닫히고 프로그램이 끝남</span></label></li>
+			<li><label><input type="checkbox"><span class="label">빌드</span><span class="what">Debug·Release x64 모두 경고 0개</span></label></li>
+			<li><label><input type="checkbox"><span class="label">검사</span><span class="what"><code>clang-format --dry-run -Werror</code>, <code>clang-tidy -p build-win</code> 통과</span></label></li>
+		</ul>
+	</section>
+
+	<section id="next" data-block="continue" data-source="자동">
+		<h2>여기서 이어 가기</h2>
+		<p class="section-note">03편을 직접 써 보려면 이 편이 끝난 시점의 태그에서 내 브랜치를 땁니다.</p>
+		<figure class="code">
+			<figcaption><span class="badge">터미널</span><button type="button" class="copy">복사</button></figcaption>
+<pre class="snip" data-lang="bash">git switch -c my-tut03 tut02</pre>
+		</figure>
+	</section>
+
+	<nav class="pager" aria-label="이전·다음 편" data-block="pager" data-source="자동 : 목차">
+		<a href="#"><span class="dir">← 이전 편</span><span class="name">01 개발 환경 셋업</span></a>
+		<a class="next" href="#"><span class="dir">다음 편 →</span><span class="name">03 DirectX 11 초기화</span></a>
+	</nav>
+
+	<footer class="site-foot" data-block="site-foot" data-source="자동">
+		원문 : <a href="https://www.rastertek.com/dx11win10tut02.html">Rastertek DirectX 11 Tutorial 2 · Creating a Framework and Window</a><br>
+		코드는 MIT 라이선스입니다.<br>
+		Rastertek 원문을 바탕으로 한 글은 라이선스에 포함되지 않습니다.
+	</footer>
+
+</main>
+
+<nav class="rail" aria-label="이 페이지" data-block="rail-outline" data-source="자동">
+	<ol id="page-outline">
+		<li><a href="#goal">이 편을 마치면</a></li>
+		<li><a href="#diverge">원문과 다른 점</a></li>
+		<li><a href="#overview">한눈에 보기</a></li>
+		<li><a href="#steps">따라 하기</a></li>
+		<li><a href="#pitfalls">흔한 실수</a></li>
+		<li><a href="#files">바뀐 파일</a></li>
+		<li><a href="#check">다 됐는지 확인</a></li>
+		<li><a href="#next">여기서 이어 가기</a></li>
+	</ol>
+</nav>
+</div>
+
+<script>
+(function () {
+	var Root = document.documentElement;
+	var CurrentTutorial = 2;
+
+	var Escape = function (Text) {
+		return Text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+	};
+	var Highlight = function (Text, Lang) {
+		try {
+			if (window.hljs && Lang && hljs.getLanguage(Lang)) {
+				return hljs.highlight(Text, { language: Lang, ignoreIllegals: true }).value;
+			}
+		} catch (E) {}
+		return Escape(Text);
+	};
+
+	document.querySelectorAll("pre.src, pre.snip").forEach(function (Pre) {
+		var Lang = Pre.dataset.lang;
+		var Lines = Pre.textContent.replace(/\n$/, "").split("\n");
+		Pre.innerHTML = Lines.map(function (Line) {
+			return '<span class="line">' + (Line.length ? Highlight(Line, Lang) : " ") + "</span>";
+		}).join("");
+		if (Pre.dataset.start) {
+			Pre.classList.add("numbered");
+			Pre.style.counterReset = "ln " + (Number(Pre.dataset.start) - 1);
+		}
+	});
+
+	var VariantButtons = document.querySelectorAll("[data-variant-button]");
+	var ShowVariant = function (Variant) {
+		document.querySelectorAll(".variant").forEach(function (Block) {
+			Block.hidden = Block.dataset.variant !== Variant;
+		});
+		VariantButtons.forEach(function (Button) {
+			Button.setAttribute("aria-pressed", Button.dataset.variantButton === Variant ? "true" : "false");
+		});
+	};
+	VariantButtons.forEach(function (Button) {
+		Button.addEventListener("click", function () {
+			ShowVariant(Button.dataset.variantButton);
+			try { localStorage.setItem("dojo-variant", Button.dataset.variantButton); } catch (E) {}
+		});
+	});
+	var SavedVariant = null;
+	try { SavedVariant = localStorage.getItem("dojo-variant"); } catch (E) {}
+	ShowVariant(SavedVariant === "brief" ? "brief" : "detail");
+
+	document.querySelectorAll("pre.diff").forEach(function (Pre) {
+		var Lang = Pre.dataset.lang;
+		var Lines = Pre.textContent.replace(/\n$/, "").split("\n");
+		var OldNumber = 0;
+		var NewNumber = 0;
+		var Rows = [];
+		Lines.forEach(function (Line) {
+			var Hunk = /^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@/.exec(Line);
+			if (Hunk) {
+				OldNumber = Number(Hunk[1]);
+				NewNumber = Number(Hunk[2]);
+				Rows.push('<div class="dl hunk"><span class="no"></span><span class="no"></span><span class="code">' + Escape(Line) + "</span></div>");
+				return;
+			}
+			if (Line.charAt(0) === "\\") { return; }
+			var Sign = Line.charAt(0);
+			var Body = Line.slice(1);
+			var Kind = Sign === "+" ? "add" : (Sign === "-" ? "del" : "ctx");
+			var Old = Kind === "add" ? "" : OldNumber++;
+			var New = Kind === "del" ? "" : NewNumber++;
+			Rows.push('<div class="dl ' + Kind + '"><span class="no">' + Old + '</span><span class="no">' + New + '</span><span class="code"><span class="sign">' + (Kind === "ctx" ? " " : Sign) + " </span>" + (Body.length ? Highlight(Body, Lang) : "") + "</span></div>");
+		});
+		var View = document.createElement("div");
+		View.className = "diff-view";
+		View.innerHTML = Rows.join("");
+		Pre.replaceWith(View);
+	});
+
+	var Scanline = document.getElementById("scanline");
+	var IsCommon = function (N) { return N <= 30 || (N >= 41 && N <= 45); };
+	var AddCell = function (ClassName, Title) {
+		var Cell = document.createElement("span");
+		Cell.className = "cell " + ClassName;
+		if (Title) { Cell.title = Title; }
+		Scanline.appendChild(Cell);
+	};
+	for (var N = 1; N <= 61; N++) {
+		var ClassName = N === CurrentTutorial ? "current" : (N < CurrentTutorial ? "done" : (IsCommon(N) ? "common" : ""));
+		AddCell(ClassName, "tut" + (N < 10 ? "0" + N : N));
+		if (N === 30 || N === 45) { AddCell("gap"); }
+	}
+	AddCell("gap");
+	AddCell("common", "tutalpha01 · 스키닝 (원문에 없음)");
+
+	var ThemeButton = document.getElementById("theme-toggle");
+	var ThemeNames = { system: "시스템", light: "라이트", dark: "다크" };
+	var NextTheme = { system: "light", light: "dark", dark: "system" };
+	var CurrentTheme = function () {
+		var Theme = Root.getAttribute("data-theme");
+		return Theme === "light" || Theme === "dark" ? Theme : "system";
+	};
+	var ShowTheme = function (Theme) {
+		ThemeButton.textContent = "테마 · " + ThemeNames[Theme];
+		ThemeButton.setAttribute("aria-label", "테마 바꾸기, 지금은 " + ThemeNames[Theme]);
+	};
+	ThemeButton.addEventListener("click", function () {
+		var Theme = NextTheme[CurrentTheme()];
+		if (Theme === "system") { Root.removeAttribute("data-theme"); }
+		else { Root.setAttribute("data-theme", Theme); }
+		try {
+			if (Theme === "system") { localStorage.removeItem("dojo-theme"); }
+			else { localStorage.setItem("dojo-theme", Theme); }
+		} catch (E) {}
+		ShowTheme(Theme);
+	});
+	ShowTheme(CurrentTheme());
+
+	document.querySelectorAll("figure.code .copy").forEach(function (Button) {
+		Button.addEventListener("click", function () {
+			var Lines = Button.closest("figure").querySelectorAll("pre .line");
+			var Text = Array.prototype.map.call(Lines, function (Line) { return Line.textContent === " " ? "" : Line.textContent; }).join("\n");
+			try {
+				navigator.clipboard.writeText(Text).then(function () {
+					Button.textContent = "복사함";
+					setTimeout(function () { Button.textContent = "복사"; }, 1400);
+				});
+			} catch (E) {}
+		});
+	});
+
+	var OutlineLinks = document.querySelectorAll("#page-outline a");
+	if ("IntersectionObserver" in window) {
+		var Observer = new IntersectionObserver(function (Entries) {
+			Entries.forEach(function (Entry) {
+				if (!Entry.isIntersecting) { return; }
+				OutlineLinks.forEach(function (Link) {
+					Link.setAttribute("aria-current", Link.getAttribute("href") === "#" + Entry.target.id ? "true" : "false");
+				});
+			});
+		}, { rootMargin: "0px 0px -70% 0px" });
+		OutlineLinks.forEach(function (Link) {
+			var Target = document.querySelector(Link.getAttribute("href"));
+			if (Target) { Observer.observe(Target); }
+		});
+	}
+
+	var BlockToggle = document.getElementById("toggle-blocks");
+	BlockToggle.addEventListener("click", function () {
+		var bOn = document.body.classList.toggle("show-blocks");
+		BlockToggle.setAttribute("aria-pressed", bOn ? "true" : "false");
+	});
+})();
+</script>
+</body>
+</html>

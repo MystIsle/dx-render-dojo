@@ -5,6 +5,7 @@
 *.hlsl         text eol=crlf
 *.vs           text eol=crlf linguist-language=HLSL
 *.ps           text eol=crlf linguist-language=HLSL
+*.rc           text eol=crlf
 *.sln          text eol=crlf
 *.vcxproj*     text eol=crlf
 
@@ -14,4 +15,5 @@ CMakeLists.txt text eol=lf
 *.md           text eol=lf
 *.json         text eol=lf
 *.xml          text eol=lf
+*.manifest     text eol=lf
 *.DotSettings  text eol=lf
