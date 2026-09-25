@@ -16,6 +16,7 @@ public:
 	void Render(ID3D11DeviceContext* Context) const;
 
 private:
+	// FColorShader 의 입력 레이아웃, Color.vs 의 FVertexInput 과 멤버 순서·형식이 같아야 한다.
 	struct FVertex
 	{
 		DirectX::XMFLOAT3 Position;

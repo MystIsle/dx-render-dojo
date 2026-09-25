@@ -37,10 +37,16 @@
     <ClCompile Include="Source\Graphics\FModel.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Shaders\FColorShader.cpp">
+      <Filter>Shaders</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Utility\Check.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
     <ClCompile Include="Source\Utility\FLog.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Utility\FPaths.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
   </ItemGroup>
@@ -66,10 +72,16 @@
     <ClInclude Include="Source\Graphics\FModel.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Shaders\FColorShader.h">
+      <Filter>Shaders</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Utility\Check.h">
       <Filter>Utility</Filter>
     </ClInclude>
     <ClInclude Include="Source\Utility\FLog.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Utility\FPaths.h">
       <Filter>Utility</Filter>
     </ClInclude>
     <ClInclude Include="Source\Utility\TSingleton.h">
