@@ -105,6 +105,9 @@ Rider 이름 규칙(`DxRenderDojo.sln.DotSettings`)은 이 절을 옮긴 것입�
 - `using namespace` : 헤더에서 금지
 - 전역 상수 : 두지 않음. 한 함수만 쓰면 그 함수 안의 `constexpr`, 여러 함수가 쓰면 클래스의 `static constexpr` 나 멤버로
 - 클래스 안 상수 : `static constexpr`. `static` 없는 `const` 멤버 변수는 객체마다 값이 다를 때만
+- include 경로 : `Source/` 기준으로 폴더까지 적음(`#include "Core/FSystem.h"`). 짝 헤더와 같은 폴더·하위 폴더의 헤더도 같음. 언리얼 엔진 코드와 에디터의 새 클래스 마법사가 모듈의 `Public` 루트 기준으로 적는 것과 같은 방식
+- 접근자 : 읽는 쪽이 생길 때 만듦. 멤버를 더했다고 게터를 같이 만들지 않음. 쓰이지 않는 접근자는 죽은 코드
+- 주석 : 지금 코드에 대해 계속 참인 문장으로 씀. 뒤 편의 계획이나 뒤 단계에서 생길 이름을 담지 않음. 구조가 바뀌면 그 편에서 주석도 고침
 
 **선언 순서**
 
@@ -213,3 +216,9 @@ static 을 먼저, 함수를 변수보다 먼저 둡니다. `.cpp` 의 정의 �
 - 같은 항목을 `.clang-tidy` 에도 더했습니다
 - 설정 파일(DotSettings, `.editorconfig`·`.gitattributes` 줄, `.clang-tidy` 항목)은 이력을 다시 써서 `tut01` 커밋부터 넣었습니다. 태그에서 브랜치를 따도 Rider 설정이 따라갑니다
 - 7절에 값 매개변수의 `const` 를 넣었습니다. Rider 가 값 매개변수마다 "상수로 만들 수 있다" 는 약한 경고를 띄웠습니다(02편 코드에서 30곳쯤). 붙이지 않기로 하고 DotSettings 에서 그 검사(`CppParameterMayBeConst`)를 껐습니다
+
+**include·접근자·주석 (2026-09-25)**
+
+- 7절에 include 경로를 옮겼습니다. 전에는 CLAUDE.md 에 "include 는 항상 폴더까지" 한 줄만 있었습니다. 짝 헤더만 파일 이름으로 적자는 안을 검토했고, 언리얼 엔진(`Private/Components/ActorComponent.cpp` 의 `#include "Components/ActorComponent.h"`)과 에디터 새 클래스 마법사(`GameProjectUtils` 가 옛 `#include "클래스.h"` 를 지우고 폴더를 포함한 경로로 바꿈)를 확인해 지금 규칙을 유지했습니다. UBT 는 `BuildSettingsVersion` V2 부터 `Public` 루트 기준입니다
+- 기각 : 짝 헤더나 같은 폴더 헤더만 파일 이름으로. 한 헤더가 두 이름을 갖게 되고, 폴더를 옮기면 양쪽 모양을 다 고쳐야 합니다. 게임 템플릿처럼 하위 폴더를 모두 검색 경로에 넣으면 이름이 같은 파일이 부딪힙니다
+- 7절에 접근자와 주석을 넣었습니다. 읽기 검토에서 02편 `FWindow::GetHandle`(03편에서 처음 씀)과 `FSystem::GetWindow`(쓰는 곳 없음), 02편 `FSystem.h` 의 "디바이스를 갖게 될 `FApplication`"(03편은 `FD3D11Graphics` 가 가짐)이 나왔습니다. 코드는 조은님 승인 뒤 고칩니다
