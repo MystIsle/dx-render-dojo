@@ -21,6 +21,7 @@ public:
 
 	ID3D11Device* GetDevice() const { return Device.Get(); }
 	ID3D11DeviceContext* GetContext() const { return Context.Get(); }
+	float GetAspectRatio() const { return Viewport.Width / Viewport.Height; }
 
 	void Resize(int Width, int Height);
 

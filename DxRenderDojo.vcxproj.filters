@@ -31,6 +31,9 @@
     <ClCompile Include="Source\Core\FWindow.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Graphics\FCamera.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Graphics\FD3D11Graphics.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
@@ -65,6 +68,9 @@
     </ClInclude>
     <ClInclude Include="Source\Core\FWindow.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\FCamera.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\FD3D11Graphics.h">
       <Filter>Graphics</Filter>

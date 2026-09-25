@@ -76,6 +76,7 @@
     <ClCompile Include="Source\Core\FInput.cpp" />
     <ClCompile Include="Source\Core\FSystem.cpp" />
     <ClCompile Include="Source\Core\FWindow.cpp" />
+    <ClCompile Include="Source\Graphics\FCamera.cpp" />
     <ClCompile Include="Source\Graphics\FD3D11Graphics.cpp" />
     <ClCompile Include="Source\Graphics\FModel.cpp" />
     <ClCompile Include="Source\Shaders\FColorShader.cpp" />
@@ -89,6 +90,7 @@
     <ClInclude Include="Source\Core\FInput.h" />
     <ClInclude Include="Source\Core\FSystem.h" />
     <ClInclude Include="Source\Core\FWindow.h" />
+    <ClInclude Include="Source\Graphics\FCamera.h" />
     <ClInclude Include="Source\Graphics\FD3D11Graphics.h" />
     <ClInclude Include="Source\Graphics\FModel.h" />
     <ClInclude Include="Source\Shaders\FColorShader.h" />

@@ -2,6 +2,7 @@
 
 #include <array>
 
+#include "Graphics/FCamera.h"
 #include "Graphics/FModel.h"
 #include "Shaders/FColorShader.h"
 
@@ -23,6 +24,7 @@ public:
 
 private:
 	std::array<float, 4> ClearColor = {0.0f, 0.0f, 0.0f, 1.0f};
+	FCamera Camera;
 	FModel Model;
 	FColorShader ColorShader;
 };
