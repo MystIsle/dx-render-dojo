@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Filter Include="Core">
+      <UniqueIdentifier>{2F8B6A43-1E5D-4C79-A3B1-7E4D2C9F6A18}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Utility">
       <UniqueIdentifier>{C3E81B5A-2F6D-4A97-8B14-6D9E0A7C5F32}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Main.cpp" />
+    <ClCompile Include="Source\Core\FSystem.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\FWindow.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Utility\Check.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
@@ -15,6 +24,15 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Core\FDisplaySettings.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\FSystem.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\FWindow.h">
+      <Filter>Core</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Utility\Check.h">
       <Filter>Utility</Filter>
     </ClInclude>

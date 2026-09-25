@@ -67,10 +67,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\Main.cpp" />
+    <ClCompile Include="Source\Core\FSystem.cpp" />
+    <ClCompile Include="Source\Core\FWindow.cpp" />
     <ClCompile Include="Source\Utility\Check.cpp" />
     <ClCompile Include="Source\Utility\FLog.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Core\FDisplaySettings.h" />
+    <ClInclude Include="Source\Core\FSystem.h" />
+    <ClInclude Include="Source\Core\FWindow.h" />
     <ClInclude Include="Source\Utility\Check.h" />
     <ClInclude Include="Source\Utility\FLog.h" />
     <ClInclude Include="Source\Utility\TSingleton.h" />
