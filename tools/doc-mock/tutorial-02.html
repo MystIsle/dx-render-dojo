@@ -515,7 +515,7 @@ details.diff-file summary .why { color: var(--slate); }
 					<h3>공통 도구 셋을 미리 만들어 둔다</h3>
 					<p>창을 만들기 전에 도구 세 개를 먼저 넣어요. 03편부터 매 편에 쓰는 것들이고 이 편의 주제는 따로 있으니 이름과 하는 일만 알고 넘어가도 돼요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/Check.h</span><span class="badge new">새로</span><span class="badge">파일 전체</span></figcaption>
+						<figcaption><span class="path">Source/Utility/Check.h</span><span class="badge new">새로</span><span class="badge">파일 전체</span></figcaption>
 <pre class="src" data-lang="cpp">#pragma once
 
 #include &lt;Windows.h&gt;
@@ -568,14 +568,14 @@ namespace Return
 						<details class="fold">
 							<summary><code>FLog</code>·<code>TSingleton</code> 코드와 <code>Check.cpp</code></summary>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FLog.h</span><span class="badge new">새로</span><span class="badge">파일 전체</span></figcaption>
+						<figcaption><span class="path">Source/Utility/FLog.h</span><span class="badge new">새로</span><span class="badge">파일 전체</span></figcaption>
 <pre class="src" data-lang="cpp">#pragma once
 
 #include &lt;Windows.h&gt;
 #include &lt;string&gt;
 #include &lt;string_view&gt;
 
-#include "Core/TSingleton.h"
+#include "Utility/TSingleton.h"
 
 class FLog : public TSingleton&lt;FLog&gt;
 {
@@ -597,13 +597,13 @@ private:
 };</pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/TSingleton.h</span><span class="badge new">새로</span><span class="badge">파일 전체</span></figcaption>
+						<figcaption><span class="path">Source/Utility/TSingleton.h</span><span class="badge new">새로</span><span class="badge">파일 전체</span></figcaption>
 <pre class="src" data-lang="cpp">#pragma once
 
 #include &lt;memory&gt;
 #include &lt;typeinfo&gt;
 
-#include "Core/Check.h"
+#include "Utility/Check.h"
 
 template &lt;typename T&gt; class TSingleton
 {
@@ -656,13 +656,13 @@ template &lt;typename T&gt; std::unique_ptr&lt;T&gt; TSingleton&lt;T&gt;::Instan
 template &lt;typename T&gt; bool TSingleton&lt;T&gt;::bReleased = false;</pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/Check.cpp</span><span class="badge new">새로</span><span class="badge">파일 전체</span></figcaption>
-<pre class="src" data-lang="cpp">#include "Core/Check.h"
+						<figcaption><span class="path">Source/Utility/Check.cpp</span><span class="badge new">새로</span><span class="badge">파일 전체</span></figcaption>
+<pre class="src" data-lang="cpp">#include "Utility/Check.h"
 
 #include &lt;format&gt;
 #include &lt;string&gt;
 
-#include "Core/FLog.h"
+#include "Utility/FLog.h"
 
 namespace Return
 {
@@ -679,8 +679,8 @@ namespace Return
 } // namespace Return</pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FLog.cpp</span><span class="badge new">새로</span><span class="badge">파일 전체</span></figcaption>
-<pre class="src" data-lang="cpp">#include "Core/FLog.h"
+						<figcaption><span class="path">Source/Utility/FLog.cpp</span><span class="badge new">새로</span><span class="badge">파일 전체</span></figcaption>
+<pre class="src" data-lang="cpp">#include "Utility/FLog.h"
 
 const std::wstring&amp; FLog::GetLastErrorMessage()
 {
@@ -840,7 +840,7 @@ private:
 
 #include &lt;utility&gt;
 
-#include "Core/Check.h"</pre>
+#include "Utility/Check.h"</pre>
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">새로</span><span class="badge">FWindow::Initialize · include 묶음 다음</span></figcaption>
@@ -1039,7 +1039,7 @@ private:
 #include "Core/FDisplaySettings.h"
 #include "Core/FInput.h"
 #include "Core/FWindow.h"
-#include "Core/TSingleton.h"
+#include "Utility/TSingleton.h"
 
 class FSystem : public TSingleton&lt;FSystem&gt;
 {
@@ -1194,8 +1194,8 @@ void FInput::KeyUp(unsigned int Key)
 
 #include &lt;format&gt;
 
-#include "Core/Check.h"
-#include "Core/FLog.h"</pre>
+#include "Utility/Check.h"
+#include "Utility/FLog.h"</pre>
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge new">새로</span><span class="badge">FSystem::Initialize · include 묶음 다음</span></figcaption>
@@ -1421,8 +1421,8 @@ void FApplication::Render()
 						<figcaption><span class="path">Source/Main.cpp</span><span class="badge mod">바꿈</span><span class="badge">파일 전체</span></figcaption>
 <pre class="src" data-lang="cpp">#include &lt;Windows.h&gt;
 
-#include "Core/FLog.h"
 #include "Core/FSystem.h"
+#include "Utility/FLog.h"
 
 int WINAPI wWinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _In_ PWSTR CmdLine, _In_ int ShowCmd)
 {
@@ -1459,11 +1459,11 @@ project(DxRenderDojo LANGUAGES CXX)
 add_executable(DxRenderDojo WIN32
 	Source/Main.cpp
 	Source/App/FApplication.cpp
-	Source/Core/Check.cpp
 	Source/Core/FInput.cpp
-	Source/Core/FLog.cpp
 	Source/Core/FSystem.cpp
 	Source/Core/FWindow.cpp
+	Source/Utility/Check.cpp
+	Source/Utility/FLog.cpp
 )
 target_include_directories(DxRenderDojo PRIVATE Source)
 target_compile_features(DxRenderDojo PRIVATE cxx_std_20)
@@ -1517,7 +1517,7 @@ endif()</pre>
 // 1 = CREATEPROCESS_MANIFEST_RESOURCE_ID, 24 = RT_MANIFEST
 1 24 "DxRenderDojo.manifest"</pre>
 					</figure>
-					<p>Visual Studio 에서는 솔루션 탐색기에 <code>App</code>·<code>Core</code> 필터를 만들고 새 <code>.h</code>·<code>.cpp</code> 를 기존 항목 추가로 넣어요. <code>Main.cpp</code> 는 필터에 넣지 않고 그대로 둬요. 프로젝트 속성은 아래를 고쳐요. 이 조작들이 <code>DxRenderDojo.vcxproj</code> 와 <code>DxRenderDojo.vcxproj.filters</code> 를 바꿔요.</p>
+					<p>Visual Studio 에서는 솔루션 탐색기에 <code>App</code>·<code>Core</code>·<code>Utility</code> 필터를 만들고 새 <code>.h</code>·<code>.cpp</code> 를 기존 항목 추가로 넣어요. <code>Main.cpp</code> 는 필터에 넣지 않고 그대로 둬요. 프로젝트 속성은 아래를 고쳐요. 이 조작들이 <code>DxRenderDojo.vcxproj</code> 와 <code>DxRenderDojo.vcxproj.filters</code> 를 바꿔요.</p>
 					<ul class="walk">
 						<li>모든 구성 · C/C++ › 일반 › 추가 포함 디렉터리 : <code>$(ProjectDir)Source</code></li>
 						<li>모든 구성 · 매니페스트 도구 › 입력 및 출력 › 추가 매니페스트 파일 : <code>$(ProjectDir)DxRenderDojo.manifest</code>. 같은 곳의 DPI 인식은 없음으로 고름(vcxproj 에는 <code>EnableDpiAwareness</code> 가 <code>false</code> 로 남음). 매니페스트 파일이 직접 선언함</li>
@@ -1563,21 +1563,21 @@ endif()</pre>
    &lt;ItemGroup&gt;
      &lt;ClCompile Include="Source\Main.cpp" /&gt;
 +    &lt;ClCompile Include="Source\App\FApplication.cpp" /&gt;
-+    &lt;ClCompile Include="Source\Core\Check.cpp" /&gt;
 +    &lt;ClCompile Include="Source\Core\FInput.cpp" /&gt;
-+    &lt;ClCompile Include="Source\Core\FLog.cpp" /&gt;
 +    &lt;ClCompile Include="Source\Core\FSystem.cpp" /&gt;
 +    &lt;ClCompile Include="Source\Core\FWindow.cpp" /&gt;
++    &lt;ClCompile Include="Source\Utility\Check.cpp" /&gt;
++    &lt;ClCompile Include="Source\Utility\FLog.cpp" /&gt;
 +  &lt;/ItemGroup&gt;
 +  &lt;ItemGroup&gt;
 +    &lt;ClInclude Include="Source\App\FApplication.h" /&gt;
-+    &lt;ClInclude Include="Source\Core\Check.h" /&gt;
 +    &lt;ClInclude Include="Source\Core\FDisplaySettings.h" /&gt;
 +    &lt;ClInclude Include="Source\Core\FInput.h" /&gt;
-+    &lt;ClInclude Include="Source\Core\FLog.h" /&gt;
 +    &lt;ClInclude Include="Source\Core\FSystem.h" /&gt;
 +    &lt;ClInclude Include="Source\Core\FWindow.h" /&gt;
-+    &lt;ClInclude Include="Source\Core\TSingleton.h" /&gt;
++    &lt;ClInclude Include="Source\Utility\Check.h" /&gt;
++    &lt;ClInclude Include="Source\Utility\FLog.h" /&gt;
++    &lt;ClInclude Include="Source\Utility\TSingleton.h" /&gt;
 +  &lt;/ItemGroup&gt;
 +  &lt;ItemGroup&gt;
 +    &lt;None Include="DxRenderDojo.manifest" /&gt;
@@ -1647,18 +1647,18 @@ endif()</pre>
 		<p class="section-note">새 파일은 전체 코드, 바뀐 파일은 diff 예요. 전부 접어 뒀으니 필요한 것만 펼쳐 보세요. 묶음은 파일이 맡은 일로 나눴어요.</p>
 		<ul class="file-list">
 			<li><span class="mark a">+</span><span class="name">Source/Core/FDisplaySettings.h</span><span class="note">+9</span></li>
-			<li><span class="mark a">+</span><span class="name">Source/Core/FInput.h</span><span class="note">+18</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/Core/FInput.h</span><span class="note">+19</span></li>
 			<li><span class="mark a">+</span><span class="name">Source/Core/FInput.cpp</span><span class="note">+11</span></li>
 			<li><span class="mark a">+</span><span class="name">Source/App/FApplication.h</span><span class="note">+12</span></li>
 			<li><span class="mark a">+</span><span class="name">Source/App/FApplication.cpp</span><span class="note">+17</span></li>
-			<li><span class="mark a">+</span><span class="name">Source/Core/TSingleton.h</span><span class="note">+56</span></li>
-			<li><span class="mark a">+</span><span class="name">Source/Core/FLog.h</span><span class="note">+26</span></li>
-			<li><span class="mark a">+</span><span class="name">Source/Core/FLog.cpp</span><span class="note">+57</span></li>
-			<li><span class="mark a">+</span><span class="name">Source/Core/Check.h</span><span class="note">+36</span></li>
-			<li><span class="mark a">+</span><span class="name">Source/Core/Check.cpp</span><span class="note">+20</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/Utility/TSingleton.h</span><span class="note">+56</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/Utility/FLog.h</span><span class="note">+26</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/Utility/FLog.cpp</span><span class="note">+57</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/Utility/Check.h</span><span class="note">+36</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/Utility/Check.cpp</span><span class="note">+20</span></li>
 			<li><span class="mark a">+</span><span class="name">Source/Core/FWindow.h</span><span class="note">+39</span></li>
 			<li><span class="mark a">+</span><span class="name">Source/Core/FWindow.cpp</span><span class="note">+184</span></li>
-			<li><span class="mark a">+</span><span class="name">Source/Core/FSystem.h</span><span class="note">+32</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/Core/FSystem.h</span><span class="note">+34</span></li>
 			<li><span class="mark a">+</span><span class="name">Source/Core/FSystem.cpp</span><span class="note">+67</span></li>
 			<li><span class="mark m">~</span><span class="name">Source/Main.cpp</span><span class="note">+16 −2</span></li>
 			<li><span class="mark m">~</span><span class="name">CMakeLists.txt</span><span class="note">+15 −3</span></li>
@@ -1723,13 +1723,13 @@ void FInput::KeyUp(unsigned int Key)
 		<div class="file-group">
 			<h3>공통 도구 셋</h3>
 			<details class="diff-file">
-				<summary><span class="path">Source/Core/TSingleton.h</span><span class="stat"><span class="plus">+56</span></span><span class="why">전역 접근과 수명</span></summary>
+				<summary><span class="path">Source/Utility/TSingleton.h</span><span class="stat"><span class="plus">+56</span></span><span class="why">전역 접근과 수명</span></summary>
 <pre class="src" data-lang="cpp">#pragma once
 
 #include &lt;memory&gt;
 #include &lt;typeinfo&gt;
 
-#include "Core/Check.h"
+#include "Utility/Check.h"
 
 template &lt;typename T&gt; class TSingleton
 {
@@ -1782,14 +1782,14 @@ template &lt;typename T&gt; std::unique_ptr&lt;T&gt; TSingleton&lt;T&gt;::Instan
 template &lt;typename T&gt; bool TSingleton&lt;T&gt;::bReleased = false;</pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">Source/Core/FLog.h</span><span class="stat"><span class="plus">+26</span></span><span class="why">정보·경고·에러 세 수준</span></summary>
+				<summary><span class="path">Source/Utility/FLog.h</span><span class="stat"><span class="plus">+26</span></span><span class="why">정보·경고·에러 세 수준</span></summary>
 <pre class="src" data-lang="cpp">#pragma once
 
 #include &lt;Windows.h&gt;
 #include &lt;string&gt;
 #include &lt;string_view&gt;
 
-#include "Core/TSingleton.h"
+#include "Utility/TSingleton.h"
 
 class FLog : public TSingleton&lt;FLog&gt;
 {
@@ -1811,8 +1811,8 @@ private:
 };</pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">Source/Core/FLog.cpp</span><span class="stat"><span class="plus">+57</span></span><span class="why">출력 창과 디버그 콘솔</span></summary>
-<pre class="src" data-lang="cpp">#include "Core/FLog.h"
+				<summary><span class="path">Source/Utility/FLog.cpp</span><span class="stat"><span class="plus">+57</span></span><span class="why">출력 창과 디버그 콘솔</span></summary>
+<pre class="src" data-lang="cpp">#include "Utility/FLog.h"
 
 const std::wstring&amp; FLog::GetLastErrorMessage()
 {
@@ -1871,7 +1871,7 @@ void FLog::Write(std::wstring_view Prefix, std::wstring_view Message)
 }</pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">Source/Core/Check.h</span><span class="stat"><span class="plus">+36</span></span><span class="why">CHECK_RETURN 매크로와 판정</span></summary>
+				<summary><span class="path">Source/Utility/Check.h</span><span class="stat"><span class="plus">+36</span></span><span class="why">CHECK_RETURN 매크로와 판정</span></summary>
 <pre class="src" data-lang="cpp">#pragma once
 
 #include &lt;Windows.h&gt;
@@ -1910,13 +1910,13 @@ namespace Return
 	} while (false)</pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">Source/Core/Check.cpp</span><span class="stat"><span class="plus">+20</span></span><span class="why">로그로 보내는 부분. 순환 include 를 피해 .cpp 에</span></summary>
-<pre class="src" data-lang="cpp">#include "Core/Check.h"
+				<summary><span class="path">Source/Utility/Check.cpp</span><span class="stat"><span class="plus">+20</span></span><span class="why">로그로 보내는 부분. 순환 include 를 피해 .cpp 에</span></summary>
+<pre class="src" data-lang="cpp">#include "Utility/Check.h"
 
 #include &lt;format&gt;
 #include &lt;string&gt;
 
-#include "Core/FLog.h"
+#include "Utility/FLog.h"
 
 namespace Return
 {
@@ -1984,7 +1984,7 @@ private:
 
 #include &lt;utility&gt;
 
-#include "Core/Check.h"
+#include "Utility/Check.h"
 
 LRESULT CALLBACK FWindow::WndProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam)
 {
@@ -2179,7 +2179,7 @@ void FWindow::NotifyResize()
 #include "Core/FDisplaySettings.h"
 #include "Core/FInput.h"
 #include "Core/FWindow.h"
-#include "Core/TSingleton.h"
+#include "Utility/TSingleton.h"
 
 class FSystem : public TSingleton&lt;FSystem&gt;
 {
@@ -2212,8 +2212,8 @@ private:
 
 #include &lt;format&gt;
 
-#include "Core/Check.h"
-#include "Core/FLog.h"
+#include "Utility/Check.h"
+#include "Utility/FLog.h"
 
 bool FSystem::Initialize(int ShowCmd)
 {
@@ -2321,8 +2321,8 @@ void FApplication::Render()
  #include &lt;Windows.h&gt;
  
 -int WINAPI WinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _In_ PSTR CmdLine, _In_ int ShowCmd)
-+#include "Core/FLog.h"
 +#include "Core/FSystem.h"
++#include "Utility/FLog.h"
 +
 +int WINAPI wWinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _In_ PWSTR CmdLine, _In_ int ShowCmd)
  {
@@ -2351,11 +2351,11 @@ void FApplication::Render()
 +add_executable(DxRenderDojo WIN32
 +	Source/Main.cpp
 +	Source/App/FApplication.cpp
-+	Source/Core/Check.cpp
 +	Source/Core/FInput.cpp
-+	Source/Core/FLog.cpp
 +	Source/Core/FSystem.cpp
 +	Source/Core/FWindow.cpp
++	Source/Utility/Check.cpp
++	Source/Utility/FLog.cpp
 +)
 +target_include_directories(DxRenderDojo PRIVATE Source)
  target_compile_features(DxRenderDojo PRIVATE cxx_std_20)
@@ -2413,21 +2413,21 @@ void FApplication::Render()
    &lt;ItemGroup&gt;
      &lt;ClCompile Include="Source\Main.cpp" /&gt;
 +    &lt;ClCompile Include="Source\App\FApplication.cpp" /&gt;
-+    &lt;ClCompile Include="Source\Core\Check.cpp" /&gt;
 +    &lt;ClCompile Include="Source\Core\FInput.cpp" /&gt;
-+    &lt;ClCompile Include="Source\Core\FLog.cpp" /&gt;
 +    &lt;ClCompile Include="Source\Core\FSystem.cpp" /&gt;
 +    &lt;ClCompile Include="Source\Core\FWindow.cpp" /&gt;
++    &lt;ClCompile Include="Source\Utility\Check.cpp" /&gt;
++    &lt;ClCompile Include="Source\Utility\FLog.cpp" /&gt;
 +  &lt;/ItemGroup&gt;
 +  &lt;ItemGroup&gt;
 +    &lt;ClInclude Include="Source\App\FApplication.h" /&gt;
-+    &lt;ClInclude Include="Source\Core\Check.h" /&gt;
 +    &lt;ClInclude Include="Source\Core\FDisplaySettings.h" /&gt;
 +    &lt;ClInclude Include="Source\Core\FInput.h" /&gt;
-+    &lt;ClInclude Include="Source\Core\FLog.h" /&gt;
 +    &lt;ClInclude Include="Source\Core\FSystem.h" /&gt;
 +    &lt;ClInclude Include="Source\Core\FWindow.h" /&gt;
-+    &lt;ClInclude Include="Source\Core\TSingleton.h" /&gt;
++    &lt;ClInclude Include="Source\Utility\Check.h" /&gt;
++    &lt;ClInclude Include="Source\Utility\FLog.h" /&gt;
++    &lt;ClInclude Include="Source\Utility\TSingleton.h" /&gt;
 +  &lt;/ItemGroup&gt;
 +  &lt;ItemGroup&gt;
 +    &lt;None Include="DxRenderDojo.manifest" /&gt;

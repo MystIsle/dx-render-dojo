@@ -521,8 +521,8 @@ figure.code .diff-view { border-top: 0; }
 					<h3>실패하면 그 자리에서 멈춘다</h3>
 					<p>이 편부터 계속할 수 없는 실패는 발견한 줄에서 멈춰요. 02편은 실패를 <code>bool</code> 로 돌려주며 <code>wWinMain</code> 까지 올라갔고, 상자에는 가장 바깥의 검사만 떴어요. D3D 초기화는 호출마다 실패할 수 있어서 어느 호출이 실패했는지는 그 줄에서 멈춰야 바로 보여요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/Check.h</span><span class="badge mod">바꿈</span><span class="badge">파일 전체</span></figcaption>
-<pre class="src" data-lang="cpp"><!--FILE:Source/Core/Check.h--></pre>
+						<figcaption><span class="path">Source/Utility/Check.h</span><span class="badge mod">바꿈</span><span class="badge">파일 전체</span></figcaption>
+<pre class="src" data-lang="cpp"><!--FILE:Source/Utility/Check.h--></pre>
 					</figure>
 					<p><code>CHECK_FATAL</code> 은 디버거로 실행 중이면 <code>__debugbreak</code> 에서 먼저 멈춰요. 호출 스택과 변수를 실패한 순간 그대로 볼 수 있어요. 디버거가 없으면 로그를 남기고 실패한 식과 줄 번호를 상자로 띄운 뒤 종료 코드 1 로 끝나요.</p>
 					<details class="fold">
@@ -538,14 +538,14 @@ figure.code .diff-view { border-top: 0; }
 					</details>
 					<p>실패하면 멈추니 <code>wWinMain</code> 의 실패 분기와 상자가 없어지고, 상자에 띄우던 <code>FLog</code> 의 마지막 에러 문구도 지워요. <code>void</code> 가 되는 <code>FSystem::Initialize</code> 와 <code>FWindow::Initialize</code> 는 각각 2단계와 6단계에서 통째로 바꿔 넣어요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FLog.h</span><span class="badge del">지움</span><span class="badge">tut02 → tut03</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF:Source/Core/FLog.h--></pre>
+						<figcaption><span class="path">Source/Utility/FLog.h</span><span class="badge del">지움</span><span class="badge">tut02 → tut03</span></figcaption>
+<pre class="diff" data-lang="cpp"><!--DIFF:Source/Utility/FLog.h--></pre>
 					</figure>
 					<details class="fold">
 						<summary>멈추는 쪽 코드</summary>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/Check.cpp</span><span class="badge mod">바꿈</span><span class="badge">파일 전체</span></figcaption>
-<pre class="src" data-lang="cpp"><!--FILE:Source/Core/Check.cpp--></pre>
+						<figcaption><span class="path">Source/Utility/Check.cpp</span><span class="badge mod">바꿈</span><span class="badge">파일 전체</span></figcaption>
+<pre class="src" data-lang="cpp"><!--FILE:Source/Utility/Check.cpp--></pre>
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">새로</span><span class="badge">WndProc 맨 앞</span></figcaption>
@@ -560,8 +560,8 @@ figure.code .diff-view { border-top: 0; }
 					</ul>
 					</details>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FLog.cpp</span><span class="badge mod">바꿈</span><span class="badge">tut02 → tut03</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF:Source/Core/FLog.cpp--></pre>
+						<figcaption><span class="path">Source/Utility/FLog.cpp</span><span class="badge mod">바꿈</span><span class="badge">tut02 → tut03</span></figcaption>
+<pre class="diff" data-lang="cpp"><!--DIFF:Source/Utility/FLog.cpp--></pre>
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/Main.cpp</span><span class="badge mod">바꿈</span><span class="badge">tut02 → tut03</span></figcaption>
@@ -1031,12 +1031,12 @@ figure.code .diff-view { border-top: 0; }
 		<h2>이 편에서 바뀐 파일</h2>
 		<p class="section-note">새 파일은 전체 코드, 바뀐 파일은 diff 예요. 전부 접어 뒀으니 필요한 것만 펼쳐 보세요. 묶음은 파일이 맡은 일로 나눴어요.</p>
 		<ul class="file-list">
-			<li><span class="mark a">+</span><span class="name">Source/Graphics/FD3D11Graphics.h</span><span class="note">+37</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/Graphics/FD3D11Graphics.h</span><span class="note">+38</span></li>
 			<li><span class="mark a">+</span><span class="name">Source/Graphics/FD3D11Graphics.cpp</span><span class="note">+191</span></li>
-			<li><span class="mark m">~</span><span class="name">Source/Core/Check.h</span><span class="note">+42 −3</span></li>
-			<li><span class="mark m">~</span><span class="name">Source/Core/Check.cpp</span><span class="note">+61 −2</span></li>
-			<li><span class="mark m">~</span><span class="name">Source/Core/FLog.h</span><span class="note">−4</span></li>
-			<li><span class="mark m">~</span><span class="name">Source/Core/FLog.cpp</span><span class="note">+3 −8</span></li>
+			<li><span class="mark m">~</span><span class="name">Source/Utility/Check.h</span><span class="note">+42 −3</span></li>
+			<li><span class="mark m">~</span><span class="name">Source/Utility/Check.cpp</span><span class="note">+61 −2</span></li>
+			<li><span class="mark m">~</span><span class="name">Source/Utility/FLog.h</span><span class="note">−4</span></li>
+			<li><span class="mark m">~</span><span class="name">Source/Utility/FLog.cpp</span><span class="note">+2 −7</span></li>
 			<li><span class="mark m">~</span><span class="name">Source/Main.cpp</span><span class="note">+1 −7</span></li>
 			<li><span class="mark m">~</span><span class="name">Source/Core/FWindow.h</span><span class="note">+8 −1</span></li>
 			<li><span class="mark m">~</span><span class="name">Source/Core/FWindow.cpp</span><span class="note">+156 −37</span></li>
@@ -1064,20 +1064,20 @@ figure.code .diff-view { border-top: 0; }
 		<div class="file-group">
 			<h3>실패 처리</h3>
 			<details class="diff-file">
-				<summary><span class="path">Source/Core/Check.h</span><span class="stat"><span class="plus">+42</span> <span class="minus">−3</span></span><span class="why">CHECK_FATAL 과 HRESULT 값 붙이기</span></summary>
-<pre class="diff" data-lang="cpp"><!--DIFF:Source/Core/Check.h--></pre>
+				<summary><span class="path">Source/Utility/Check.h</span><span class="stat"><span class="plus">+42</span> <span class="minus">−3</span></span><span class="why">CHECK_FATAL 과 HRESULT 값 붙이기</span></summary>
+<pre class="diff" data-lang="cpp"><!--DIFF:Source/Utility/Check.h--></pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">Source/Core/Check.cpp</span><span class="stat"><span class="plus">+61</span> <span class="minus">−2</span></span><span class="why">치명 실패 처리와 훅</span></summary>
-<pre class="diff" data-lang="cpp"><!--DIFF:Source/Core/Check.cpp--></pre>
+				<summary><span class="path">Source/Utility/Check.cpp</span><span class="stat"><span class="plus">+61</span> <span class="minus">−2</span></span><span class="why">치명 실패 처리와 훅</span></summary>
+<pre class="diff" data-lang="cpp"><!--DIFF:Source/Utility/Check.cpp--></pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">Source/Core/FLog.h</span><span class="stat"><span class="minus">−4</span></span><span class="why">마지막 에러 문구를 뺌</span></summary>
-<pre class="diff" data-lang="cpp"><!--DIFF:Source/Core/FLog.h--></pre>
+				<summary><span class="path">Source/Utility/FLog.h</span><span class="stat"><span class="minus">−4</span></span><span class="why">마지막 에러 문구를 뺌</span></summary>
+<pre class="diff" data-lang="cpp"><!--DIFF:Source/Utility/FLog.h--></pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">Source/Core/FLog.cpp</span><span class="stat"><span class="plus">+2</span> <span class="minus">−7</span></span><span class="why">같은 변경</span></summary>
-<pre class="diff" data-lang="cpp"><!--DIFF:Source/Core/FLog.cpp--></pre>
+				<summary><span class="path">Source/Utility/FLog.cpp</span><span class="stat"><span class="plus">+2</span> <span class="minus">−7</span></span><span class="why">같은 변경</span></summary>
+<pre class="diff" data-lang="cpp"><!--DIFF:Source/Utility/FLog.cpp--></pre>
 			</details>
 			<details class="diff-file">
 				<summary><span class="path">Source/Main.cpp</span><span class="stat"><span class="plus">+1</span> <span class="minus">−7</span></span><span class="why">실패 분기와 상자를 뺌</span></summary>
