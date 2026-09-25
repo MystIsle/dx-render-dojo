@@ -584,13 +584,14 @@ brew install --cask game-porting-toolkit</pre>
 		<ul class="file-list">
 			<li><span class="mark a">+</span><span class="name">Source/Main.cpp</span><span class="note">+6 · 4단계</span></li>
 			<li><span class="mark a">+</span><span class="name">DxRenderDojo.sln</span><span class="note">+25 · VS 가 관리. 본문 생략</span></li>
+			<li><span class="mark a">+</span><span class="name">DxRenderDojo.sln.DotSettings</span><span class="note">+61 · Rider 이름 규칙. Rider 가 관리. 본문 생략</span></li>
 			<li><span class="mark a">+</span><span class="name">DxRenderDojo.vcxproj</span><span class="note">+71 · 3단계의 설정</span></li>
 			<li><span class="mark a">+</span><span class="name">CMakeLists.txt</span><span class="note">+16</span></li>
 			<li><span class="mark a">+</span><span class="name">cmake/toolchain-mingw-x86_64.cmake</span><span class="note">+13 · macOS 빌드용</span></li>
 			<li><span class="mark a">+</span><span class="name">scripts/mac-build.sh</span><span class="note">+13 · macOS 빌드용</span></li>
 			<li><span class="mark a">+</span><span class="name">scripts/mac-run.sh</span><span class="note">+15 · macOS 빌드용</span></li>
-			<li><span class="mark a">+</span><span class="name">.gitattributes</span><span class="note">+16 · 파일 종류별 줄끝</span></li>
-			<li><span class="mark a">+</span><span class="name">.editorconfig</span><span class="note">+11 · BOM 없는 UTF-8 과 줄끝</span></li>
+			<li><span class="mark a">+</span><span class="name">.gitattributes</span><span class="note">+17 · 파일 종류별 줄끝</span></li>
+			<li><span class="mark a">+</span><span class="name">.editorconfig</span><span class="note">+16 · BOM 없는 UTF-8 과 줄끝</span></li>
 		</ul>
 
 		<div class="file-group">
@@ -747,7 +748,7 @@ WINE_BIN="$(command -v wine64 || command -v wine || true)"
 		<div class="file-group">
 			<h3>인코딩과 줄끝</h3>
 			<details class="diff-file">
-				<summary><span class="path">.gitattributes</span><span class="stat"><span class="plus">+16</span></span><span class="why">C++ 소스는 CRLF, 스크립트는 LF</span></summary>
+				<summary><span class="path">.gitattributes</span><span class="stat"><span class="plus">+17</span></span><span class="why">C++ 소스는 CRLF, 스크립트는 LF</span></summary>
 <pre class="src" data-lang="plaintext">* text=auto
 
 *.h            text eol=crlf
@@ -763,10 +764,11 @@ WINE_BIN="$(command -v wine64 || command -v wine || true)"
 CMakeLists.txt text eol=lf
 *.md           text eol=lf
 *.json         text eol=lf
-*.xml          text eol=lf</pre>
+*.xml          text eol=lf
+*.DotSettings  text eol=lf</pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">.editorconfig</span><span class="stat"><span class="plus">+11</span></span><span class="why">에디터가 BOM 없는 UTF-8 로 저장하게 함</span></summary>
+				<summary><span class="path">.editorconfig</span><span class="stat"><span class="plus">+16</span></span><span class="why">에디터가 BOM 없는 UTF-8 로 저장하게 함</span></summary>
 <pre class="src" data-lang="ini">root = true
 
 [*]
@@ -777,6 +779,11 @@ charset = utf-8
 end_of_line = crlf
 
 [{*.sh,*.cmake,CMakeLists.txt,*.md,*.json,*.xml}]
+end_of_line = lf
+
+[*.DotSettings]
+# Rider 가 저장할 때마다 BOM 을 붙인다
+charset = utf-8-bom
 end_of_line = lf</pre>
 			</details>
 		</div>
