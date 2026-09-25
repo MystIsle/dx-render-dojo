@@ -516,7 +516,7 @@ figure.code .diff-view { border-top: 0; }
 
 	<section id="steps" data-block="steps" data-source="직접">
 		<h2>따라 하기</h2>
-		<p class="section-note">코드 조각의 배지는 할 일이에요. <b>새로</b>는 추가, <b>바꿈</b>은 있던 함수나 파일을 통째로 바꿔 넣기, <b>지움</b>은 빨간 줄 지우기예요. diff 조각은 초록 줄을 넣고 빨간 줄을 지워요.</p>
+		<p class="section-note">코드 조각의 배지는 할 일이에요. <b>신규</b>는 추가, <b>수정</b>은 있던 함수나 파일을 통째로 바꿔 넣기, <b>삭제</b>는 빨간 줄 지우기예요. diff 조각은 초록 줄을 넣고 빨간 줄을 지워요.</p>
 		<ol class="steps">
 
 			<li class="step" id="step-fatal">
@@ -524,7 +524,7 @@ figure.code .diff-view { border-top: 0; }
 					<h3>실패하면 그 자리에서 멈춘다</h3>
 					<p>이 편부터 계속할 수 없는 실패는 발견한 줄에서 멈춰요. 02편은 실패를 <code>bool</code> 로 돌려주며 <code>wWinMain</code> 까지 올라갔고, 상자에는 가장 바깥의 검사만 떴어요. D3D 초기화는 호출마다 실패할 수 있어서 어느 호출이 실패했는지는 그 줄에서 멈춰야 바로 보여요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Utility/Check.h</span><span class="badge mod">바꿈</span><span class="badge">파일 전체</span></figcaption>
+						<figcaption><span class="path">Source/Utility/Check.h</span><span class="badge mod">수정</span><span class="badge">파일 전체</span></figcaption>
 <pre class="src" data-lang="cpp"><!--FILE:Source/Utility/Check.h--></pre>
 					</figure>
 					<p><code>CHECK_FATAL</code> 은 디버거로 실행 중이면 <code>__debugbreak</code> 에서 먼저 멈춰요. 호출 스택과 변수를 실패한 순간 그대로 볼 수 있어요. 디버거가 없으면 로그를 남기고 실패한 식과 줄 번호를 상자로 띄운 뒤 종료 코드 1 로 끝나요.</p>
@@ -541,17 +541,17 @@ figure.code .diff-view { border-top: 0; }
 					</details>
 					<p>실패하면 멈추니 <code>wWinMain</code> 의 실패 분기와 상자가 없어지고, 상자에 띄우던 <code>FLog</code> 의 마지막 에러 문구도 지워요. <code>void</code> 가 되는 <code>FSystem::Initialize</code> 와 <code>FWindow::Initialize</code> 는 각각 2단계와 6단계에서 통째로 바꿔 넣어요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Utility/FLog.h</span><span class="badge del">지움</span><span class="badge">tut02 → tut03</span></figcaption>
+						<figcaption><span class="path">Source/Utility/FLog.h</span><span class="badge del">삭제</span><span class="badge">tut02 → tut03</span></figcaption>
 <pre class="diff" data-lang="cpp"><!--DIFF:Source/Utility/FLog.h--></pre>
 					</figure>
 					<details class="fold">
 						<summary>멈추는 쪽 코드</summary>
 					<figure class="code">
-						<figcaption><span class="path">Source/Utility/Check.cpp</span><span class="badge mod">바꿈</span><span class="badge">파일 전체</span></figcaption>
+						<figcaption><span class="path">Source/Utility/Check.cpp</span><span class="badge mod">수정</span><span class="badge">파일 전체</span></figcaption>
 <pre class="src" data-lang="cpp"><!--FILE:Source/Utility/Check.cpp--></pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">새로</span><span class="badge">WndProc 맨 앞</span></figcaption>
+						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">신규</span><span class="badge">WndProc 맨 앞</span></figcaption>
 <pre class="diff" data-lang="cpp"><!--DIFF:Source/Core/FWindow.cpp:LRESULT CALLBACK FWindow::WndProc=>const CREATESTRUCTW* CreateInfo--></pre>
 					</figure>
 					<ul class="walk">
@@ -563,11 +563,11 @@ figure.code .diff-view { border-top: 0; }
 					</ul>
 					</details>
 					<figure class="code">
-						<figcaption><span class="path">Source/Utility/FLog.cpp</span><span class="badge mod">바꿈</span><span class="badge">tut02 → tut03</span></figcaption>
+						<figcaption><span class="path">Source/Utility/FLog.cpp</span><span class="badge mod">수정</span><span class="badge">tut02 → tut03</span></figcaption>
 <pre class="diff" data-lang="cpp"><!--DIFF:Source/Utility/FLog.cpp--></pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/Main.cpp</span><span class="badge mod">바꿈</span><span class="badge">tut02 → tut03</span></figcaption>
+						<figcaption><span class="path">Source/Main.cpp</span><span class="badge mod">수정</span><span class="badge">tut02 → tut03</span></figcaption>
 <pre class="diff" data-lang="cpp"><!--DIFF:Source/Main.cpp--></pre>
 					</figure>
 				</div>
@@ -590,7 +590,7 @@ figure.code .diff-view { border-top: 0; }
 						</aside>
 					</details>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.h</span><span class="badge new">새로</span><span class="badge">파일 전체</span></figcaption>
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.h</span><span class="badge new">신규</span><span class="badge">파일 전체</span></figcaption>
 <pre class="src" data-lang="cpp"><!--FILE:Source/Graphics/FD3D11Graphics.h--></pre>
 					</figure>
 					<details class="fold">
@@ -605,15 +605,15 @@ figure.code .diff-view { border-top: 0; }
 					</details>
 					<p><code>FD3D11Graphics</code> 는 <code>FSystem</code> 의 멤버예요. <code>FSystem::Initialize</code> 가 창을 만든 다음 <code>Graphics.Initialize</code> 를 불러요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FSystem.h</span><span class="badge mod">바꿈</span><span class="badge">tut02 → tut03</span></figcaption>
+						<figcaption><span class="path">Source/Core/FSystem.h</span><span class="badge mod">수정</span><span class="badge">tut02 → tut03</span></figcaption>
 <pre class="diff" data-lang="cpp"><!--DIFF:Source/Core/FSystem.h--></pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge del">지움</span><span class="badge">맨 위 include</span></figcaption>
+						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge del">삭제</span><span class="badge">맨 위 include</span></figcaption>
 <pre class="diff" data-lang="cpp"><!--DIFF:Source/Core/FSystem.cpp:#include "Core/FSystem.h"=>void FSystem::Initialize--></pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge mod">바꿈</span><span class="badge">FSystem::Initialize</span></figcaption>
+						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge mod">수정</span><span class="badge">FSystem::Initialize</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FSystem.cpp:void FSystem::Initialize--></pre>
 					</figure>
 					<details class="fold">
@@ -626,7 +626,7 @@ figure.code .diff-view { border-top: 0; }
 					</details>
 					<p><code>FD3D11Graphics.cpp</code> 는 새 파일이에요. include 묶음 다음에 <code>Initialize</code> 를 ① 조각부터 차례로 이어 붙이고, 마지막 ⑥ 조각은 3단계에서 붙여요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">파일 맨 위 include</span></figcaption>
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">파일 맨 위 include</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SLICE:Source/Graphics/FD3D11Graphics.cpp:#include <initguid.h>=>FD3D11Graphics::~FD3D11Graphics()--></pre>
 					</figure>
 					<details class="fold">
@@ -638,19 +638,19 @@ figure.code .diff-view { border-top: 0; }
 						</ul>
 					</details>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">Initialize ① 시작 · include 묶음 다음</span></figcaption>
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">Initialize ① 시작 · include 묶음 다음</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SLICE:Source/Graphics/FD3D11Graphics.cpp:void FD3D11Graphics::Initialize=>UINT FactoryFlags = 0;--></pre>
 					</figure>
 					<details class="fold" id="fold-debug-factory">
 						<summary>Initialize ② 디버그 빌드 코드 · 7단계에서 설명</summary>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">Initialize ② DXGI 디버그 큐</span></figcaption>
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">Initialize ② DXGI 디버그 큐</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SLICE:Source/Graphics/FD3D11Graphics.cpp:UINT FactoryFlags = 0;=>ComPtr<IDXGIFactory2> Factory;--></pre>
 					</figure>
 					</details>
 					<p><code>FD3D11Graphics::Initialize</code> 는 먼저 DXGI 팩토리로 어댑터를 골라요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">Initialize ③ 어댑터 고르기</span></figcaption>
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">Initialize ③ 어댑터 고르기</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SLICE:Source/Graphics/FD3D11Graphics.cpp:ComPtr<IDXGIFactory2> Factory;=>UINT Flags = 0;--></pre>
 					</figure>
 					<details class="fold">
@@ -665,12 +665,12 @@ figure.code .diff-view { border-top: 0; }
 					<details class="fold" id="fold-debug-layer">
 						<summary>Initialize ④ 디버그 빌드 코드 · 7단계에서 설명</summary>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">Initialize ④ D3D 디버그 레이어</span></figcaption>
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">Initialize ④ D3D 디버그 레이어</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SLICE:Source/Graphics/FD3D11Graphics.cpp:UINT Flags = 0;=>const D3D_FEATURE_LEVEL FeatureLevel--></pre>
 					</figure>
 					</details>
 					<figure class="code" id="code-init-device">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">Initialize ⑤ 디바이스 만들기</span></figcaption>
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">Initialize ⑤ 디바이스 만들기</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SLICE:Source/Graphics/FD3D11Graphics.cpp:const D3D_FEATURE_LEVEL FeatureLevel=>DXGI_SWAP_CHAIN_DESC1 SwapChainDesc--></pre>
 					</figure>
 					<p><code>D3D11CreateDevice</code> 는 디바이스와 컨텍스트를 한 번에 돌려줘요. 무엇을 만드는 함수는 <code>Device</code> 에, 파이프라인에 일을 시키는 함수는 <code>Context</code> 에 있어요.</p>
@@ -720,7 +720,7 @@ figure.code .diff-view { border-top: 0; }
 						</aside>
 					</details>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">Initialize ⑥ 스왑체인과 끝</span></figcaption>
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">Initialize ⑥ 스왑체인과 끝</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SLICE:Source/Graphics/FD3D11Graphics.cpp:DXGI_SWAP_CHAIN_DESC1 SwapChainDesc=>void FD3D11Graphics::Resize--></pre>
 					</figure>
 					<details class="fold">
@@ -738,7 +738,7 @@ figure.code .diff-view { border-top: 0; }
 					</details>
 					<p>백 버퍼는 텍스처일 뿐이라 그대로는 지울 수도 그릴 수도 없어요. <code>CreateSizeDependentResources</code> 가 백 버퍼로 RTV 를 만들고, 4단계는 이 RTV 를 거쳐 백 버퍼를 지워요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">FD3D11Graphics::CreateSizeDependentResources · Initialize 다음</span></figcaption>
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">FD3D11Graphics::CreateSizeDependentResources · Initialize 다음</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Graphics/FD3D11Graphics.cpp:void FD3D11Graphics::CreateSizeDependentResources--></pre>
 					</figure>
 					<details class="fold">
@@ -766,23 +766,23 @@ figure.code .diff-view { border-top: 0; }
 					<p>한 프레임은 백 버퍼를 지우는 것으로 시작해 <code>Present</code> 로 끝나요. 그 앞뒤를 <code>FSystem::Frame</code> 이 맡아서 <code>FApplication::Render</code> 는 그 사이에 그리기만 하면 돼요.</p>
 					<p>지우는 색은 장면이 정해요. <code>FApplication</code> 의 <code>ClearColor</code> 가 (0.5, 0.5, 0.5, 1) 이라 창 안쪽이 회색이 돼요. vsync 를 켤지는 <code>FDisplaySettings</code> 의 <code>bVSync</code> 가 정해요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FDisplaySettings.h</span><span class="badge new">새로</span><span class="badge">tut02 → tut03</span></figcaption>
+						<figcaption><span class="path">Source/Core/FDisplaySettings.h</span><span class="badge new">신규</span><span class="badge">tut02 → tut03</span></figcaption>
 <pre class="diff" data-lang="cpp"><!--DIFF:Source/Core/FDisplaySettings.h--></pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/App/FApplication.h</span><span class="badge new">새로</span><span class="badge">tut02 → tut03</span></figcaption>
+						<figcaption><span class="path">Source/App/FApplication.h</span><span class="badge new">신규</span><span class="badge">tut02 → tut03</span></figcaption>
 <pre class="diff" data-lang="cpp"><!--DIFF:Source/App/FApplication.h--></pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge mod">바꿈</span><span class="badge">FSystem::Frame</span></figcaption>
+						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge mod">수정</span><span class="badge">FSystem::Frame</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FSystem.cpp:void FSystem::Frame()--></pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">FD3D11Graphics::BeginScene · Initialize 다음, CreateSizeDependentResources 앞</span></figcaption>
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">FD3D11Graphics::BeginScene · Initialize 다음, CreateSizeDependentResources 앞</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Graphics/FD3D11Graphics.cpp:void FD3D11Graphics::BeginScene--></pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">FD3D11Graphics::EndScene · BeginScene 다음</span></figcaption>
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">FD3D11Graphics::EndScene · BeginScene 다음</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Graphics/FD3D11Graphics.cpp:void FD3D11Graphics::EndScene--></pre>
 					</figure>
 					<p><code>Present</code> 의 첫 인자는 화면이 몇 번 갱신될 때마다 한 프레임을 내보낼지예요. 1 을 넘기면 화면이 한 번 갱신될 때 한 프레임씩만 나가요. 내보내지 못한 프레임이 쌓여 있으면 <code>Present</code> 가 기다리고 루프도 그동안 멈춰서 02편처럼 코어 하나를 다 쓰지 않아요.</p>
@@ -819,7 +819,7 @@ figure.code .diff-view { border-top: 0; }
 					<p>스왑체인 버퍼의 크기는 만들 때 정해지고 창을 따라 저절로 바뀌지 않아요. 창 크기가 바뀌면 <code>ResizeBuffers</code> 로 버퍼를 다시 만들어야 해요.</p>
 					<p><code>ResizeBuffers</code> 는 백 버퍼를 참조하는 RTV 가 남아 있으면 실패해요. 그래서 RTV 를 먼저 놓고 버퍼를 다시 만든 뒤 새 백 버퍼로 RTV 를 다시 만들어요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">FD3D11Graphics::Resize · Initialize 다음, BeginScene 앞</span></figcaption>
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">FD3D11Graphics::Resize · Initialize 다음, BeginScene 앞</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Graphics/FD3D11Graphics.cpp:void FD3D11Graphics::Resize--></pre>
 					</figure>
 					<details class="fold">
@@ -831,11 +831,11 @@ figure.code .diff-view { border-top: 0; }
 					</details>
 					<p>크기 알림은 02편의 <code>FWindow::NotifyResize</code> 에서 출발해요. 이 편에서는 <code>FSystem::OnResize</code> 가 로그를 남긴 다음 <code>Graphics.Resize</code> 를 불러요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge mod">바꿈</span><span class="badge">FSystem::OnResize</span></figcaption>
+						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge mod">수정</span><span class="badge">FSystem::OnResize</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FSystem.cpp:void FSystem::OnResize--></pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge mod">바꿈</span><span class="badge">FWindow::NotifyResize</span></figcaption>
+						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge mod">수정</span><span class="badge">FWindow::NotifyResize</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FWindow.cpp:void FWindow::NotifyResize--></pre>
 					</figure>
 					<p><code>NotifyResize</code> 의 <code>if (NewWidth == Width &amp;&amp; NewHeight == Height)</code> 가 02편 바꿔 보기 4번의 답이에요. 창을 옮기기만 하면 이제 로그도 찍히지 않고 스왑체인도 그대로예요.</p>
@@ -872,27 +872,27 @@ figure.code .diff-view { border-top: 0; }
 					<details class="fold">
 						<summary>배율을 처리하는 코드</summary>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FWindow.h</span><span class="badge mod">바꿈</span><span class="badge">tut02 → tut03 · 전체 화면 멤버도 함께</span></figcaption>
+						<figcaption><span class="path">Source/Core/FWindow.h</span><span class="badge mod">수정</span><span class="badge">tut02 → tut03 · 전체 화면 멤버도 함께</span></figcaption>
 <pre class="diff" data-lang="cpp"><!--DIFF:Source/Core/FWindow.h--></pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">새로</span><span class="badge">맨 위 include</span></figcaption>
+						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">신규</span><span class="badge">맨 위 include</span></figcaption>
 <pre class="diff" data-lang="cpp"><!--DIFF:Source/Core/FWindow.cpp:#include "Core/FWindow.h"=>LRESULT CALLBACK FWindow::WndProc--></pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge mod">바꿈</span><span class="badge">FWindow::Initialize</span></figcaption>
+						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge mod">수정</span><span class="badge">FWindow::Initialize</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FWindow.cpp:void FWindow::Initialize--></pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">새로</span><span class="badge">HandleMessage 의 switch 안, case WM_SIZE 다음</span></figcaption>
+						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">신규</span><span class="badge">HandleMessage 의 switch 안, case WM_SIZE 다음</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SLICE:Source/Core/FWindow.cpp:case WM_GETDPISCALEDSIZE=>case WM_GETMINMAXINFO--></pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge mod">바꿈</span><span class="badge">HandleMessage 의 case WM_GETMINMAXINFO</span></figcaption>
+						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge mod">수정</span><span class="badge">HandleMessage 의 case WM_GETMINMAXINFO</span></figcaption>
 <pre class="diff" data-lang="cpp"><!--DIFF:Source/Core/FWindow.cpp:case WM_GETMINMAXINFO=>case WM_MENUCHAR--></pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">새로</span><span class="badge">FWindow::ScaleForDpi · 파일 끝, NotifyResize 다음</span></figcaption>
+						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">신규</span><span class="badge">FWindow::ScaleForDpi · 파일 끝, NotifyResize 다음</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FWindow.cpp:int FWindow::ScaleForDpi--></pre>
 					</figure>
 					<ul class="walk">
@@ -906,15 +906,15 @@ figure.code .diff-view { border-top: 0; }
 					<details class="fold">
 						<summary>전체 화면 코드</summary>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">새로</span><span class="badge">HandleMessage 의 switch 안, case WM_GETMINMAXINFO 다음</span></figcaption>
+						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">신규</span><span class="badge">HandleMessage 의 switch 안, case WM_GETMINMAXINFO 다음</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SLICE:Source/Core/FWindow.cpp:case WM_MENUCHAR=>default:--></pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">새로</span><span class="badge">FWindow::ToggleFullScreen · ScaleForDpi 다음</span></figcaption>
+						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">신규</span><span class="badge">FWindow::ToggleFullScreen · ScaleForDpi 다음</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FWindow.cpp:void FWindow::ToggleFullScreen--></pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">새로</span><span class="badge">FWindow::FitToMonitor · ToggleFullScreen 다음</span></figcaption>
+						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">신규</span><span class="badge">FWindow::FitToMonitor · ToggleFullScreen 다음</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Core/FWindow.cpp:void FWindow::FitToMonitor--></pre>
 					</figure>
 					<ul class="walk">
@@ -942,7 +942,7 @@ figure.code .diff-view { border-top: 0; }
 						<li><a href="#code-init-device">⑤ 조각 끝의 출력 창 끄기</a> : D3D11 런타임이 출력 창에 직접 쓰는 것을 끔. DXGI 런타임의 출력은 이것으로 꺼지지 않아서 Visual Studio 출력 창에는 DXGI 메시지가 두 번 찍힘</li>
 					</ul>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">FD3D11Graphics::FlushDebugMessages · 파일 끝, CreateSizeDependentResources 다음</span></figcaption>
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">FD3D11Graphics::FlushDebugMessages · 파일 끝, CreateSizeDependentResources 다음</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Graphics/FD3D11Graphics.cpp:void FD3D11Graphics::FlushDebugMessages--></pre>
 					</figure>
 					<p>메시지는 DXGI 정보 큐 하나에서 꺼내요. 스왑체인 메시지는 DXGI 쪽이라 D3D11 의 <code>ID3D11InfoQueue</code> 로는 받지 못해요. 꺼내는 때는 <code>Initialize</code> 끝, <code>Present</code> 뒤마다, 그리고 치명 실패로 끝나기 직전이에요.</p>
@@ -959,7 +959,7 @@ figure.code .diff-view { border-top: 0; }
 					<details class="fold">
 						<summary>소멸자</summary>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">새로</span><span class="badge">FD3D11Graphics::~FD3D11Graphics · using 다음, Initialize 앞</span></figcaption>
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge new">신규</span><span class="badge">FD3D11Graphics::~FD3D11Graphics · using 다음, Initialize 앞</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SYMBOL:Source/Graphics/FD3D11Graphics.cpp:FD3D11Graphics::~FD3D11Graphics()--></pre>
 					</figure>
 					</details>
@@ -971,7 +971,7 @@ figure.code .diff-view { border-top: 0; }
 					<h3>새 파일을 빌드에 등록한다</h3>
 					<p>CMake 빌드는 <code>CMakeLists.txt</code> 에 새 파일 <code>FD3D11Graphics.cpp</code> 를 등록하고 D3D 라이브러리 <code>d3d11</code>·<code>dxgi</code> 를 링크에 더해요.</p>
 					<figure class="code">
-						<figcaption><span class="path">CMakeLists.txt</span><span class="badge new">새로</span><span class="badge">tut02 → tut03</span></figcaption>
+						<figcaption><span class="path">CMakeLists.txt</span><span class="badge new">신규</span><span class="badge">tut02 → tut03</span></figcaption>
 <pre class="diff" data-lang="cmake"><!--DIFF:CMakeLists.txt--></pre>
 					</figure>
 					<details class="fold">
@@ -985,7 +985,7 @@ figure.code .diff-view { border-top: 0; }
 					<details class="fold">
 						<summary>참고 : 위 조작이 프로젝트 파일에 남기는 diff · 따로 치지 않음</summary>
 					<figure class="code">
-						<figcaption><span class="path">DxRenderDojo.vcxproj</span><span class="badge new">새로</span><span class="badge">tut02 → tut03</span></figcaption>
+						<figcaption><span class="path">DxRenderDojo.vcxproj</span><span class="badge new">신규</span><span class="badge">tut02 → tut03</span></figcaption>
 <pre class="diff" data-lang="xml"><!--DIFF:DxRenderDojo.vcxproj--></pre>
 					</figure>
 					</details>
