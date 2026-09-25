@@ -3,14 +3,17 @@
 #include <dxgi1_6.h>
 #include <format>
 
+#include "Core/FDisplaySettings.h"
 #include "Core/FWindow.h"
 #include "Utility/Check.h"
 #include "Utility/FLog.h"
 
 using Microsoft::WRL::ComPtr;
 
-void FD3D11Graphics::Initialize(const FWindow& Window)
+void FD3D11Graphics::Initialize(const FWindow& Window, const FDisplaySettings& Settings)
 {
+	bVSync = Settings.bVSync;
+
 	ComPtr<IDXGIFactory2> Factory;
 	CHECK_FATAL(CreateDXGIFactory2(0, IID_PPV_ARGS(Factory.GetAddressOf())));
 
@@ -58,6 +61,16 @@ void FD3D11Graphics::Initialize(const FWindow& Window)
 	CHECK_FATAL(Factory->MakeWindowAssociation(Window.GetHandle(), DXGI_MWA_NO_ALT_ENTER));
 
 	CreateSizeDependentResources();
+}
+
+void FD3D11Graphics::BeginScene(const std::array<float, 4>& Color)
+{
+	Context->ClearRenderTargetView(RenderTargetView.Get(), Color.data());
+}
+
+void FD3D11Graphics::EndScene()
+{
+	CHECK_FATAL(SwapChain->Present(bVSync ? 1 : 0, 0));
 }
 
 void FD3D11Graphics::CreateSizeDependentResources()
