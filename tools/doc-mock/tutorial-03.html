@@ -723,14 +723,17 @@ namespace Return
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FWindow.cpp</span><span class="badge new">새로</span><span class="badge">WndProc 맨 앞</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -7,2 +9,7 @@
+<pre class="diff" data-lang="cpp">@@ -7,4 +9,10 @@
  LRESULT CALLBACK FWindow::WndProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam)
  {
 +	// 치명 실패 상자가 떠 있는 동안 창 메시지가 실패한 객체에 닿지 않게 한다.
 +	if (::Return::IsFatal())
 +	{
 +		return DefWindowProcW(WindowHandle, Message, WParam, LParam);
-+	}</pre>
++	}
++
+ 	if (Message == WM_NCCREATE)
+ 	{</pre>
 					</figure>
 					<ul class="walk">
 						<li class="entry"><code>namespace { ... }</code> 이름 없는 네임스페이스. 안의 변수와 함수는 이 파일에서만 보임</li>
@@ -1729,7 +1732,7 @@ void FWindow::ToggleFullScreen()
 					</details>
 					<p>Visual Studio 에서는 솔루션 탐색기에 <code>Graphics</code> 필터를 만들고 <code>FD3D11Graphics.h</code>·<code>FD3D11Graphics.cpp</code> 를 기존 항목 추가로 넣어요. 링크할 라이브러리는 프로젝트 속성에서 구성을 모든 구성으로 두고 링커 › 입력 › 추가 종속성에 <code>d3d11.lib;dxgi.lib</code> 를 더해요. 두 조작이 <code>DxRenderDojo.vcxproj</code> 와 <code>DxRenderDojo.vcxproj.filters</code> 를 바꿔요.</p>
 					<details class="fold">
-						<summary>프로젝트 파일을 직접 고칠 때의 diff</summary>
+						<summary>참고 : 위 조작이 프로젝트 파일에 남기는 diff · 따로 치지 않음</summary>
 					<figure class="code">
 						<figcaption><span class="path">DxRenderDojo.vcxproj</span><span class="badge new">새로</span><span class="badge">tut02 → tut03</span></figcaption>
 <pre class="diff" data-lang="xml">@@ -47,6 +47,7 @@
