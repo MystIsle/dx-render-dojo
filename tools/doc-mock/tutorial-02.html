@@ -327,6 +327,8 @@ details.diff-file summary .why { color: var(--slate); }
 .pager .dir { font-size: 0.9375rem; color: var(--slate); }
 .pager .name { font-weight: 700; font-size: 1.25rem; letter-spacing: -0.01em; }
 .pager .next { text-align: right; }
+.pager a:not([href]) { opacity: 0.5; }
+.pager a:not([href]):hover { border-color: var(--rule); }
 
 .site-foot { margin-top: 3rem; padding-top: 1.25rem; border-top: 1px solid var(--rule); color: var(--slate); font-size: 0.9375rem; line-height: 1.7; }
 
@@ -369,9 +371,9 @@ details.diff-file summary .why { color: var(--slate); }
 </div>
 
 <header class="topbar" data-block="site-header" data-source="자동">
-	<a class="brand" href="#">렌더러 공부방</a>
+	<a class="brand" href="index.html">렌더러 공부방</a>
 	<nav aria-label="사이트">
-		<a href="#">목차</a>
+		<a href="index.html">목차</a>
 		<a href="https://github.com/MystIsle/dx-render-dojo">GitHub</a>
 	</nav>
 	<button type="button" class="theme-toggle" id="theme-toggle">테마 · 시스템</button>
@@ -2525,8 +2527,8 @@ void FApplication::Render()
 	</section>
 
 	<nav class="pager" aria-label="이전·다음 편" data-block="pager" data-source="자동 : 목차">
-		<a href="#"><span class="dir">← 이전 편</span><span class="name">01 개발 환경 셋업</span></a>
-		<a class="next" href="#"><span class="dir">다음 편 →</span><span class="name">03 DirectX 11 초기화</span></a>
+		<a href="tutorial-01.html"><span class="dir">← 이전 편</span><span class="name">01 개발 환경 셋업</span></a>
+		<a class="next" href="tutorial-03.html"><span class="dir">다음 편 →</span><span class="name">03 DirectX 11 초기화</span></a>
 	</nav>
 
 	<footer class="site-foot" data-block="site-foot" data-source="자동">

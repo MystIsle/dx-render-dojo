@@ -13,6 +13,7 @@
 
 import argparse
 import html
+import json
 import re
 import subprocess
 import sys
@@ -43,7 +44,8 @@ PHRASE_PATTERNS = [
 
 PAIRED_TAGS = ["details", "summary", "figure", "figcaption", "section", "ul", "ol", "li", "div", "aside", "p", "pre"]
 
-MARKER = re.compile(r"<!--(INCLUDE|FILE|SYMBOL|DIFF|SLICE):(.*?)-->", re.S)
+MARKER = re.compile(r"<!--(INCLUDE|FILE|SYMBOL|DIFF|SLICE|TOC):(.*?)-->", re.S)
+TOC_NAMES = ("eyebrow", "base", "pager", "progress", "count", "stages", "rail")
 
 # 빠짐없음을 세는 파일. 프로젝트 파일은 솔루션 탐색기로 바뀌는 것이라 본문이 언급하는지만 본다.
 CODE_PATH = re.compile(r"^(Source/|CMakeLists\.txt$|[^/]+\.(manifest|rc)$)")
@@ -151,6 +153,8 @@ def check_markers(source, tag, built, report):
             report.error(f"SLICE 마커 형식이 `경로:시작=>끝` 이 아님 : {body}")
         if kind == "DIFF" and ":" in body and not re.fullmatch(r"[^:>\n]+?:.+?=>.+", body, re.S):
             report.error(f"범위 DIFF 마커 형식이 `경로:시작=>끝` 이 아님 : {body}")
+        if kind == "TOC" and body not in TOC_NAMES:
+            report.error(f"TOC 마커 이름을 모름 : {body}")
 
     if built and markers:
         report.error(f"생성 결과에 채워지지 않은 마커 {len(markers)}개")
@@ -166,6 +170,8 @@ def check_markers(source, tag, built, report):
         return cache[path]
 
     for kind, body in markers:
+        if kind == "TOC":
+            continue
         if kind == "INCLUDE":
             if not (HERE / body).exists():
                 report.error(f"INCLUDE 대상이 없음 : {body}")
@@ -258,8 +264,11 @@ def spans_text(numbers):
 
 def check_follow_along(source, tag, report):
     ref = tag if tag.startswith("refs/") else f"refs/tags/{tag}"
-    number = re.search(r"tut(\d+)$", ref)
-    base = f"refs/tags/tut{int(number.group(1)) - 1:02d}" if number else None
+    # 앞 편 태그는 목차에서 읽는다. 원문에 없는 편은 번호로 앞 편을 알 수 없다.
+    toc = json.loads((HERE / "toc.json").read_text(encoding="utf-8"))
+    bases = {lesson["tag"]: lesson["base"] for stage in toc["stages"] for lesson in stage["lessons"]}
+    base_tag = bases.get(ref.rsplit("/", 1)[-1])
+    base = f"refs/tags/{base_tag}" if base_tag else None
     if base is None or git_run("rev-parse", "--verify", "--quiet", base) is None:
         report.note("빠짐없음 : 이전 태그가 없어 건너뜀")
         return
@@ -428,7 +437,7 @@ def check_prose(body, report):
         text = strip_tags(title)
         if not text.endswith("다"):
             report.warn(f"단계 제목이 `~한다` 동사구가 아님 : {text}")
-    for item in re.findall(r'<li(?![^>]*class="step")(?:\s[^>]*)?>(.*?)</li>', prose, flags=re.S):
+    for item in re.findall(r'<li(?![^>]*class="(?:step|entry)[" ])(?:\s[^>]*)?>(.*?)</li>', prose, flags=re.S):
         text = strip_tags(re.sub(r"<(ul|ol)\b.*?</\1>", "", item, flags=re.S))
         if re.search(r"(요|니다)[.?!]?$", text) and not text.endswith("?"):
             report.warn(f"목록 항목이 명사 종결이 아님 : {text[-40:]}")

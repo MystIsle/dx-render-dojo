@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>렌더러 공부방 · 목차</title>
+<script>
+(function () {
+	try {
+		var Theme = localStorage.getItem("dojo-theme");
+		if (Theme === "light" || Theme === "dark") { document.documentElement.setAttribute("data-theme", Theme); }
+	} catch (E) {}
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Nanum+Gothic+Coding&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+/* ===== 토큰 : A 잔잔한 문서형 ===== */
+:root {
+	color-scheme: light;
+	--paper: #FFFFFF;
+	--raised: #F6F7F9;
+	--ink: #1E2430;
+	--slate: #555E6E;
+	--rule: #E3E6EB;
+	--accent: #3456C8;
+	--accent-soft: #EDF1FC;
+	--cell-optional: #E3E6EB;
+	--body-weight: 450;
+	--radius: 8px;
+
+	--font-body: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+	--font-mono: "IBM Plex Mono", "Nanum Gothic Coding", ui-monospace, Consolas, monospace;
+	--column: 54rem;
+	--rail: 11rem;
+	--rail-gap: 3.5rem;
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) {
+		color-scheme: dark;
+		--paper: #16181D; --raised: #1E2127; --ink: #DADFE8; --slate: #9AA2B1; --rule: #2C3038;
+		--accent: #8FA8F0; --accent-soft: #232A3D;
+		--cell-optional: #2C3038; --body-weight: 400;
+	}
+	:root:not([data-theme="light"]) body { -webkit-font-smoothing: antialiased; }
+}
+:root[data-theme="dark"] {
+	color-scheme: dark;
+	--paper: #16181D; --raised: #1E2127; --ink: #DADFE8; --slate: #9AA2B1; --rule: #2C3038;
+	--accent: #8FA8F0; --accent-soft: #232A3D;
+	--cell-optional: #2C3038; --body-weight: 400;
+}
+:root[data-theme="dark"] body { -webkit-font-smoothing: antialiased; }
+
+/* ===== 공통 ===== */
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 1.5rem; }
+body {
+	margin: 0;
+	background: var(--paper);
+	color: var(--ink);
+	font-family: var(--font-body);
+	font-size: 1.0625rem;
+	font-weight: var(--body-weight);
+	line-height: 1.75;
+	word-break: keep-all;
+	overflow-wrap: break-word;
+}
+p, li { text-wrap: pretty; }
+a { color: var(--accent); text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+h1, h2 { text-wrap: balance; line-height: 1.3; margin: 0; }
+p { margin: 0; }
+b, strong { font-weight: 650; }
+
+.mock-strip {
+	display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem;
+	padding: 0.6rem 1.5rem;
+	background: #FFF4DB; border-bottom: 1px solid #E9CFA2;
+	color: #6B4309; font-size: 0.875rem; line-height: 1.5;
+}
+.mock-strip strong { font-weight: 700; }
+
+.topbar {
+	display: flex; align-items: center; gap: 1.25rem;
+	max-width: calc(var(--column) + 3rem); margin: 0 auto; padding: 0.9rem 1.5rem;
+	border-bottom: 1px solid var(--rule);
+}
+.brand { font-weight: 750; font-size: 1.125rem; letter-spacing: -0.02em; color: var(--ink); text-decoration: none; }
+.topbar nav { margin-left: auto; display: flex; gap: 1.25rem; font-size: 0.9375rem; }
+.topbar nav a { color: var(--slate); text-decoration: none; }
+.topbar nav a:hover { color: var(--ink); }
+.topbar nav a[aria-current="page"] { color: var(--ink); font-weight: 600; }
+.theme-toggle {
+	font: 600 0.875rem/1 var(--font-body);
+	color: var(--ink); background: var(--raised); border: 1px solid var(--rule);
+	padding: 0.5rem 0.8rem; border-radius: 6px; cursor: pointer;
+}
+.theme-toggle:hover { border-color: var(--accent); }
+
+.shell { max-width: calc(var(--column) + 3rem); margin: 0 auto; padding: 2.75rem 1.5rem 5rem; }
+main { min-width: 0; }
+.rail { display: none; }
+@media (min-width: 1200px) {
+	.topbar, .shell { max-width: calc(var(--column) + var(--rail-gap) + var(--rail) + 3rem); }
+	.shell { display: grid; grid-template-columns: minmax(0, var(--column)) var(--rail); gap: var(--rail-gap); }
+	.rail { display: block; position: sticky; top: 2rem; align-self: start; font-size: 0.875rem; }
+	.rail ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.05rem; border-left: 1px solid var(--rule); }
+	.rail a { display: flex; gap: 0.5rem; padding: 0.22rem 0 0.22rem 0.9rem; margin-left: -1px; border-left: 2px solid transparent; color: var(--slate); text-decoration: none; line-height: 1.45; }
+	.rail a .n { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--accent); min-width: 1.2rem; }
+	.rail a:hover { color: var(--ink); }
+}
+
+.page-head { display: grid; gap: 1.1rem; padding-bottom: 1rem; }
+.eyebrow { font-size: 0.9375rem; font-weight: 600; color: var(--slate); }
+h1 { font-size: clamp(2rem, 1.35rem + 2.2vw, 2.75rem); font-weight: 750; letter-spacing: -0.025em; }
+.lede { font-size: 1.1875rem; line-height: 1.7; }
+
+.scanline { display: grid; gap: 0.5rem; margin-top: 0.3rem; }
+.scanline-cells { display: flex; flex-wrap: wrap; gap: 3px; align-items: center; }
+.cell { width: 10px; height: 16px; background: var(--cell-optional); border-radius: 2px; }
+.cell.common { background: color-mix(in srgb, var(--accent) 42%, var(--paper)); }
+.cell.done { background: var(--accent); }
+.cell.gap { width: 6px; background: transparent; }
+.scanline-legend { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; font-size: 0.875rem; color: var(--slate); line-height: 1.5; font-variant-numeric: tabular-nums; }
+.scanline-legend span { display: inline-flex; align-items: center; gap: 0.45rem; }
+.scanline-legend i { display: inline-block; width: 10px; height: 16px; border-radius: 2px; }
+
+/* ===== 스테이지와 편 ===== */
+section.stage { margin-top: 3rem; }
+.stage-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.75rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--rule); }
+.stage-no { font-family: var(--font-mono); font-size: 0.875rem; font-weight: 500; color: var(--accent); letter-spacing: 0.04em; }
+.stage-head h2 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.015em; }
+.stage-range { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--slate); }
+.track { margin-left: auto; font-size: 0.8125rem; font-weight: 600; padding: 0.1rem 0.55rem; border-radius: 999px; }
+.track.common { background: var(--accent-soft); color: var(--accent); }
+.track.optional { background: var(--raised); color: var(--slate); border: 1px solid var(--rule); }
+.stage-desc { color: var(--slate); font-size: 0.9375rem; margin: 0.6rem 0 0.4rem; }
+
+.rows { list-style: none; margin: 0; padding: 0; }
+.rows li { border-bottom: 1px solid var(--rule); }
+.rows .row { display: grid; grid-template-columns: 2.75rem minmax(0, 1fr) auto; gap: 0.25rem 1rem; align-items: baseline; padding: 0.65rem 0.5rem; color: inherit; text-decoration: none; border-radius: 6px; }
+.rows a.row:hover { background: var(--raised); }
+.rows a.row:hover .title { color: var(--accent); }
+.rows .num { font-family: var(--font-mono); font-weight: 500; color: var(--accent); font-variant-numeric: tabular-nums; }
+.rows .title { font-weight: 650; }
+.rows .orig { font-size: 0.8125rem; color: var(--slate); text-align: right; }
+.rows .summary { grid-column: 2 / 4; color: var(--slate); font-size: 0.9375rem; line-height: 1.55; }
+.rows .summary code { font-family: var(--font-mono); font-size: 0.875em; background: var(--raised); padding: 0.1em 0.38em; border-radius: 4px; }
+.rows .todo .row { opacity: 0.5; }
+.rows .todo .num { color: var(--slate); }
+.rows .todo .title { font-weight: 500; }
+
+.site-foot { margin-top: 3rem; padding-top: 1.25rem; border-top: 1px solid var(--rule); color: var(--slate); font-size: 0.9375rem; line-height: 1.7; }
+
+@media (max-width: 720px) {
+	.shell { padding: 2rem 1.1rem 4rem; }
+	.topbar { padding: 0.9rem 1.1rem; }
+	.topbar nav { display: none; }
+	.theme-toggle { margin-left: auto; }
+	.mock-strip { padding: 0.6rem 1.1rem; }
+}
+@media (max-width: 560px) {
+	.rows .row { grid-template-columns: 2.5rem minmax(0, 1fr); }
+	.rows .orig { grid-column: 2; text-align: left; }
+	.rows .summary { grid-column: 2; }
+}
+@media (prefers-reduced-motion: reduce) {
+	html { scroll-behavior: auto; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="mock-strip" role="note">
+	<span><strong>시안 · 목차</strong> : 스테이지와 편 목록은 빌드할 때 <code>toc.json</code> 에서 채워요. 흐린 편은 아직 원고가 없어요.</span>
+</div>
+
+<header class="topbar">
+	<a class="brand" href="index.html">렌더러 공부방</a>
+	<nav aria-label="사이트">
+		<a href="index.html" aria-current="page">목차</a>
+		<a href="https://github.com/MystIsle/dx-render-dojo">GitHub</a>
+	</nav>
+	<button type="button" class="theme-toggle" id="theme-toggle">테마 · 시스템</button>
+</header>
+
+<div class="shell">
+<main>
+
+	<header class="page-head">
+		<p class="eyebrow">Rastertek DirectX 11 튜토리얼 61편과 원문에 없는 편</p>
+		<h1>목차</h1>
+		<p class="lede">Rastertek DirectX 11 튜토리얼을 따라 렌더러를 처음부터 만들어요. 편마다 코드가 태그로 남아 있어서 어느 편에서든 이어서 시작할 수 있어요.</p>
+		<div class="scanline" aria-label="전체 진도">
+			<div class="scanline-cells"><!--TOC:progress--></div>
+			<div class="scanline-legend">
+				<span><i style="background: var(--accent)"></i>원고가 있는 편 (<!--TOC:count-->)</span>
+				<span><i style="background: color-mix(in srgb, var(--accent) 42%, var(--paper))"></i>공통 진도 : 01~30, 41~45, 스키닝(α)</span>
+				<span><i style="background: var(--cell-optional)"></i>각자 선택</span>
+			</div>
+		</div>
+	</header>
+
+	<!--TOC:stages-->
+
+	<footer class="site-foot">
+		원문 : <a href="https://www.rastertek.com/tutdx11win10.html">Rastertek DirectX 11 on Windows 10 Tutorials</a><br>
+		코드는 MIT 라이선스입니다.<br>
+		Rastertek 원문을 바탕으로 한 글은 라이선스에 포함되지 않습니다.
+	</footer>
+
+</main>
+
+<nav class="rail" aria-label="스테이지">
+	<ol>
+		<!--TOC:rail-->
+	</ol>
+</nav>
+</div>
+
+<script>
+(function () {
+	var Root = document.documentElement;
+	var ThemeButton = document.getElementById("theme-toggle");
+	var ThemeNames = { system: "시스템", light: "라이트", dark: "다크" };
+	var NextTheme = { system: "light", light: "dark", dark: "system" };
+	var CurrentTheme = function () {
+		var Theme = Root.getAttribute("data-theme");
+		return Theme === "light" || Theme === "dark" ? Theme : "system";
+	};
+	var ShowTheme = function (Theme) {
+		ThemeButton.textContent = "테마 · " + ThemeNames[Theme];
+		ThemeButton.setAttribute("aria-label", "테마 바꾸기, 지금은 " + ThemeNames[Theme]);
+	};
+	ThemeButton.addEventListener("click", function () {
+		var Theme = NextTheme[CurrentTheme()];
+		if (Theme === "system") { Root.removeAttribute("data-theme"); }
+		else { Root.setAttribute("data-theme", Theme); }
+		try {
+			if (Theme === "system") { localStorage.removeItem("dojo-theme"); }
+			else { localStorage.setItem("dojo-theme", Theme); }
+		} catch (E) {}
+		ShowTheme(Theme);
+	});
+	ShowTheme(CurrentTheme());
+})();
+</script>
+</body>
+</html>

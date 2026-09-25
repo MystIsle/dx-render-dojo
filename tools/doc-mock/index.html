@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>렌더러 공부방 · 목차</title>
+<script>
+(function () {
+	try {
+		var Theme = localStorage.getItem("dojo-theme");
+		if (Theme === "light" || Theme === "dark") { document.documentElement.setAttribute("data-theme", Theme); }
+	} catch (E) {}
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Nanum+Gothic+Coding&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+/* ===== 토큰 : A 잔잔한 문서형 ===== */
+:root {
+	color-scheme: light;
+	--paper: #FFFFFF;
+	--raised: #F6F7F9;
+	--ink: #1E2430;
+	--slate: #555E6E;
+	--rule: #E3E6EB;
+	--accent: #3456C8;
+	--accent-soft: #EDF1FC;
+	--cell-optional: #E3E6EB;
+	--body-weight: 450;
+	--radius: 8px;
+
+	--font-body: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+	--font-mono: "IBM Plex Mono", "Nanum Gothic Coding", ui-monospace, Consolas, monospace;
+	--column: 54rem;
+	--rail: 11rem;
+	--rail-gap: 3.5rem;
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) {
+		color-scheme: dark;
+		--paper: #16181D; --raised: #1E2127; --ink: #DADFE8; --slate: #9AA2B1; --rule: #2C3038;
+		--accent: #8FA8F0; --accent-soft: #232A3D;
+		--cell-optional: #2C3038; --body-weight: 400;
+	}
+	:root:not([data-theme="light"]) body { -webkit-font-smoothing: antialiased; }
+}
+:root[data-theme="dark"] {
+	color-scheme: dark;
+	--paper: #16181D; --raised: #1E2127; --ink: #DADFE8; --slate: #9AA2B1; --rule: #2C3038;
+	--accent: #8FA8F0; --accent-soft: #232A3D;
+	--cell-optional: #2C3038; --body-weight: 400;
+}
+:root[data-theme="dark"] body { -webkit-font-smoothing: antialiased; }
+
+/* ===== 공통 ===== */
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 1.5rem; }
+body {
+	margin: 0;
+	background: var(--paper);
+	color: var(--ink);
+	font-family: var(--font-body);
+	font-size: 1.0625rem;
+	font-weight: var(--body-weight);
+	line-height: 1.75;
+	word-break: keep-all;
+	overflow-wrap: break-word;
+}
+p, li { text-wrap: pretty; }
+a { color: var(--accent); text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+h1, h2 { text-wrap: balance; line-height: 1.3; margin: 0; }
+p { margin: 0; }
+b, strong { font-weight: 650; }
+
+.mock-strip {
+	display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem;
+	padding: 0.6rem 1.5rem;
+	background: #FFF4DB; border-bottom: 1px solid #E9CFA2;
+	color: #6B4309; font-size: 0.875rem; line-height: 1.5;
+}
+.mock-strip strong { font-weight: 700; }
+
+.topbar {
+	display: flex; align-items: center; gap: 1.25rem;
+	max-width: calc(var(--column) + 3rem); margin: 0 auto; padding: 0.9rem 1.5rem;
+	border-bottom: 1px solid var(--rule);
+}
+.brand { font-weight: 750; font-size: 1.125rem; letter-spacing: -0.02em; color: var(--ink); text-decoration: none; }
+.topbar nav { margin-left: auto; display: flex; gap: 1.25rem; font-size: 0.9375rem; }
+.topbar nav a { color: var(--slate); text-decoration: none; }
+.topbar nav a:hover { color: var(--ink); }
+.topbar nav a[aria-current="page"] { color: var(--ink); font-weight: 600; }
+.theme-toggle {
+	font: 600 0.875rem/1 var(--font-body);
+	color: var(--ink); background: var(--raised); border: 1px solid var(--rule);
+	padding: 0.5rem 0.8rem; border-radius: 6px; cursor: pointer;
+}
+.theme-toggle:hover { border-color: var(--accent); }
+
+.shell { max-width: calc(var(--column) + 3rem); margin: 0 auto; padding: 2.75rem 1.5rem 5rem; }
+main { min-width: 0; }
+.rail { display: none; }
+@media (min-width: 1200px) {
+	.topbar, .shell { max-width: calc(var(--column) + var(--rail-gap) + var(--rail) + 3rem); }
+	.shell { display: grid; grid-template-columns: minmax(0, var(--column)) var(--rail); gap: var(--rail-gap); }
+	.rail { display: block; position: sticky; top: 2rem; align-self: start; font-size: 0.875rem; }
+	.rail ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.05rem; border-left: 1px solid var(--rule); }
+	.rail a { display: flex; gap: 0.5rem; padding: 0.22rem 0 0.22rem 0.9rem; margin-left: -1px; border-left: 2px solid transparent; color: var(--slate); text-decoration: none; line-height: 1.45; }
+	.rail a .n { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--accent); min-width: 1.2rem; }
+	.rail a:hover { color: var(--ink); }
+}
+
+.page-head { display: grid; gap: 1.1rem; padding-bottom: 1rem; }
+.eyebrow { font-size: 0.9375rem; font-weight: 600; color: var(--slate); }
+h1 { font-size: clamp(2rem, 1.35rem + 2.2vw, 2.75rem); font-weight: 750; letter-spacing: -0.025em; }
+.lede { font-size: 1.1875rem; line-height: 1.7; }
+
+.scanline { display: grid; gap: 0.5rem; margin-top: 0.3rem; }
+.scanline-cells { display: flex; flex-wrap: wrap; gap: 3px; align-items: center; }
+.cell { width: 10px; height: 16px; background: var(--cell-optional); border-radius: 2px; }
+.cell.common { background: color-mix(in srgb, var(--accent) 42%, var(--paper)); }
+.cell.done { background: var(--accent); }
+.cell.gap { width: 6px; background: transparent; }
+.scanline-legend { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; font-size: 0.875rem; color: var(--slate); line-height: 1.5; font-variant-numeric: tabular-nums; }
+.scanline-legend span { display: inline-flex; align-items: center; gap: 0.45rem; }
+.scanline-legend i { display: inline-block; width: 10px; height: 16px; border-radius: 2px; }
+
+/* ===== 스테이지와 편 ===== */
+section.stage { margin-top: 3rem; }
+.stage-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.75rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--rule); }
+.stage-no { font-family: var(--font-mono); font-size: 0.875rem; font-weight: 500; color: var(--accent); letter-spacing: 0.04em; }
+.stage-head h2 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.015em; }
+.stage-range { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--slate); }
+.track { margin-left: auto; font-size: 0.8125rem; font-weight: 600; padding: 0.1rem 0.55rem; border-radius: 999px; }
+.track.common { background: var(--accent-soft); color: var(--accent); }
+.track.optional { background: var(--raised); color: var(--slate); border: 1px solid var(--rule); }
+.stage-desc { color: var(--slate); font-size: 0.9375rem; margin: 0.6rem 0 0.4rem; }
+
+.rows { list-style: none; margin: 0; padding: 0; }
+.rows li { border-bottom: 1px solid var(--rule); }
+.rows .row { display: grid; grid-template-columns: 2.75rem minmax(0, 1fr) auto; gap: 0.25rem 1rem; align-items: baseline; padding: 0.65rem 0.5rem; color: inherit; text-decoration: none; border-radius: 6px; }
+.rows a.row:hover { background: var(--raised); }
+.rows a.row:hover .title { color: var(--accent); }
+.rows .num { font-family: var(--font-mono); font-weight: 500; color: var(--accent); font-variant-numeric: tabular-nums; }
+.rows .title { font-weight: 650; }
+.rows .orig { font-size: 0.8125rem; color: var(--slate); text-align: right; }
+.rows .summary { grid-column: 2 / 4; color: var(--slate); font-size: 0.9375rem; line-height: 1.55; }
+.rows .summary code { font-family: var(--font-mono); font-size: 0.875em; background: var(--raised); padding: 0.1em 0.38em; border-radius: 4px; }
+.rows .todo .row { opacity: 0.5; }
+.rows .todo .num { color: var(--slate); }
+.rows .todo .title { font-weight: 500; }
+
+.site-foot { margin-top: 3rem; padding-top: 1.25rem; border-top: 1px solid var(--rule); color: var(--slate); font-size: 0.9375rem; line-height: 1.7; }
+
+@media (max-width: 720px) {
+	.shell { padding: 2rem 1.1rem 4rem; }
+	.topbar { padding: 0.9rem 1.1rem; }
+	.topbar nav { display: none; }
+	.theme-toggle { margin-left: auto; }
+	.mock-strip { padding: 0.6rem 1.1rem; }
+}
+@media (max-width: 560px) {
+	.rows .row { grid-template-columns: 2.5rem minmax(0, 1fr); }
+	.rows .orig { grid-column: 2; text-align: left; }
+	.rows .summary { grid-column: 2; }
+}
+@media (prefers-reduced-motion: reduce) {
+	html { scroll-behavior: auto; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="mock-strip" role="note">
+	<span><strong>시안 · 목차</strong> : 스테이지와 편 목록은 빌드할 때 <code>toc.json</code> 에서 채워요. 흐린 편은 아직 원고가 없어요.</span>
+</div>
+
+<header class="topbar">
+	<a class="brand" href="index.html">렌더러 공부방</a>
+	<nav aria-label="사이트">
+		<a href="index.html" aria-current="page">목차</a>
+		<a href="https://github.com/MystIsle/dx-render-dojo">GitHub</a>
+	</nav>
+	<button type="button" class="theme-toggle" id="theme-toggle">테마 · 시스템</button>
+</header>
+
+<div class="shell">
+<main>
+
+	<header class="page-head">
+		<p class="eyebrow">Rastertek DirectX 11 튜토리얼 61편과 원문에 없는 편</p>
+		<h1>목차</h1>
+		<p class="lede">Rastertek DirectX 11 튜토리얼을 따라 렌더러를 처음부터 만들어요. 편마다 코드가 태그로 남아 있어서 어느 편에서든 이어서 시작할 수 있어요.</p>
+		<div class="scanline" aria-label="전체 진도">
+			<div class="scanline-cells"><span class="cell done" title="tut01 개발 환경 셋업"></span><span class="cell done" title="tut02 프레임워크와 창"></span><span class="cell done" title="tut03 DirectX 11 초기화"></span><span class="cell done" title="tut04 버퍼·셰이더·HLSL"></span><span class="cell common" title="tut05 텍스처링"></span><span class="cell common" title="tut06 디퓨즈 라이팅"></span><span class="cell common" title="tut07 3D 모델 렌더링"></span><span class="cell common" title="tut08 스케일·회전·이동"></span><span class="cell common" title="tut09 앰비언트 라이팅"></span><span class="cell common" title="tut10 스페큘러 라이팅"></span><span class="cell common" title="tut11 다중 점광원"></span><span class="cell common" title="tut12 2D 렌더링"></span><span class="cell common" title="tut13 스프라이트·타이머"></span><span class="cell common" title="tut14 폰트 엔진"></span><span class="cell common" title="tut15 FPS 카운터"></span><span class="cell common" title="tut16 다이렉트 인풋"></span><span class="cell common" title="tut17 멀티텍스처링"></span><span class="cell common" title="tut18 라이트 맵"></span><span class="cell common" title="tut19 알파 매핑"></span><span class="cell common" title="tut20 노멀 매핑"></span><span class="cell common" title="tut21 스페큘러 매핑"></span><span class="cell common" title="tut22 다중 셰이더 관리"></span><span class="cell common" title="tut23 프러스텀 컬링"></span><span class="cell common" title="tut24 Maya 모델 로딩"></span><span class="cell common" title="tut25 렌더 투 텍스처"></span><span class="cell common" title="tut26 안개"></span><span class="cell common" title="tut27 클리핑 평면"></span><span class="cell common" title="tut28 텍스처 평행이동"></span><span class="cell common" title="tut29 투명도"></span><span class="cell common" title="tut30 반사"></span><span class="cell gap"></span><span class="cell" title="tut31 물"></span><span class="cell" title="tut32 유리와 얼음"></span><span class="cell" title="tut33 불"></span><span class="cell" title="tut34 빌보딩"></span><span class="cell" title="tut35 깊이 버퍼"></span><span class="cell" title="tut36 블러"></span><span class="cell" title="tut37 스크린 페이드"></span><span class="cell" title="tut38 파티클 시스템"></span><span class="cell" title="tut39 투영 텍스처링"></span><span class="cell" title="tut40 투영 라이트맵"></span><span class="cell common" title="tut41 섀도우 매핑"></span><span class="cell common" title="tut42 다중 광원 섀도우 매핑"></span><span class="cell common" title="tut43 방향성 섀도우 맵"></span><span class="cell common" title="tut44 소프트 섀도우"></span><span class="cell common" title="tut45 섀도우 매핑과 투명도"></span><span class="cell gap"></span><span class="cell" title="tut46 글로우"></span><span class="cell" title="tut47 피킹"></span><span class="cell" title="tut48 인스턴싱"></span><span class="cell" title="tut49 하드웨어 테셀레이션"></span><span class="cell" title="tut50 디퍼드 셰이딩"></span><span class="cell" title="tut51 화면 공간 앰비언트 오클루전"></span><span class="cell" title="tut52 물리 기반 렌더링"></span><span class="cell" title="tut53 열 아지랑이"></span><span class="cell" title="tut54 패럴랙스 스크롤링"></span><span class="cell" title="tut55 다이렉트사운드"></span><span class="cell" title="tut56 3D 사운드"></span><span class="cell" title="tut57 XAudio2"></span><span class="cell" title="tut58 X3DAudio"></span><span class="cell" title="tut59 애니메이션 파티클"></span><span class="cell" title="tut60 XInput"></span><span class="cell" title="tut61 컬러 그레이딩"></span><span class="cell gap"></span><span class="cell common" title="tutalpha01 스키닝 애니메이션"></span></div>
+			<div class="scanline-legend">
+				<span><i style="background: var(--accent)"></i>원고가 있는 편 (4 / 62)</span>
+				<span><i style="background: color-mix(in srgb, var(--accent) 42%, var(--paper))"></i>공통 진도 : 01~30, 41~45, 스키닝(α)</span>
+				<span><i style="background: var(--cell-optional)"></i>각자 선택</span>
+			</div>
+		</div>
+	</header>
+
+	<section class="stage">
+		<div class="stage-head"><span class="stage-no">STAGE 1</span><h2 id="stage1">기초 셋업</h2><span class="stage-range">tut01~05</span><span class="track common">공통 진도</span></div>
+		<p class="stage-desc">빈 프로젝트에서 시작해 창을 띄우고 D3D11 을 초기화해요. 버퍼와 셰이더로 첫 삼각형을 그린 뒤 텍스처를 입혀요.</p>
+		<ol class="rows">
+			<li class="entry"><a class="row" href="tutorial-01.html"><span class="num">01</span><span class="title">개발 환경 셋업</span><span class="orig">Setting up DirectX 11 with Visual Studio 2022</span><span class="summary">빈 Windows 프로그램 하나를 빌드하고 실행해요.</span></a></li>
+			<li class="entry"><a class="row" href="tutorial-02.html"><span class="num">02</span><span class="title">프레임워크와 창</span><span class="orig">Creating a Framework and Window</span><span class="summary">창을 띄우고 메시지를 받고 ESC 를 누르면 끝나는 프로그램을 만들어요.</span></a></li>
+			<li class="entry"><a class="row" href="tutorial-03.html"><span class="num">03</span><span class="title">DirectX 11 초기화</span><span class="orig">Initializing DirectX 11</span><span class="summary">D3D11 을 초기화하고 창 안쪽을 회색으로 지워요.</span></a></li>
+			<li class="entry"><a class="row" href="tutorial-04.html"><span class="num">04</span><span class="title">버퍼·셰이더·HLSL</span><span class="orig">Buffers, Shaders, and HLSL</span><span class="summary">정점 버퍼와 HLSL 셰이더로 초록 삼각형 하나를 그려요.</span></a></li>
+			<li class="entry todo"><div class="row"><span class="num">05</span><span class="title">텍스처링</span><span class="orig">Texturing</span></div></li>
+		</ol>
+	</section>
+	<section class="stage">
+		<div class="stage-head"><span class="stage-no">STAGE 2</span><h2 id="stage2">3D 모델 &amp; 조명</h2><span class="stage-range">tut06~11</span><span class="track common">공통 진도</span></div>
+		<p class="stage-desc">파일에서 모델을 읽어 배치하고 빛을 계산해요. 디퓨즈·앰비언트·스페큘러와 여러 점광원을 다뤄요.</p>
+		<ol class="rows">
+			<li class="entry todo"><div class="row"><span class="num">06</span><span class="title">디퓨즈 라이팅</span><span class="orig">Diffuse Lighting</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">07</span><span class="title">3D 모델 렌더링</span><span class="orig">3D Model Rendering</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">08</span><span class="title">스케일·회전·이동</span><span class="orig">Scaling, Rotation, and Translation</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">09</span><span class="title">앰비언트 라이팅</span><span class="orig">Ambient Lighting</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">10</span><span class="title">스페큘러 라이팅</span><span class="orig">Specular Lighting</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">11</span><span class="title">다중 점광원</span><span class="orig">Multiple Point Lights</span></div></li>
+		</ol>
+	</section>
+	<section class="stage">
+		<div class="stage-head"><span class="stage-no">STAGE 3</span><h2 id="stage3">2D · 텍스트 · 입력</h2><span class="stage-range">tut12~16</span><span class="track common">공통 진도</span></div>
+		<p class="stage-desc">직교 투영으로 2D 이미지·스프라이트·글자를 그려요. 키보드와 마우스는 DirectInput 으로 읽어요.</p>
+		<ol class="rows">
+			<li class="entry todo"><div class="row"><span class="num">12</span><span class="title">2D 렌더링</span><span class="orig">2D Rendering</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">13</span><span class="title">스프라이트·타이머</span><span class="orig">Sprites and Timers</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">14</span><span class="title">폰트 엔진</span><span class="orig">Font Engine</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">15</span><span class="title">FPS 카운터</span><span class="orig">FPS Counters</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">16</span><span class="title">다이렉트 인풋</span><span class="orig">Direct Input</span></div></li>
+		</ol>
+	</section>
+	<section class="stage">
+		<div class="stage-head"><span class="stage-no">STAGE 4</span><h2 id="stage4">텍스처 매핑</h2><span class="stage-range">tut17~21</span><span class="track common">공통 진도</span></div>
+		<p class="stage-desc">한 표면에 텍스처 여러 장을 섞어 디테일을 더해요. 라이트 맵·알파 맵·노멀 맵·스페큘러 맵을 다뤄요.</p>
+		<ol class="rows">
+			<li class="entry todo"><div class="row"><span class="num">17</span><span class="title">멀티텍스처링</span><span class="orig">Multitexturing</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">18</span><span class="title">라이트 맵</span><span class="orig">Light Maps</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">19</span><span class="title">알파 매핑</span><span class="orig">Alpha Mapping</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">20</span><span class="title">노멀 매핑</span><span class="orig">Normal Mapping</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">21</span><span class="title">스페큘러 매핑</span><span class="orig">Specular Mapping</span></div></li>
+		</ol>
+	</section>
+	<section class="stage">
+		<div class="stage-head"><span class="stage-no">STAGE 5</span><h2 id="stage5">엔진 구조</h2><span class="stage-range">tut22~25</span><span class="track common">공통 진도</span></div>
+		<p class="stage-desc">셰이더 여러 개를 관리하고 화면 밖 물체를 걸러요. 장면을 텍스처에 그리는 렌더 투 텍스처가 뒤 스테이지의 바탕이 돼요.</p>
+		<ol class="rows">
+			<li class="entry todo"><div class="row"><span class="num">22</span><span class="title">다중 셰이더 관리</span><span class="orig">Managing Multiple Shaders</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">23</span><span class="title">프러스텀 컬링</span><span class="orig">Frustum Culling</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">24</span><span class="title">Maya 모델 로딩</span><span class="orig">Loading Maya Models</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">25</span><span class="title">렌더 투 텍스처</span><span class="orig">Render to Texture</span></div></li>
+		</ol>
+	</section>
+	<section class="stage">
+		<div class="stage-head"><span class="stage-no">STAGE 6</span><h2 id="stage6">렌더 기법 기초</h2><span class="stage-range">tut26~30</span><span class="track common">공통 진도</span></div>
+		<p class="stage-desc">안개·클리핑 평면·텍스처 이동·투명도를 다루고 평면 반사로 마무리해요.</p>
+		<ol class="rows">
+			<li class="entry todo"><div class="row"><span class="num">26</span><span class="title">안개</span><span class="orig">Fog</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">27</span><span class="title">클리핑 평면</span><span class="orig">Clipping Planes</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">28</span><span class="title">텍스처 평행이동</span><span class="orig">Texture Translation</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">29</span><span class="title">투명도</span><span class="orig">Transparency</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">30</span><span class="title">반사</span><span class="orig">Reflection</span></div></li>
+		</ol>
+	</section>
+	<section class="stage">
+		<div class="stage-head"><span class="stage-no">STAGE 7</span><h2 id="stage7">자연 효과</h2><span class="stage-range">tut31~34</span><span class="track optional">각자 선택</span></div>
+		<p class="stage-desc">굴절과 노이즈로 물·유리·얼음·불을 흉내 내요. 먼 물체는 카메라를 향하는 판으로 바꿔 그려요.</p>
+		<ol class="rows">
+			<li class="entry todo"><div class="row"><span class="num">31</span><span class="title">물</span><span class="orig">Water</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">32</span><span class="title">유리와 얼음</span><span class="orig">Glass and Ice</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">33</span><span class="title">불</span><span class="orig">Fire</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">34</span><span class="title">빌보딩</span><span class="orig">Billboarding</span></div></li>
+		</ol>
+	</section>
+	<section class="stage">
+		<div class="stage-head"><span class="stage-no">STAGE 8</span><h2 id="stage8">후처리 · 파티클</h2><span class="stage-range">tut35~40</span><span class="track optional">각자 선택</span></div>
+		<p class="stage-desc">장면을 텍스처에 그린 뒤 블러·페이드 같은 후처리를 걸어요. 파티클과 투영 텍스처도 다뤄요.</p>
+		<ol class="rows">
+			<li class="entry todo"><div class="row"><span class="num">35</span><span class="title">깊이 버퍼</span><span class="orig">Depth Buffer</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">36</span><span class="title">블러</span><span class="orig">Blur</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">37</span><span class="title">스크린 페이드</span><span class="orig">Screen Fades</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">38</span><span class="title">파티클 시스템</span><span class="orig">Particle Systems</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">39</span><span class="title">투영 텍스처링</span><span class="orig">Projective Texturing</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">40</span><span class="title">투영 라이트맵</span><span class="orig">Projected Light Maps</span></div></li>
+		</ol>
+	</section>
+	<section class="stage">
+		<div class="stage-head"><span class="stage-no">STAGE 9</span><h2 id="stage9">그림자</h2><span class="stage-range">tut41~45</span><span class="track common">공통 진도</span></div>
+		<p class="stage-desc">광원 시점의 깊이로 그림자를 그려요. 광원 여러 개, 방향광, 부드러운 가장자리, 투명한 물체의 그림자로 넓혀요.</p>
+		<ol class="rows">
+			<li class="entry todo"><div class="row"><span class="num">41</span><span class="title">섀도우 매핑</span><span class="orig">Shadow Mapping</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">42</span><span class="title">다중 광원 섀도우 매핑</span><span class="orig">Multiple Light Shadow Mapping</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">43</span><span class="title">방향성 섀도우 맵</span><span class="orig">Directional Shadow Maps</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">44</span><span class="title">소프트 섀도우</span><span class="orig">Soft Shadows</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">45</span><span class="title">섀도우 매핑과 투명도</span><span class="orig">Shadow Mapping and Transparency</span></div></li>
+		</ol>
+	</section>
+	<section class="stage">
+		<div class="stage-head"><span class="stage-no">STAGE 10</span><h2 id="stage10">고급 렌더</h2><span class="stage-range">tut46~49</span><span class="track optional">각자 선택</span></div>
+		<p class="stage-desc">글로우·피킹·인스턴싱·하드웨어 테셀레이션을 다뤄요.</p>
+		<ol class="rows">
+			<li class="entry todo"><div class="row"><span class="num">46</span><span class="title">글로우</span><span class="orig">Glow</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">47</span><span class="title">피킹</span><span class="orig">Picking</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">48</span><span class="title">인스턴싱</span><span class="orig">Instancing</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">49</span><span class="title">하드웨어 테셀레이션</span><span class="orig">Hardware Tessellation</span></div></li>
+		</ol>
+	</section>
+	<section class="stage">
+		<div class="stage-head"><span class="stage-no">STAGE 11</span><h2 id="stage11">현대 파이프라인</h2><span class="stage-range">tut50~52</span><span class="track optional">각자 선택</span></div>
+		<p class="stage-desc">디퍼드 셰이딩·SSAO·물리 기반 렌더링을 다뤄요.</p>
+		<ol class="rows">
+			<li class="entry todo"><div class="row"><span class="num">50</span><span class="title">디퍼드 셰이딩</span><span class="orig">Deferred Shading</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">51</span><span class="title">화면 공간 앰비언트 오클루전</span><span class="orig">Screen Space Ambient Occlusion</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">52</span><span class="title">물리 기반 렌더링</span><span class="orig">Physically Based Rendering</span></div></li>
+		</ol>
+	</section>
+	<section class="stage">
+		<div class="stage-head"><span class="stage-no">STAGE 12</span><h2 id="stage12">추가 효과</h2><span class="stage-range">tut53·54·59</span><span class="track optional">각자 선택</span></div>
+		<p class="stage-desc">앞 스테이지의 기법을 섞어 열 아지랑이·패럴랙스 스크롤링·애니메이션 파티클을 만들어요.</p>
+		<ol class="rows">
+			<li class="entry todo"><div class="row"><span class="num">53</span><span class="title">열 아지랑이</span><span class="orig">Heat</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">54</span><span class="title">패럴랙스 스크롤링</span><span class="orig">Parallax Scrolling</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">59</span><span class="title">애니메이션 파티클</span><span class="orig">Animated Particles</span></div></li>
+		</ol>
+	</section>
+	<section class="stage">
+		<div class="stage-head"><span class="stage-no">STAGE 13</span><h2 id="stage13">사운드</h2><span class="stage-range">tut55~58</span><span class="track optional">각자 선택</span></div>
+		<p class="stage-desc">DirectSound 와 XAudio2 로 소리를 내고 3D 위치에 따라 섞어요.</p>
+		<ol class="rows">
+			<li class="entry todo"><div class="row"><span class="num">55</span><span class="title">다이렉트사운드</span><span class="orig">Direct Sound</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">56</span><span class="title">3D 사운드</span><span class="orig">3D Sound</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">57</span><span class="title">XAudio2</span><span class="orig">XAudio2</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">58</span><span class="title">X3DAudio</span><span class="orig">X3DAudio</span></div></li>
+		</ol>
+	</section>
+	<section class="stage">
+		<div class="stage-head"><span class="stage-no">STAGE 14</span><h2 id="stage14">입력 · 피날레</h2><span class="stage-range">tut60~61</span><span class="track optional">각자 선택</span></div>
+		<p class="stage-desc">XInput 으로 게임패드를 읽어요. 마지막 편은 3D LUT 로 색을 보정하는 후처리예요.</p>
+		<ol class="rows">
+			<li class="entry todo"><div class="row"><span class="num">60</span><span class="title">XInput</span><span class="orig">XInput</span></div></li>
+			<li class="entry todo"><div class="row"><span class="num">61</span><span class="title">컬러 그레이딩</span><span class="orig">Color Grading</span></div></li>
+		</ol>
+	</section>
+	<section class="stage">
+		<div class="stage-head"><h2 id="extra">원문에 없는 편</h2><span class="track common">공통 진도</span></div>
+		<p class="stage-desc">Rastertek 61편에 없는 주제예요. 스키닝 애니메이션은 30편 코드에서 이어져요.</p>
+		<ol class="rows">
+			<li class="entry todo"><div class="row"><span class="num">α01</span><span class="title">스키닝 애니메이션</span><span class="orig"></span></div></li>
+		</ol>
+	</section>
+
+	<footer class="site-foot">
+		원문 : <a href="https://www.rastertek.com/tutdx11win10.html">Rastertek DirectX 11 on Windows 10 Tutorials</a><br>
+		코드는 MIT 라이선스입니다.<br>
+		Rastertek 원문을 바탕으로 한 글은 라이선스에 포함되지 않습니다.
+	</footer>
+
+</main>
+
+<nav class="rail" aria-label="스테이지">
+	<ol>
+		<li><a href="#stage1"><span class="n">1</span>기초 셋업</a></li>
+		<li><a href="#stage2"><span class="n">2</span>3D 모델 &amp; 조명</a></li>
+		<li><a href="#stage3"><span class="n">3</span>2D · 텍스트 · 입력</a></li>
+		<li><a href="#stage4"><span class="n">4</span>텍스처 매핑</a></li>
+		<li><a href="#stage5"><span class="n">5</span>엔진 구조</a></li>
+		<li><a href="#stage6"><span class="n">6</span>렌더 기법 기초</a></li>
+		<li><a href="#stage7"><span class="n">7</span>자연 효과</a></li>
+		<li><a href="#stage8"><span class="n">8</span>후처리 · 파티클</a></li>
+		<li><a href="#stage9"><span class="n">9</span>그림자</a></li>
+		<li><a href="#stage10"><span class="n">10</span>고급 렌더</a></li>
+		<li><a href="#stage11"><span class="n">11</span>현대 파이프라인</a></li>
+		<li><a href="#stage12"><span class="n">12</span>추가 효과</a></li>
+		<li><a href="#stage13"><span class="n">13</span>사운드</a></li>
+		<li><a href="#stage14"><span class="n">14</span>입력 · 피날레</a></li>
+		<li><a href="#extra"><span class="n">α</span>원문에 없는 편</a></li>
+	</ol>
+</nav>
+</div>
+
+<script>
+(function () {
+	var Root = document.documentElement;
+	var ThemeButton = document.getElementById("theme-toggle");
+	var ThemeNames = { system: "시스템", light: "라이트", dark: "다크" };
+	var NextTheme = { system: "light", light: "dark", dark: "system" };
+	var CurrentTheme = function () {
+		var Theme = Root.getAttribute("data-theme");
+		return Theme === "light" || Theme === "dark" ? Theme : "system";
+	};
+	var ShowTheme = function (Theme) {
+		ThemeButton.textContent = "테마 · " + ThemeNames[Theme];
+		ThemeButton.setAttribute("aria-label", "테마 바꾸기, 지금은 " + ThemeNames[Theme]);
+	};
+	ThemeButton.addEventListener("click", function () {
+		var Theme = NextTheme[CurrentTheme()];
+		if (Theme === "system") { Root.removeAttribute("data-theme"); }
+		else { Root.setAttribute("data-theme", Theme); }
+		try {
+			if (Theme === "system") { localStorage.removeItem("dojo-theme"); }
+			else { localStorage.setItem("dojo-theme", Theme); }
+		} catch (E) {}
+		ShowTheme(Theme);
+	});
+	ShowTheme(CurrentTheme());
+})();
+</script>
+</body>
+</html>
