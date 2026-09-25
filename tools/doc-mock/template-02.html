@@ -894,7 +894,7 @@ details.diff-file summary .why { color: var(--slate); }
 						<figcaption><span class="path">CMakeLists.txt</span><span class="badge mod">수정</span><span class="badge">파일 전체</span></figcaption>
 <pre class="src" data-lang="cmake"><!--FILE:CMakeLists.txt--></pre>
 					</figure>
-					<p>함께 추가한 매니페스트(<code>DxRenderDojo.manifest</code>)는 모니터 배율을 앱이 직접 처리하겠다고 Windows 에 알리는 선언이에요. MSVC 와 mingw 는 넣는 방법이 달라서 한 빌드에 둘을 같이 쓰면 <code>CVT1100</code> 링크 에러가 나요.</p>
+					<p>매니페스트(<code>DxRenderDojo.manifest</code>)와 <code>DxRenderDojo.rc</code> 는 루트, <code>DxRenderDojo.vcxproj</code> 옆에 새로 만들어요. 매니페스트는 모니터 배율을 앱이 직접 처리하겠다고 Windows 에 알리는 선언이에요. MSVC 와 mingw 는 넣는 방법이 달라서 한 빌드에 둘을 같이 쓰면 <code>CVT1100</code> 링크 에러가 나요.</p>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
