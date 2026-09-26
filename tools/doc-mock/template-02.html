@@ -473,6 +473,7 @@ details.diff-file summary .why { color: var(--slate); }
 				<span class="label">실행</span>
 				<div class="flow-steps">
 					<span class="node">wWinMain</span><span class="arrow">→</span>
+						<span class="node">FLog::Prepare</span><span class="arrow">→</span>
 					<span class="node">FSystem::Prepare</span><span class="arrow">→</span>
 					<span class="node">Initialize</span><span class="arrow">→</span>
 					<span class="node loop">Run ⟲ Frame</span><span class="arrow">→</span>
@@ -781,11 +782,13 @@ details.diff-file summary .why { color: var(--slate); }
 						<figcaption><span class="path">Source/Main.cpp</span><span class="badge mod">수정</span><span class="badge">파일 전체</span></figcaption>
 <pre class="src" data-lang="cpp"><!--FILE@2:Source/Main.cpp--></pre>
 					</figure>
+					<p><code>FLog</code> 는 창보다 먼저 만들어요. 디버그 빌드는 <code>FLog</code> 를 만들 때 콘솔 창이 열려요. 창보다 늦게 열리면 콘솔이 맨 앞에 와서 창을 한 번 누르기 전까지 키 입력을 가져가요.</p>
 					<p><code>FSystem</code> 은 <code>Run</code> 이 돌아온 다음 줄에서 <code>Release</code> 로 직접 해제해요. 창과 뒤 편의 D3D 객체를 이 줄에서 정리하려는 거예요. 그냥 두면 프로세스가 끝날 때 <code>FLog</code> 같은 다른 싱글톤과 함께 해제되고, 둘 중 무엇이 먼저인지 보장받지 못해요.</p>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
-														<li class="entry"><code>FSystem::Prepare();</code> <a href="#step-tools">1단계</a>에서 친 <code>TSingleton</code> 의 함수. 부르지 않아도 첫 <code>Get()</code> 이 만들지만, 만드는 때를 여기로 정함</li>
+								<li class="entry"><code>FLog::Prepare();</code> <a href="#step-tools">1단계</a>에서 친 <code>TSingleton</code> 의 함수. 부르지 않아도 첫 <code>Get()</code> 이 만들지만, 만드는 때를 여기로 정함</li>
+								<li class="entry"><code>FSystem::Prepare();</code> 같은 함수로 <code>FSystem</code> 을 만드는 때도 정함. 해제하는 때는 아래 <code>Release</code></li>
 						</ul>
 					</details>
 					<details class="fold">
@@ -802,7 +805,7 @@ details.diff-file summary .why { color: var(--slate); }
 					</details>
 					<div class="checkpoint">
 						<p class="box-label">여기까지</p>
-						<p>검은 창이 화면 가운데에 뜨고 로그에 <code>창 생성 : 800x600</code> 이 찍혀요. 디버그 빌드는 로그를 보여 줄 콘솔 창도 함께 떠요. 닫기 단추를 누르면 창은 사라지는데 프로그램은 끝나지 않아요. 창이 없어도 루프는 <code>WM_QUIT</code> 을 기다리며 계속 돌아서 Visual Studio 의 디버깅 중지로 꺼야 해요.</p>
+						<p>검은 창이 화면 가운데에 뜨고 로그에 <code>창 생성 : 800x600</code> 이 찍혀요. 디버그 빌드는 로그를 보여 줄 콘솔 창도 함께 뜨는데, 맨 앞에 오는 것은 검은 창이에요. 닫기 단추를 누르면 창은 사라지는데 프로그램은 끝나지 않아요. 창이 없어도 루프는 <code>WM_QUIT</code> 을 기다리며 계속 돌아서 Visual Studio 의 디버깅 중지로 꺼야 해요.</p>
 					</div>
 				</div>
 			</li>
@@ -1046,7 +1049,7 @@ details.diff-file summary .why { color: var(--slate); }
 					</div>
 					<div class="checkpoint">
 						<p class="box-label">여기까지</p>
-						<p>검은 창을 한 번 누른 뒤 ESC 를 누르면 끝나고 종료 코드는 0 이에요. 디버그 빌드는 콘솔 창이 앞에 떠서 창을 누르기 전에는 키가 콘솔로 가요. CPU 코어 하나를 다 쓰는 것은 2단계부터 그랬어요. 루프가 기다리지 않고 돌기 때문이라 정상이에요.</p>
+						<p>ESC 를 누르면 끝나고 종료 코드는 0 이에요. 창을 먼저 누르지 않아도 키가 창으로 가요. <a href="#step-window">2단계</a>에서 콘솔을 창보다 먼저 열었기 때문이에요. CPU 코어 하나를 다 쓰는 것은 2단계부터 그랬어요. 루프가 기다리지 않고 돌기 때문이라 정상이에요.</p>
 					</div>
 				</div>
 			</li>
@@ -1288,7 +1291,7 @@ details.diff-file summary .why { color: var(--slate); }
 			<li><span class="mark a">+</span><span class="name">Source/Core/FWindow.cpp</span><span class="note">+294</span></li>
 			<li><span class="mark a">+</span><span class="name">Source/Core/FSystem.h</span><span class="note">+33</span></li>
 			<li><span class="mark a">+</span><span class="name">Source/Core/FSystem.cpp</span><span class="note">+67</span></li>
-			<li><span class="mark m">~</span><span class="name">Source/Main.cpp</span><span class="note">+9 −1</span></li>
+			<li><span class="mark m">~</span><span class="name">Source/Main.cpp</span><span class="note">+13 −1</span></li>
 			<li><span class="mark m">~</span><span class="name">CMakeLists.txt</span><span class="note">+6 −1</span></li>
 			<li><span class="mark m">~</span><span class="name">DxRenderDojo.vcxproj</span><span class="note">+27 −2</span></li>
 			<li><span class="mark a">+</span><span class="name">DxRenderDojo.manifest</span><span class="note">+15 · DPI 인식과 OS 호환 선언</span></li>
@@ -1371,7 +1374,7 @@ details.diff-file summary .why { color: var(--slate); }
 		<div class="file-group">
 			<h3>호출부와 빌드</h3>
 			<details class="diff-file">
-				<summary><span class="path">Source/Main.cpp</span><span class="stat"><span class="plus">+9</span> <span class="minus">−1</span></span><span class="why">FSystem 을 만들어 돌림</span></summary>
+				<summary><span class="path">Source/Main.cpp</span><span class="stat"><span class="plus">+13</span> <span class="minus">−1</span></span><span class="why">FLog 를 먼저, FSystem 을 만들어 돌림</span></summary>
 <pre class="diff" data-lang="cpp"><!--DIFF:Source/Main.cpp--></pre>
 			</details>
 			<details class="diff-file">
