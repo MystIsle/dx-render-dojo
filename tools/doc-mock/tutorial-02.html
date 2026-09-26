@@ -1621,7 +1621,7 @@ private:
 	void OnWindowMessage(UINT Message, WPARAM WParam, LPARAM LParam);
 
 	// 선언 순서가 곧 생성 순서이고 소멸은 그 역순이다.
-	// 디바이스를 갖게 될 FApplication 이 FWindow 보다 먼저 사라져야 한다.
+	// 창을 쓰는 멤버는 FWindow 뒤에 둔다.
 	FDisplaySettings Display;
 	FWindow Window;
 	FInput Input;
@@ -1635,7 +1635,7 @@ private:
 							<li class="entry"><code>const FInput&amp; GetInput() const { return Input; }</code> 장면 코드가 입력을 읽는 길. <code>Update</code> 가 씀</li>
 						</ul>
 					</details>
-					<p>루프가 끝나고 <code>FSystem</code> 이 해제되면 멤버가 선언 역순으로, 그러니까 <code>FApplication</code>, <code>FInput</code>, <code>FWindow</code>, <code>FDisplaySettings</code> 순서로 소멸해요. 창을 쓰는 멤버를 <code>FWindow</code> 뒤에 선언하면 창보다 먼저 사라져요.</p>
+					<p>루프가 끝나고 <code>FSystem</code> 이 해제되면 멤버가 선언 역순으로, 그러니까 <code>FApplication</code>, <code>FInput</code>, <code>FWindow</code>, <code>FDisplaySettings</code> 순서로 소멸해요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FWindow.h</span><span class="badge mod">수정</span><span class="badge">SetMessageCallback 과 MessageCallback</span></figcaption>
 <pre class="diff" data-lang="cpp">@@ -1,6 +1,7 @@
@@ -1955,7 +1955,7 @@ void FApplication::Render()
 +	void OnResize(int NewWidth, int NewHeight);
  
  	// 선언 순서가 곧 생성 순서이고 소멸은 그 역순이다.
- 	// 디바이스를 갖게 될 FApplication 이 FWindow 보다 먼저 사라져야 한다.</pre>
+ 	// 창을 쓰는 멤버는 FWindow 뒤에 둔다.</pre>
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge mod">수정</span><span class="badge">크기 콜백 걸기와 OnResize</span></figcaption>
@@ -3161,7 +3161,7 @@ private:
 	void OnResize(int NewWidth, int NewHeight);
 
 	// 선언 순서가 곧 생성 순서이고 소멸은 그 역순이다.
-	// 디바이스를 갖게 될 FApplication 이 FWindow 보다 먼저 사라져야 한다.
+	// 창을 쓰는 멤버는 FWindow 뒤에 둔다.
 	FDisplaySettings Display;
 	FWindow Window;
 	FInput Input;
