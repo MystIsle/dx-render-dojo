@@ -70,8 +70,7 @@ clang-tidy -p build-win <파일>
 ## 자주 걸리는 곳
 
 - 플립 모델은 `Present` 가 백 버퍼를 파이프라인에서 뗌. RTV 는 `BeginScene` 에서 매 프레임 묶음
-- `ComPtr` 의 `&` 는 `ReleaseAndGetAddressOf()` 임. `OMSetRenderTargets(1, &Rtv, ...)` 처럼 넘기면 호출 직전에 RTV 가 해제돼 크래시. 주소는 항상 `.GetAddressOf()` 로 넘김. 예외는 `As(&Other)` 하나로, 받을 쪽을 채우는 함수라 이 모양으로 씀
-- `ComPtr` 를 들고 있으면 다른 인터페이스는 `As` 로 받음. `QueryInterface(IID_PPV_ARGS(...))` 는 날 포인터밖에 없을 때만
+- `ComPtr` 의 `&` 는 숨은 `ReleaseAndGetAddressOf()` 라 쓰지 않음. `OMSetRenderTargets(1, &Rtv, ...)` 처럼 넘기면 호출 직전에 RTV 가 해제돼 크래시. 출력은 `.ReleaseAndGetAddressOf()`, 입력 배열은 `.GetAddressOf()`, 인터페이스 넓히기는 `As(&Other)`(유일한 예외). 규칙 원본은 `docs/CODING_STYLE.md` 2절
 - 매니페스트는 빌드마다 넣는 길이 다름. 한 exe 에 두 번 들어가면 `CVT1100` 으로 링크 실패
   - MSVC(vcxproj) : 링커의 "추가 매니페스트 파일"(`<Manifest><AdditionalManifestFiles>`)
   - MSVC(CMake) : `.manifest` 를 `target_sources` 로 넘김. `/MANIFEST:EMBED` 나 `/MANIFESTINPUT` 을 `target_link_options` 로 직접 주면 CMake 의 `vs_link_exe` 가 만드는 `manifest.res` 와 겹쳐 실패함

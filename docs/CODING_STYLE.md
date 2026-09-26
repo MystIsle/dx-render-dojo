@@ -22,6 +22,10 @@ dx-render-dojo 의 C++ 코드 규약입니다. 코드를 쓰다가 걸리는 주
 ## 2. 소유
 
 - COM 객체 : `ComPtr<T>`
+  - 주소를 넘길 때 `&` 를 쓰지 않음. `ComPtr` 의 `&` 는 들고 있던 객체를 먼저 놓는 동작이 숨어 있음
+  - 받아 오는 출력(Create·Get·`IID_PPV_ARGS`) : `.ReleaseAndGetAddressOf()`. 다시 만들어 받아도 옛 객체가 새지 않음
+  - 넘겨 주는 입력(Set 계열의 배열 인자) : `.GetAddressOf()`
+  - 다른 인터페이스로 넓힐 때 : `As(&Other)`. `As` 는 이 모양으로만 받는 유일한 예외. 날 포인터밖에 없을 때만 `QueryInterface(IID_PPV_ARGS(...))`
 - 내 객체 : 값 멤버가 기본. 다형성이 필요할 때, 다시 만들어야 할 때, 생성을 늦춰야 할 때만 `std::unique_ptr<T>`
 - `shared_ptr` : 쓰지 않음
 - raw 포인터·참조 : 빌리는 매개변수에만
