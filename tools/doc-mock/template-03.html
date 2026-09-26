@@ -626,6 +626,12 @@ figure.code .diff-view { border-top: 0; }
 						<figcaption><span class="path">Source/Core/FSystem.h</span><span class="badge mod">수정</span><span class="badge">include 와 멤버</span></figcaption>
 <pre class="diff" data-lang="cpp"><!--DIFF@1:Source/Core/FSystem.h--></pre>
 					</figure>
+					<details class="fold">
+						<summary>줄 단위 풀이</summary>
+						<ul class="walk">
+							<li class="entry"><code>FD3D11Graphics Graphics;</code> <code>FWindow</code> 뒤에 둬서 창보다 먼저 사라짐. <a href="#step-swapchain">2단계</a>의 스왑체인이 창에 그림을 내보냄</li>
+						</ul>
+					</details>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge mod">수정</span><span class="badge">FSystem::Initialize 안, 창 생성 로그 다음</span></figcaption>
 <pre class="diff" data-lang="cpp"><!--DIFF@1:Source/Core/FSystem.cpp--></pre>
@@ -1047,7 +1053,7 @@ figure.code .diff-view { border-top: 0; }
 		<ul class="file-list">
 			<li><span class="mark a">+</span><span class="name">Source/Graphics/FD3D11Graphics.h</span><span class="note">+38</span></li>
 			<li><span class="mark a">+</span><span class="name">Source/Graphics/FD3D11Graphics.cpp</span><span class="note">+191</span></li>
-			<li><span class="mark m">~</span><span class="name">Source/Core/FSystem.h</span><span class="note">+3 −1</span></li>
+			<li><span class="mark m">~</span><span class="name">Source/Core/FSystem.h</span><span class="note">+2</span></li>
 			<li><span class="mark m">~</span><span class="name">Source/Core/FSystem.cpp</span><span class="note">+5</span></li>
 			<li><span class="mark m">~</span><span class="name">Source/App/FApplication.h</span><span class="note">+7</span></li>
 			<li><span class="mark m">~</span><span class="name">Source/Core/FDisplaySettings.h</span><span class="note">+1</span></li>
@@ -1074,7 +1080,7 @@ figure.code .diff-view { border-top: 0; }
 		<div class="file-group">
 			<h3>프레임과 설정</h3>
 			<details class="diff-file">
-				<summary><span class="path">Source/Core/FSystem.h</span><span class="stat"><span class="plus">+3</span> <span class="minus">−1</span></span><span class="why">Graphics 멤버와 선언 순서</span></summary>
+				<summary><span class="path">Source/Core/FSystem.h</span><span class="stat"><span class="plus">+2</span></span><span class="why">Graphics 멤버</span></summary>
 <pre class="diff" data-lang="cpp"><!--DIFF:Source/Core/FSystem.h--></pre>
 			</details>
 			<details class="diff-file">

@@ -988,7 +988,7 @@ details.diff-file summary .why { color: var(--slate); }
 							<li class="entry"><code>const FInput&amp; GetInput() const { return Input; }</code> 장면 코드가 입력을 읽는 길. <code>Update</code> 가 씀</li>
 						</ul>
 					</details>
-					<p>루프가 끝나고 <code>FSystem</code> 이 해제되면 멤버가 선언 역순으로, 그러니까 <code>FApplication</code>, <code>FInput</code>, <code>FWindow</code>, <code>FDisplaySettings</code> 순서로 소멸해요. 창을 쓰는 멤버를 <code>FWindow</code> 뒤에 선언하면 창보다 먼저 사라져요.</p>
+					<p>루프가 끝나고 <code>FSystem</code> 이 해제되면 멤버가 선언 역순으로, 그러니까 <code>FApplication</code>, <code>FInput</code>, <code>FWindow</code>, <code>FDisplaySettings</code> 순서로 소멸해요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FWindow.h</span><span class="badge mod">수정</span><span class="badge">SetMessageCallback 과 MessageCallback</span></figcaption>
 <pre class="diff" data-lang="cpp"><!--DIFF@5:Source/Core/FWindow.h--></pre>

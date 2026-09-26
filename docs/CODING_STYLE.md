@@ -221,4 +221,4 @@ static 을 먼저, 함수를 변수보다 먼저 둡니다. `.cpp` 의 정의 �
 
 - 7절에 include 경로를 옮겼습니다. 전에는 CLAUDE.md 에 "include 는 항상 폴더까지" 한 줄만 있었습니다. 짝 헤더만 파일 이름으로 적자는 안을 검토했고, 언리얼 엔진(`Private/Components/ActorComponent.cpp` 의 `#include "Components/ActorComponent.h"`)과 에디터 새 클래스 마법사(`GameProjectUtils` 가 옛 `#include "클래스.h"` 를 지우고 폴더를 포함한 경로로 바꿈)를 확인해 지금 규칙을 유지했습니다. UBT 는 `BuildSettingsVersion` V2 부터 `Public` 루트 기준입니다
 - 기각 : 짝 헤더나 같은 폴더 헤더만 파일 이름으로. 한 헤더가 두 이름을 갖게 되고, 폴더를 옮기면 양쪽 모양을 다 고쳐야 합니다. 게임 템플릿처럼 하위 폴더를 모두 검색 경로에 넣으면 이름이 같은 파일이 부딪힙니다
-- 7절에 접근자와 주석을 넣었습니다. 읽기 검토에서 02편 `FWindow::GetHandle`(03편에서 처음 씀)과 `FSystem::GetWindow`(쓰는 곳 없음), 02편 `FSystem.h` 의 "디바이스를 갖게 될 `FApplication`"(03편은 `FD3D11Graphics` 가 가짐)이 나왔습니다. 코드는 조은님 승인 뒤 고칩니다
+- 7절에 접근자와 주석을 넣었습니다. 읽기 검토에서 02편 `FWindow::GetHandle`(03편에서 처음 씀)과 `FSystem::GetWindow`(쓰는 곳 없음), 02편 `FSystem.h` 의 "디바이스를 갖게 될 `FApplication`"(03편은 `FD3D11Graphics` 가 가짐)이 나왔습니다. 주석은 "창을 쓰는 멤버는 `FWindow` 뒤에 둔다" 로 바꿔 02편 5단계부터 이력에 반영했습니다. 03편 1단계에서 주석을 고치던 줄은 없어졌습니다. 접근자는 조은님 결정을 기다립니다
