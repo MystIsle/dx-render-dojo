@@ -362,6 +362,8 @@ def check_range(steps, base, ref, label, report):
     report.note(f"{label}빠짐없음 : 추가 {total_added}줄 중 빠짐 {total_missing}, 지운 {total_removed}줄 중 빠짐 {total_removed_missing}")
 
     check_piece_order(pieces, ref, label, report)
+    check_badges(steps, base, ref, label, report)
+    check_range_start(steps, base, ref, label, report)
 
 
 def check_piece_order(pieces, ref, label, report):
@@ -385,6 +387,93 @@ def check_piece_order(pieces, ref, label, report):
             where = lines[block[0]].strip() if block else "파일 머리"
             order = ", ".join(str(s + 1) for s in starts)
             report.error(f"{label}덩어리 순서 : {path} `{where}` 의 조각 순서가 소스와 다름 (문서 순서의 시작 줄 {order})")
+
+
+def check_badges(steps, base, ref, label, report):
+    """조각의 배지가 조각 종류와 맞는지. diff 조각은 늘 `수정`. 파일 전체 `신규` 는 앞 단계에 없던 파일, `수정` 은 있던 파일. 함수 `신규` 는 앞 단계에 없던 함수."""
+    renames = renamed_paths(base, ref)
+    for figure in re.finditer(r"<figure\b.*?</figure>", steps, re.S):
+        badges = re.findall(r'<span class="badge[^"]*">\s*([^<]*?)\s*</span>', figure.group(0))
+        action = next((b for b in badges if b in ACTION_BADGES), None)
+        for kind, _, body in MARKER.findall(figure.group(0)):
+            path = body.split(":", 1)[0]
+            if kind == "DIFF" and action not in (None, "수정"):
+                report.error(f"{label}배지 : {path} diff 조각의 배지가 `{action}`")
+            if kind not in ("FILE", "SYMBOL") or action not in ("신규", "수정"):
+                continue
+            old = git_lines(base, renames.get(path, path))
+            if kind == "FILE" and action == "신규" and old is not None:
+                report.error(f"{label}배지 : {path} 파일 전체 `신규` 인데 앞 단계에 있던 파일")
+            elif kind == "FILE" and action == "수정" and old is None:
+                report.error(f"{label}배지 : {path} 파일 전체 `수정` 인데 앞 단계에 없던 파일")
+            elif kind == "SYMBOL" and action == "신규" and old is not None:
+                symbol = body.split(":", 1)[1]
+                if any(symbol in line for line in old):
+                    report.error(f"{label}배지 : {path} `{symbol}` : `신규` 인데 앞 단계에 있던 함수")
+
+
+def check_range_start(steps, base, ref, label, report):
+    """범위 diff 가 추가 줄로 시작하지 않는지. 파일 맨 위에 넣는 줄처럼 앞에 문맥 줄이 없으면 넘어간다."""
+    renames = renamed_paths(base, ref)
+    for kind, _, body in MARKER.findall(steps):
+        if kind != "DIFF" or ":" not in body:
+            continue
+        path, rest = body.split(":", 1)
+        begin, until = rest.split("=>", 1)
+        lines = git_lines(ref, path) or []
+        bounds = slice_bounds(lines, begin, until)
+        if bounds is None:
+            continue
+        start = bounds[0]
+        added, _ = changed_lines(base, ref, path, renames.get(path))
+        if start in added and not all(i in added for i in range(start)):
+            report.error(f"{label}범위 diff : {path} 조각이 추가 줄 `{lines[start].strip()[:50]}` 로 시작")
+
+
+def check_predict(source, tag, report):
+    """먼저 예측 1번이 앞 편의 "다음 편 미리 생각하기" 를 받는지 라벨로 본다. 질문 문장은 편에 맞게 고쳐 쓰므로 비교하지 않는다."""
+    toc = json.loads((HERE / "toc.json").read_text(encoding="utf-8"))
+    bases = {lesson["tag"]: lesson["base"] for stage in toc["stages"] for lesson in stage["lessons"]}
+    base_tag = bases.get(tag_ref(tag).rsplit("/", 1)[-1])
+    if not base_tag:
+        return
+    base_id = base_tag[3:]
+    base_file = HERE / f"template-{base_id}.html"
+    if not base_file.exists() or 'id="preview"' not in base_file.read_text(encoding="utf-8"):
+        return
+    name = "α" + base_id[5:] if base_id.startswith("alpha") else base_id
+    expected = f"1 · {name}편 끝에서 낸 질문"
+    predict = re.search(r'<section id="predict".*?</section>', source, re.S)
+    first = re.search(r'<p class="box-label">(.*?)</p>', predict.group(0), re.S) if predict else None
+    if first is None or strip_tags(first.group(1)) != expected:
+        report.error(f"먼저 예측 1번 라벨이 `{expected}` 이 아님")
+
+
+def check_walk(body, report):
+    r"""줄 단위 풀이 항목의 첫 코드가 그 풀이 앞의 조각에 있는지. 앞 풀이 뒤로 나온 조각만 본다. `...` 로 줄인 곳은 나눠 찾고, 공백과 줄 잇기 `\` 는 무시한다."""
+    steps = re.search(r'<section id="steps".*?</section>', body, re.S)
+    if not steps:
+        return
+    pattern = r'<figure class="code">.*?</figure>|<details class="fold">\s*<summary>줄 단위 풀이</summary>.*?</details>'
+    for number, block in enumerate(step_blocks(steps.group(0)), 1):
+        code = []
+        for item in re.finditer(pattern, block, re.S):
+            text = item.group(0)
+            if text.startswith("<figure"):
+                for attrs, pre in re.findall(r"<pre\b([^>]*)>(.*?)</pre>", text, re.S):
+                    lines = html.unescape(re.sub(r"<[^>]+>", "", pre)).split("\n")
+                    # diff 조각은 줄머리 기호를 떼야 여러 줄에 걸친 호출이 이어진다.
+                    if 'class="diff"' in attrs:
+                        lines = [line[1:] for line in lines if not line.startswith("@@")]
+                    code.extend(lines)
+                continue
+            flat = re.sub(r"[\s\\]+", "", "\n".join(code))
+            for entry in re.findall(r'<li class="entry">\s*<code>(.*?)</code>', text, re.S):
+                snippet = html.unescape(entry)
+                parts = [re.sub(r"[\s\\]+", "", part) for part in re.split(r"\.\.\.|…", snippet)]
+                if not all(part in flat for part in parts if part):
+                    report.warn(f"{number}단계 풀이 : 바로 위 조각에 없는 코드 `{snippet[:50]}`")
+            code = []
 
 
 def check_structure(body, report):
@@ -508,6 +597,9 @@ def main():
     check_markers(source, args.tag, args.built, report)
     if args.tag and not args.built:
         check_follow_along(source, args.tag, report)
+        check_predict(source, args.tag, report)
+    if args.built:
+        check_walk(body, report)
     check_structure(body, report)
     check_prose(body, report)
 
