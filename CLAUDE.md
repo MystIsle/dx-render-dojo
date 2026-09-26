@@ -6,7 +6,7 @@
 
 - 학습이 목적이고 엔진은 목적이 아님. 진도가 지표
 - 현재 튜토리얼이 요구하지 않는 추상화는 만들지 않음. 중복은 3번째에서 뽑음
-- 코드는 100% Windows 코드. mingw 크로스컴파일 호환 유지 (맥에서는 Wine 으로 실행)
+- 코드는 100% Windows 코드. 맥은 필수가 아닌 옵션. 맥에서 도는지는 Apple Game Porting Toolkit 의 호환성에 맡기고, 맥 빌드와 mingw 호환에는 공수를 들이지 않음. 좋은 코드와 부딪히면 좋은 코드를 고름
 - 튜토리얼 한 편 = 단계 커밋 → 단계마다 Windows 빌드·실행 → 태그 → 문서 생성 → 산문 검토. 맥 빌드는 태그 조건이 아님
 - 태그 : 원문 편은 `tutNN`, 원문에 없는 편은 `tutalpha01` 형식. 따라 하기 N단계 커밋은 `tutNN-sN` (`docs/DOC_STYLE.md` 2절)
 - 작업 브랜치는 `work/tutNN`. 편이 끝나 태그를 달면 지움. 태그와 이름이 겹치면 git 이 어느 쪽인지 모른다고 경고함
@@ -56,7 +56,7 @@ clang-tidy -p build-win <파일>
 ```
 
 - clang-tidy 는 20 이상을 씀. VS 2022 에 들어 있는 19.1.5 는 VS 18 표준 라이브러리 헤더가 거부함 (VS 18 의 LLVM 은 22.1.3)
-- 맥 : `./scripts/mac-build.sh` 로 빌드, `./scripts/mac-run.sh` 로 실행(Wine), `./scripts/mac-lint.sh [파일...]` 로 검사. 검사는 Homebrew `llvm` 이 필요하고, 인자가 없으면 `Source/` 전체를 봄
+- 맥(옵션, 깨져도 고치는 데 공수를 들이지 않음) : `./scripts/mac-build.sh` 로 빌드, `./scripts/mac-run.sh` 로 실행(Wine), `./scripts/mac-lint.sh [파일...]` 로 검사. 검사는 Homebrew `llvm` 이 필요하고, 인자가 없으면 `Source/` 전체를 봄
 - 맥의 clang-tidy 는 mingw 타깃·sysroot·`-std=c++20` 을 따로 넘겨야 헤더를 찾음. 인자는 `mac-lint.sh` 에 있음
 
 ## 인코딩·줄끝
@@ -70,12 +70,13 @@ clang-tidy -p build-win <파일>
 ## 자주 걸리는 곳
 
 - 플립 모델은 `Present` 가 백 버퍼를 파이프라인에서 뗌. RTV 는 `BeginScene` 에서 매 프레임 묶음
-- `ComPtr` 의 `&` 는 `ReleaseAndGetAddressOf()` 임. `OMSetRenderTargets(1, &Rtv, ...)` 처럼 넘기면 호출 직전에 RTV 가 해제돼 크래시. 주소는 항상 `.GetAddressOf()` 로 넘김
+- `ComPtr` 의 `&` 는 `ReleaseAndGetAddressOf()` 임. `OMSetRenderTargets(1, &Rtv, ...)` 처럼 넘기면 호출 직전에 RTV 가 해제돼 크래시. 주소는 항상 `.GetAddressOf()` 로 넘김. 예외는 `As(&Other)` 하나로, 받을 쪽을 채우는 함수라 이 모양으로 씀
+- `ComPtr` 를 들고 있으면 다른 인터페이스는 `As` 로 받음. `QueryInterface(IID_PPV_ARGS(...))` 는 날 포인터밖에 없을 때만
 - 매니페스트는 빌드마다 넣는 길이 다름. 한 exe 에 두 번 들어가면 `CVT1100` 으로 링크 실패
   - MSVC(vcxproj) : 링커의 "추가 매니페스트 파일"(`<Manifest><AdditionalManifestFiles>`)
   - MSVC(CMake) : `.manifest` 를 `target_sources` 로 넘김. `/MANIFEST:EMBED` 나 `/MANIFESTINPUT` 을 `target_link_options` 로 직접 주면 CMake 의 `vs_link_exe` 가 만드는 `manifest.res` 와 겹쳐 실패함
   - mingw : `.rc` 에 `1 24 "<파일>"`. 이 `.rc` 는 MSVC 빌드에 넣지 않음
-- mingw 호환
+- mingw 호환 (선택. 지키기 쉬우면 지키고, 좋은 코드와 부딪히면 버림)
   - `#pragma comment(lib, ...)` 금지. 라이브러리는 CMake 의 `target_link_libraries` 에 추가
   - `sprintf_s` 등 `_s` 계열은 `#ifdef _MSC_VER` 로 분기하고 그 밖에서는 `snprintf`
   - `CD3D11_VIEWPORT`, `CD3D11_RECT`, `CD3D11_DEPTH_STENCIL_VIEW_DESC`, `D3D11_MIN_DEPTH`, `D3D11_MAX_DEPTH` 는 mingw 헤더에 없음. `CD3D11_BUFFER_DESC`, `CD3D11_TEXTURE2D_DESC`, `CD3D11_RASTERIZER_DESC`, `CD3D11_SAMPLER_DESC` 는 있음
