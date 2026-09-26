@@ -45,6 +45,7 @@
 
 - Visual Studio 빌드 : `DxRenderDojo.sln`. x64 전용
 - 경고 수준은 `/W4`. 이름 가림 경고(C4456·C4458·C4459)가 4수준이라 `/W3` 에서는 뜨지 않음
+- 도구 집합은 v143 을 유지함. 언리얼 엔진 작업의 주력 도구 집합이 v143 이라서임. Visual Studio 2026 의 기본(v145)으로 올리지 않음
 - 검사용 CMake 빌드 : VS 개발자 명령 프롬프트(`vcvars64.bat`)에서 실행. `build-win/compile_commands.json` 이 생겨 clang-tidy 가 컴파일 옵션을 그대로 씀
 
 ```
