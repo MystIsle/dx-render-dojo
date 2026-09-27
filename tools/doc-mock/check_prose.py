@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """교재 원고(template-NN.html)의 기계 점검.
 
-사람이 읽어야 아는 것은 다루지 않는다. 셀 수 있는 것만 센다 : 마커, 따라 하기 조각의 빠짐없음, 앵커, 태그 짝, 어미, 금지 표현, 리듬 수치.
+사람이 읽어야 아는 것은 다루지 않는다. 셀 수 있는 것만 센다 : 마커, 따라 하기 조각의 빠짐없음, 앵커, 태그 짝, 원문 언급, 여기까지 상자, 어미, 금지 표현, 리듬 수치.
 규칙의 출처는 docs/DOC_STYLE.md 다.
 
 사용법 :
@@ -47,10 +47,27 @@ PAIRED_TAGS = ["details", "summary", "figure", "figcaption", "section", "ul", "o
 MARKER = re.compile(r"<!--(INCLUDE|FILE|SYMBOL|DIFF|SLICE|TOC)(?:@(\d+))?:(.*?)-->", re.S)
 TOC_NAMES = ("eyebrow", "base", "pager", "progress", "count", "stages", "rail")
 
-# 빠짐없음을 세는 파일. 프로젝트 파일은 솔루션 탐색기로 바뀌는 것이라 본문이 언급하는지만 본다.
+# 빠짐없음을 세는 파일. 프로젝트 파일은 솔루션 탐색기로 바뀌는 것이라 본문이 VS 조작을 안내하는지만 본다.
 CODE_PATH = re.compile(r"^(Source/|CMakeLists\.txt$|[^/]+\.(manifest|rc)$)")
 PROJECT_FILE = re.compile(r"\.vcxproj(\.filters)?$")
 ACTION_BADGES = ("신규", "수정", "삭제")
+
+# CMake 조각은 01·02편 기본 세팅에만 있다. 03편부터는 CMakeLists.txt 가 바뀌어도 빠짐없음을 세지 않는다.
+CMAKE_FILE = "CMakeLists.txt"
+CMAKE_LESSONS = ("tut01", "tut02")
+
+# VS 조작 안내. 01~04편 원고가 프로젝트 파일을 바꾸는 단계에 쓴 말에서 뽑았다.
+# 필터·속성은 D3D 용어(샘플러 필터, 정점 속성)와 겹치므로 조작으로만 읽히는 꼴로 찾는다.
+VS_ACTIONS = re.compile(r"솔루션 탐색기|(새|기존) 항목 추가|필터(에|를 만들)|(프로젝트|파일|구성) 속성|속성을 열|모든 구성")
+
+# 원고에 쓰지 않는 원문 언급과 출처. 링크 주소도 잡도록 대소문자를 가리지 않는다.
+SOURCE_MENTION = re.compile(r"원문|rastertek|dxstudy", re.I)
+# 목차 마커가 채우는 자리. 원고에는 마커만 있고, 생성 결과에는 toc.json 의 스테이지 이름("원문에 없는 편" 등)이 들어온다.
+TOC_SLOTS = (r"<!--TOC:\w+-->", r'<p class="eyebrow">.*?</p>', r'<nav class="pager"[^>]*>.*?</nav>', r"<b>이전 태그</b><code>.*?</code>")
+
+# 단계 끝 "여기까지" 상자. 원고는 <div class="checkpoint"> 에 라벨 "여기까지" 를 달았다.
+CHECKPOINT = re.compile(r'<div class="[^"]*\bcheckpoint\b[^"]*">')
+CHECKPOINT_LABEL = re.compile(r'<p class="box-label">\s*여기까지\s*</p>')
 
 
 class Report:
@@ -278,11 +295,15 @@ def check_follow_along(source, tag, report):
     # 앞 편 태그는 목차에서 읽는다. 원문에 없는 편은 번호로 앞 편을 알 수 없다.
     toc = json.loads((HERE / "toc.json").read_text(encoding="utf-8"))
     bases = {lesson["tag"]: lesson["base"] for stage in toc["stages"] for lesson in stage["lessons"]}
-    base_tag = bases.get(ref.rsplit("/", 1)[-1])
+    lesson = ref.rsplit("/", 1)[-1]
+    base_tag = bases.get(lesson)
     base = f"refs/tags/{base_tag}" if base_tag else None
     if base is None or git_run("rev-parse", "--verify", "--quiet", base) is None:
         report.note("빠짐없음 : 이전 태그가 없어 건너뜀")
         return
+    count_cmake = lesson in CMAKE_LESSONS
+    if not count_cmake and (git_run("diff", "--name-only", base, ref, "--", CMAKE_FILE) or "").strip():
+        report.note(f"빠짐없음 : {CMAKE_FILE} 가 바뀌었지만 01·02편만 셈")
 
     steps_match = re.search(r'<section id="steps".*?</section>', source, re.S)
     if not steps_match:
@@ -290,7 +311,7 @@ def check_follow_along(source, tag, report):
     steps = steps_match.group(0)
 
     if not any(step for _, step, _ in MARKER.findall(steps)):
-        check_range(steps, base, ref, "", report)
+        check_range(steps, base, ref, "", count_cmake, report)
         return
 
     # 단계 커밋 사슬. N단계 조각을 모으면 N-1단계에서 N단계로 온 diff 와 같아야 한다.
@@ -313,10 +334,10 @@ def check_follow_along(source, tag, report):
         if strays:
             report.error(f"{number}단계 : 다른 단계를 가리키거나 단계가 없는 마커 : " + ", ".join(strays))
         step_base = tag_ref(tag, str(number - 1)) if number > 1 else base
-        check_range(block, step_base, tag_ref(tag, str(number)), f"{number}단계 ", report)
+        check_range(block, step_base, tag_ref(tag, str(number)), f"{number}단계 ", count_cmake, report)
 
 
-def check_range(steps, base, ref, label, report):
+def check_range(steps, base, ref, label, count_cmake, report):
     """base 에서 ref 로 온 코드 변경이 steps 의 조각에 빠짐없이 나오는지, 나눈 조각의 순서가 소스와 같은지."""
     pieces = step_pieces(steps, ref)
 
@@ -327,8 +348,9 @@ def check_range(steps, base, ref, label, report):
     names = [name for name in (git_run("diff", "-M", "--name-only", base, ref) or "").split("\n") if name]
     renames = renamed_paths(base, ref)
     steps_text = strip_tags(steps)
-    if any(PROJECT_FILE.search(name) for name in names) and "vcxproj" not in steps_text:
-        report.error(f"{label}빠짐없음 : 프로젝트 파일이 바뀌었는데 따라 하기 본문이 언급하지 않음")
+    # 프로젝트 파일의 diff 는 원고에 보이지 않는다. 독자는 VS 로 조작하므로 그 조작을 문장으로 안내했는지 본다.
+    if any(PROJECT_FILE.search(name) for name in names) and not VS_ACTIONS.search(steps_text):
+        report.error(f"{label}프로젝트 파일 : 바뀌었는데 따라 하기 본문이 VS 조작(솔루션 탐색기·항목 추가·필터·속성)을 안내하지 않음")
     unmentioned = sorted(Path(new).name for new in renames if CODE_PATH.search(new) and Path(new).name not in steps_text)
     if unmentioned:
         report.error(f"{label}빠짐없음 : 옮긴 파일을 따라 하기 본문이 언급하지 않음 : " + ", ".join(unmentioned))
@@ -336,6 +358,8 @@ def check_range(steps, base, ref, label, report):
     total_added = total_missing = total_removed = total_removed_missing = 0
     for path in names:
         if not CODE_PATH.search(path) or PROJECT_FILE.search(path):
+            continue
+        if path == CMAKE_FILE and not count_cmake:
             continue
         lines = git_lines(ref, path) or []
         covered, removal_covered = set(), set()
@@ -492,6 +516,38 @@ def check_structure(body, report):
         report.error("가리키는 곳이 없는 앵커 : " + ", ".join("#" + d for d in dangling))
 
 
+def blank_out(text, pattern):
+    """pattern 에 걸린 곳을 공백으로 지운다. 줄바꿈은 남겨서 줄 번호가 그대로다."""
+    return re.sub(pattern, lambda match: re.sub(r"[^\n]", " ", match.group(0)), text, flags=re.S)
+
+
+def check_source_mentions(source, report):
+    """원문 언급·출처. 독자는 원문을 보지 않는다. <script>·<style> 과 목차 마커가 채우는 자리는 빼고, 한 줄을 한 건으로 센다."""
+    text = source
+    for pattern in (r"<script\b.*?</script>", r"<style\b.*?</style>", *TOC_SLOTS):
+        text = blank_out(text, pattern)
+    for number, line in enumerate(text.split("\n"), 1):
+        words = sorted({match.group(0).lower() for match in SOURCE_MENTION.finditer(line)})
+        if words:
+            report.error(f"원문 언급 {number}줄 ({'·'.join(words)}) : {strip_tags(re.sub(r'<[^>]+>', ' ', line))[:50]}")
+
+
+def check_checkpoints(source, report):
+    """단계 끝 "여기까지" 상자. 독자는 편 끝 "다 됐는지 확인" 에서 한 번 빌드·실행한다."""
+    text = blank_out(blank_out(source, r"<script\b.*?</script>"), r"<style\b.*?</style>")
+    boxes = {match.start() for match in CHECKPOINT.finditer(text)}
+    # 클래스 없이 라벨만 단 상자도 센다. 라벨이 checkpoint div 안에 있으면 같은 상자다.
+    for label in CHECKPOINT_LABEL.finditer(text):
+        if text.rfind("<div", 0, label.start()) not in boxes:
+            boxes.add(label.start())
+    for start in sorted(boxes):
+        line = text.count("\n", 0, start) + 1
+        report.error(f"`여기까지` 상자 {line}줄. 빌드·실행 결과는 편 끝 `다 됐는지 확인` 에만")
+    mentions = re.findall(r"[^.]*여기까지 상자[^.]*\.", strip_tags(CHECKPOINT_LABEL.sub("", text)))
+    if mentions:
+        report.warn(f"`여기까지` 상자를 가리키는 문장 {len(mentions)}곳 : " + " / ".join(m.strip()[:60] for m in mentions))
+
+
 def check_prose(body, report):
     # 자동 블록(바뀐 파일)과 푸터는 산문 점검에서 뺀다. 푸터의 라이선스 문구는 합쇼체가 맞다.
     prose = re.sub(r"<!-- code:begin -->.*?<!-- code:end -->", "", body, flags=re.S)
@@ -601,6 +657,8 @@ def main():
     if args.built:
         check_walk(body, report)
     check_structure(body, report)
+    check_source_mentions(source, report)
+    check_checkpoints(source, report)
     check_prose(body, report)
 
     print(f"점검 : {args.file}")
