@@ -33,6 +33,7 @@ private:
 	Microsoft::WRL::ComPtr<IDXGISwapChain1> SwapChain;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> RenderTargetView;
 	Microsoft::WRL::ComPtr<IDXGIInfoQueue> InfoQueue;
+	D3D11_VIEWPORT Viewport = {};
 	DirectX::XMFLOAT4 ClearColor = {0.5f, 0.5f, 0.5f, 1.0f};
 	bool bVSync = true;
 };
