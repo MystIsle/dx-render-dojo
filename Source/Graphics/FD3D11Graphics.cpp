@@ -145,8 +145,8 @@ void FD3D11Graphics::Resize(int Width, int Height)
 
 void FD3D11Graphics::BeginScene()
 {
-	// ClearRenderTargetView 는 float 4개 배열을 받는다. DXGI_RGBA 는 r·g·b·a 를 이 순서로 이어 둔다.
-	Context->ClearRenderTargetView(RenderTargetView.Get(), &ClearColor.r);
+	// ClearRenderTargetView 는 float 4개 배열을 받는다. XMFLOAT4 는 x·y·z·w 를 이 순서로 이어 둔다.
+	Context->ClearRenderTargetView(RenderTargetView.Get(), &ClearColor.x);
 }
 
 void FD3D11Graphics::EndScene()

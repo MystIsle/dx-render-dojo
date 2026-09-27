@@ -1,5 +1,6 @@
 #pragma once
 
+#include <DirectXMath.h>
 #include <d3d11.h>
 #include <dxgi1_2.h>
 #include <dxgidebug.h>
@@ -32,6 +33,6 @@ private:
 	Microsoft::WRL::ComPtr<IDXGISwapChain1> SwapChain;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> RenderTargetView;
 	Microsoft::WRL::ComPtr<IDXGIInfoQueue> InfoQueue;
-	DXGI_RGBA ClearColor = {0.5f, 0.5f, 0.5f, 1.0f};
+	DirectX::XMFLOAT4 ClearColor = {0.5f, 0.5f, 0.5f, 1.0f};
 	bool bVSync = true;
 };
