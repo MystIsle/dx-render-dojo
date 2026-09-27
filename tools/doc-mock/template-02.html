@@ -511,7 +511,7 @@ details.diff-file summary .why { color: var(--slate); }
 
 	<section id="steps" data-block="steps" data-source="직접">
 		<h2>따라 하기</h2>
-		<p class="section-note">코드 조각 위의 경로는 리포 루트 기준이에요. 새 파일은 그 폴더에 만들어요. Visual Studio 의 새 항목 추가는 기본 위치가 프로젝트 파일 옆이라 위치를 그 폴더로 바꿔야 해요. 배지는 할 일이에요. <b>신규</b>는 새 파일이나 새 함수를 넣기, <b>수정</b>은 있던 것을 고치기, <b>삭제</b>는 지우기예요. 통째로 보이는 조각은 그대로 넣거나 바꿔 넣고, diff 조각은 초록 줄을 넣고 빨간 줄을 지워요. 빌드와 실행은 7단계까지 친 뒤 <a href="#check">다 됐는지 확인</a>에서 한 번 해요.</p>
+		<p class="section-note">코드 조각 위의 경로는 리포 루트 기준이에요. 새 파일은 솔루션 탐색기에서 그 파일이 들어갈 필터를 오른쪽 클릭 › 추가 › 새 항목으로 만들어요. 새 항목 추가는 기본 위치가 프로젝트 파일 옆이라 위치를 경로의 폴더로 바꿔야 해요. 필터는 프로젝트를 오른쪽 클릭 › 추가 › 새 필터로, 프로젝트 바로 아래에 만들어요. 배지는 할 일이에요. <b>신규</b>는 새 파일이나 새 함수를 넣기, <b>수정</b>은 있던 것을 고치기, <b>삭제</b>는 지우기예요. 통째로 보이는 조각은 그대로 넣거나 바꿔 넣고, diff 조각은 초록 줄을 넣고 빨간 줄을 지워요. 빌드와 실행은 7단계까지 친 뒤 <a href="#check">다 됐는지 확인</a>에서 한 번 해요.</p>
 		<ol class="steps">
 
 			<li class="step" id="step-tools">
@@ -601,7 +601,7 @@ details.diff-file summary .why { color: var(--slate); }
 							<li class="entry"><code>FStringConv::ToWide(TypeName)</code> 싱글톤 경고에 붙일 타입 이름. 바이트 하나를 글자 하나로 옮기면 한글처럼 여러 바이트인 글자가 깨짐</li>
 						</ul>
 					</details>
-					<p>Visual Studio 에서는 솔루션 탐색기에 <code>Utility</code> 필터를 만들고 새 <code>.h</code>·<code>.cpp</code> 를 기존 항목 추가로 넣어요. <code>Main.cpp</code> 는 필터에 넣지 않고 그대로 둬요. 프로젝트 속성은 아래 둘을 고쳐요. 이 조작들이 <code>DxRenderDojo.vcxproj</code> 와 <code>DxRenderDojo.vcxproj.filters</code> 를 바꿔요.</p>
+					<p>Visual Studio 에서는 솔루션 탐색기에 <code>Utility</code> 필터를 만들고 그 필터에서 일곱 파일을 새 항목 추가로 만들어요. <code>Main.cpp</code> 는 필터에 넣지 않고 그대로 둬요. 프로젝트 속성은 아래 둘을 고쳐요. 이 조작들이 <code>DxRenderDojo.vcxproj</code> 와 <code>DxRenderDojo.vcxproj.filters</code> 를 바꿔요.</p>
 					<ul class="walk">
 						<li>모든 구성 · C/C++ › 일반 › 추가 포함 디렉터리 : <code>$(ProjectDir)Source</code>. <code>#include "Utility/Check.h"</code> 처럼 <code>Source/</code> 기준으로 폴더까지 적을 수 있게 함</li>
 						<li>Debug·Release 각각 · C/C++ › 전처리기 › 전처리기 정의 : <code>WIN32_LEAN_AND_MEAN</code> 추가. <code>Windows.h</code> 가 잘 쓰지 않는 헤더를 빼고 읽게 함</li>
@@ -750,7 +750,7 @@ details.diff-file summary .why { color: var(--slate); }
 						<p>디버그 빌드는 <code>FLog::Prepare</code> 에서 로그를 보여 줄 콘솔 창이 열려요. Windows 는 키 입력을 맨 앞에 있는 창 하나에만 보내고, 새로 열린 창은 맨 앞으로 와요. <code>FLog::Prepare</code> 를 <code>Initialize</code> 뒤로 옮겨 실행하면 콘솔 창이 검은 창보다 앞에 떠요. 이 상태에서는 검은 창을 한 번 누르기 전까지 키 입력이 콘솔로 가요.</p>
 						<p><code>FSystem::Release</code> 는 <code>Run</code> 이 돌아온 바로 다음 줄에서 창을 치워요. 이 줄이 없어도 프로그램이 끝날 때 싱글톤은 저절로 해제돼요. 다만 <code>FSystem</code> 과 <code>FLog</code> 중 어느 쪽이 먼저 해제될지는 정해져 있지 않아요. <code>FLog</code> 가 먼저 사라지면 <code>FSystem</code> 을 정리하는 코드가 이미 없는 로그를 부르게 될 수 있어요. 여기서 직접 해제하면 그때 <code>FLog</code> 는 아직 살아 있어요.</p>
 					</details>
-					<p>Visual Studio 에서는 솔루션 탐색기에 <code>Core</code> 필터를 만들고 새 <code>.h</code>·<code>.cpp</code> 를 기존 항목 추가로 넣어요.</p>
+					<p>Visual Studio 에서는 솔루션 탐색기에 <code>Core</code> 필터를 만들고 그 필터에서 새 파일을 새 항목 추가로 만들어요.</p>
 				</div>
 			</li>
 
@@ -956,7 +956,7 @@ details.diff-file summary .why { color: var(--slate); }
 							<li class="entry"><code>[[maybe_unused]] LPARAM LParam</code> 콜백 모양을 맞추려고 받지만 이 함수는 쓰지 않음</li>
 						</ul>
 					</details>
-					<p>Visual Studio 에서는 <code>App</code> 필터를 만들어 <code>FApplication</code> 두 파일을 넣고, <code>FInput</code> 두 파일은 <code>Core</code> 필터에 넣어요.</p>
+					<p>Visual Studio 에서는 <code>App</code> 필터를 만들어 그 필터에서 <code>FApplication</code> 두 파일을, <code>Core</code> 필터에서 <code>FInput</code> 두 파일을 새 항목 추가로 만들어요.</p>
 					<div class="learn">
 						<p class="box-label">스스로 설명해 보기</p>
 						<p>F1 키를 누르면 <code>FInput</code> 의 어느 칸이 바뀔까요? Windows 가 <code>WndProc</code> 를 부르는 데서 시작해 거쳐 가는 함수를 차례로 말해 보세요.</p>
@@ -1023,7 +1023,7 @@ details.diff-file summary .why { color: var(--slate); }
 						<figcaption><span class="path">DxRenderDojo.rc</span><span class="badge new">신규</span><span class="badge">파일 전체 · mingw 빌드 전용</span></figcaption>
 <pre class="src" data-lang="cpp"><!--FILE@7:DxRenderDojo.rc--></pre>
 					</figure>
-					<p>Visual Studio 에서는 두 파일을 기존 항목 추가로 넣고 아래를 고쳐요.</p>
+					<p>Visual Studio 에서는 두 파일을 프로젝트에서 새 항목 추가로 만들고(위치는 기본값인 프로젝트 파일 옆) 아래를 고쳐요.</p>
 					<ul class="walk">
 						<li>모든 구성 · 매니페스트 도구 › 입력 및 출력 › 추가 매니페스트 파일 : <code>$(ProjectDir)DxRenderDojo.manifest</code>. 같은 곳의 DPI 인식은 없음으로 고름(vcxproj 에는 <code>EnableDpiAwareness</code> 가 <code>false</code> 로 남음). 매니페스트 파일이 직접 선언함</li>
 						<li><code>DxRenderDojo.manifest</code>·<code>DxRenderDojo.rc</code> : 파일 속성의 구성 속성 › 일반 › 항목 형식을 빌드에 참여 안 함으로 바꿈. <code>.rc</code> 가 기본값인 리소스 컴파일러로 남으면 <a href="#pitfalls">흔한 실수</a> 3번의 <code>CVT1100</code></li>

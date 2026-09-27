@@ -554,7 +554,7 @@ figure.code .diff-view { border-top: 0; }
 
 	<section id="steps" data-block="steps" data-source="직접">
 		<h2>따라 하기</h2>
-		<p class="section-note">코드 조각 위의 경로는 리포 루트 기준이에요. 새 파일은 그 폴더에 만들어요. Visual Studio 의 새 항목 추가는 기본 위치가 프로젝트 파일 옆이라 위치를 그 폴더로 바꿔야 해요. 배지는 할 일이에요. <b>신규</b>는 새 파일이나 새 함수를 넣기, <b>수정</b>은 있던 것을 고치기, <b>삭제</b>는 지우기예요. 통째로 보이는 조각은 그대로 넣거나 바꿔 넣고, diff 조각은 초록 줄을 넣고 빨간 줄을 지워요. 빌드와 실행은 8단계까지 친 뒤 <a href="#check">다 됐는지 확인</a>에서 한 번 해요.</p>
+		<p class="section-note">코드 조각 위의 경로는 리포 루트 기준이에요. 새 파일은 솔루션 탐색기에서 그 파일이 들어갈 필터를 오른쪽 클릭 › 추가 › 새 항목으로 만들어요. 새 항목 추가는 기본 위치가 프로젝트 파일 옆이라 위치를 경로의 폴더로 바꿔야 해요. 필터는 프로젝트를 오른쪽 클릭 › 추가 › 새 필터로, 프로젝트 바로 아래에 만들어요. 배지는 할 일이에요. <b>신규</b>는 새 파일이나 새 함수를 넣기, <b>수정</b>은 있던 것을 고치기, <b>삭제</b>는 지우기예요. 통째로 보이는 조각은 그대로 넣거나 바꿔 넣고, diff 조각은 초록 줄을 넣고 빨간 줄을 지워요. 빌드와 실행은 8단계까지 친 뒤 <a href="#check">다 됐는지 확인</a>에서 한 번 해요.</p>
 		<ol class="steps">
 
 			<li class="step" id="step-math">
@@ -692,7 +692,7 @@ figure.code .diff-view { border-top: 0; }
 <pre class="src" data-lang="cpp"><!--FILE@3:Source/Graphics/FModel.h--></pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FModel.cpp</span><span class="badge new">신규</span><span class="badge">파일 맨 위 include</span></figcaption>
+						<figcaption><span class="path">Source/Graphics/FModel.cpp</span><span class="badge new">신규</span><span class="badge">파일 맨 위 include 와 using</span></figcaption>
 <pre class="snip" data-lang="cpp"><!--SLICE@3:Source/Graphics/FModel.cpp:#include "Graphics/FModel.h"=>void FModel::Initialize--></pre>
 					</figure>
 					<figure class="code">
@@ -756,7 +756,7 @@ figure.code .diff-view { border-top: 0; }
 						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge mod">수정</span><span class="badge">FSystem::Initialize</span></figcaption>
 <pre class="diff" data-lang="cpp"><!--DIFF@3:Source/Core/FSystem.cpp--></pre>
 					</figure>
-					<p>Visual Studio 에서는 <code>Graphics</code> 필터에 <code>FVertexTypes.h</code>·<code>FModel.h</code>·<code>FModel.cpp</code> 를 넣어요.</p>
+					<p>Visual Studio 에서는 <code>Graphics</code> 필터에서 <code>FVertexTypes.h</code>·<code>FModel.h</code>·<code>FModel.cpp</code> 를 새 항목 추가로 만들어요.</p>
 					<details class="fold">
 						<summary>언리얼로 치면</summary>
 						<aside class="ue">
@@ -803,7 +803,7 @@ figure.code .diff-view { border-top: 0; }
 						</ul>
 					</details>
 					<p>픽셀 셰이더가 받는 <code>Input.Color</code> 는 정점 셰이더가 내보낸 색이에요. 래스터라이저가 삼각형 안쪽 픽셀마다 세 정점의 값을 섞어서 넘겨요.</p>
-					<p>셰이더 파일은 빌드할 때 exe 옆 <code>Shaders</code> 폴더로 복사해요. Visual Studio 에서는 새 <code>Shaders</code> 필터에 <code>Color.hlsl</code> 을 넣고 아래처럼 고쳐요.</p>
+					<p>셰이더 파일은 빌드할 때 exe 옆 <code>Shaders</code> 폴더로 복사해요. Visual Studio 에서는 <code>Graphics</code> 와 나란히 <code>Shaders</code> 필터를 만들고, 그 필터에서 새 항목 추가로 <code>Color.hlsl</code> 을 만들어요. HLSL 항목의 셰이더 파일 템플릿을 고르면 예제 코드가 들어 있으니 지우고 위의 내용을 쳐요. 그다음 아래처럼 고쳐요.</p>
 					<ul class="walk">
 						<li><code>Color.hlsl</code> 의 속성을 열고 구성을 모든 구성으로 둠</li>
 						<li>구성 속성 › 일반 › 항목 형식 : 파일 복사. 기본값인 HLSL 컴파일러는 빌드할 때 셰이더를 컴파일하려 해서 바꿈. 적용을 누르면 왼쪽에 파일 복사 항목이 생김</li>
@@ -945,7 +945,7 @@ figure.code .diff-view { border-top: 0; }
 						<figcaption><span class="path">Source/App/FApplication.cpp</span><span class="badge mod">수정</span><span class="badge">FApplication::Initialize</span></figcaption>
 <pre class="diff" data-lang="cpp"><!--DIFF@5:Source/App/FApplication.cpp--></pre>
 					</figure>
-					<p>Visual Studio 에서는 <code>Shaders</code> 필터에 <code>FColorShader.h</code>·<code>FColorShader.cpp</code> 를, <code>Utility</code> 필터에 <code>FPaths.h</code>·<code>FPaths.cpp</code> 를, <code>Graphics</code> 필터에 <code>FVertexTypes.cpp</code> 를 넣고 아래를 고쳐요.</p>
+					<p>Visual Studio 에서는 <code>Shaders</code> 필터에서 <code>FColorShader.h</code>·<code>FColorShader.cpp</code> 를, <code>Utility</code> 필터에서 <code>FPaths.h</code>·<code>FPaths.cpp</code> 를, <code>Graphics</code> 필터에서 <code>FVertexTypes.cpp</code> 를 새 항목 추가로 만들고 아래를 고쳐요.</p>
 					<ul class="walk">
 						<li>모든 구성 · 링커 › 입력 › 추가 종속성 : <code>dxguid.lib;</code> 뒤에 <code>d3dcompiler.lib;</code> 를 더함. <code>D3DCompileFromFile</code> 이 이 라이브러리에 있음</li>
 					</ul>
@@ -1105,7 +1105,7 @@ figure.code .diff-view { border-top: 0; }
 						</svg>
 						<figcaption>세로 시야각이 정해져 있어서 삼각형 크기는 창 높이를 따라가요. 창을 가로로만 넓히면 크기는 그대로예요.</figcaption>
 					</figure>
-					<p>Visual Studio 에서는 <code>Graphics</code> 필터에 <code>FCamera.h</code>·<code>FCamera.cpp</code> 를 넣어요.</p>
+					<p>Visual Studio 에서는 <code>Graphics</code> 필터에서 <code>FCamera.h</code>·<code>FCamera.cpp</code> 를 새 항목 추가로 만들어요.</p>
 					<details class="fold">
 						<summary>언리얼로 치면</summary>
 						<aside class="ue">
@@ -1150,14 +1150,14 @@ figure.code .diff-view { border-top: 0; }
 						<figcaption><span class="path">Source/Shaders/Color.hlsl</span><span class="badge mod">수정</span><span class="badge">cbuffer 위 주석</span></figcaption>
 <pre class="diff" data-lang="cpp"><!--DIFF@8:Source/Shaders/Color.hlsl--></pre>
 					</figure>
-					<p>상수 버퍼는 <code>Initialize</code> 끝에서 만들어요.</p>
+					<p>상수 버퍼는 <code>Initialize</code> 끝, <code>CreateInputLayout</code> 다음에서 만들어요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Shaders/FColorShader.cpp</span><span class="badge mod">수정</span><span class="badge">using 줄</span></figcaption>
 <pre class="diff" data-lang="cpp"><!--DIFF@8:Source/Shaders/FColorShader.cpp:using Microsoft::WRL::ComPtr;=>ComPtr<ID3DBlob> CompileShader--></pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/Shaders/FColorShader.cpp</span><span class="badge mod">수정</span><span class="badge">FColorShader::Initialize 끝, CreateInputLayout 다음</span></figcaption>
-<pre class="diff" data-lang="cpp"><!--DIFF@8:Source/Shaders/FColorShader.cpp:void FColorShader::Initialize=>void XM_CALLCONV FColorShader::SetMatrices--></pre>
+						<figcaption><span class="path">Source/Shaders/FColorShader.cpp</span><span class="badge mod">수정</span><span class="badge">FColorShader::Initialize</span></figcaption>
+<pre class="snip" data-lang="cpp"><!--SYMBOL@8:Source/Shaders/FColorShader.cpp:void FColorShader::Initialize--></pre>
 					</figure>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
