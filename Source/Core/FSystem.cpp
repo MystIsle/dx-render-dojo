@@ -14,6 +14,7 @@ void FSystem::Initialize(int ShowCmd)
 
 	Window.SetMessageCallback([this](UINT Message, WPARAM WParam, LPARAM LParam)
 	                          { OnWindowMessage(Message, WParam, LParam); });
+	Window.SetResizeCallback([this](int NewWidth, int NewHeight) { OnResize(NewWidth, NewHeight); });
 }
 
 int FSystem::Run()
@@ -61,4 +62,9 @@ void FSystem::OnWindowMessage(UINT Message, WPARAM WParam, [[maybe_unused]] LPAR
 	default:
 		break;
 	}
+}
+
+void FSystem::OnResize(int NewWidth, int NewHeight)
+{
+	FLog::Info(std::format(L"창 크기 변경 : {}x{}", NewWidth, NewHeight));
 }

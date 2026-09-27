@@ -31,6 +31,7 @@ FWindow::~FWindow()
 {
 	// 콜백을 먼저 끊는다. DestroyWindow 가 부르는 메시지가 이미 사라진 FInput·FApplication 에 닿지 않게 한다.
 	MessageCallback = nullptr;
+	ResizeCallback = nullptr;
 
 	if (bCursorHidden)
 	{
@@ -115,6 +116,11 @@ void FWindow::SetMessageCallback(std::function<void(UINT, WPARAM, LPARAM)> Callb
 	MessageCallback = std::move(Callback);
 }
 
+void FWindow::SetResizeCallback(std::function<void(int, int)> Callback)
+{
+	ResizeCallback = std::move(Callback);
+}
+
 LRESULT FWindow::HandleMessage(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam)
 {
 	switch (Message)
@@ -132,11 +138,52 @@ LRESULT FWindow::HandleMessage(HWND WindowHandle, UINT Message, WPARAM WParam, L
 		}
 		return 0;
 
+	// 드래그하는 동안에는 알리지 않고 끝날 때 한 번만 알린다. 매 픽셀마다 스왑체인을 다시 만들지 않기 위해서다.
+	case WM_ENTERSIZEMOVE:
+		bSizing = true;
+		return 0;
+
+	case WM_EXITSIZEMOVE:
+		bSizing = false;
+		NotifyResize();
+		return 0;
+
+	case WM_SIZE:
+		if (WParam != SIZE_MINIMIZED && bSizing == false)
+		{
+			NotifyResize();
+		}
+		return 0;
+
+	case WM_GETMINMAXINFO:
+	{
+		constexpr int MinimumWidth = 320;
+		constexpr int MinimumHeight = 240;
+
+		MINMAXINFO* Limits = reinterpret_cast<MINMAXINFO*>(LParam);
+		Limits->ptMinTrackSize.x = MinimumWidth;
+		Limits->ptMinTrackSize.y = MinimumHeight;
+		return 0;
+	}
+
 	default:
 		if (MessageCallback)
 		{
 			MessageCallback(Message, WParam, LParam);
 		}
 		return DefWindowProcW(WindowHandle, Message, WParam, LParam);
+	}
+}
+
+void FWindow::NotifyResize()
+{
+	RECT Client = {};
+	GetClientRect(Handle, &Client);
+	Width = Client.right - Client.left;
+	Height = Client.bottom - Client.top;
+
+	if (ResizeCallback)
+	{
+		ResizeCallback(Width, Height);
 	}
 }

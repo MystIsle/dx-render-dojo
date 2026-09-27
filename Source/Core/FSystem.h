@@ -18,6 +18,7 @@ private:
 	void Frame();
 
 	void OnWindowMessage(UINT Message, WPARAM WParam, LPARAM LParam);
+	void OnResize(int NewWidth, int NewHeight);
 
 	// 멤버는 선언의 역순으로 소멸한다.
 	// 창을 쓰는 멤버는 FWindow 뒤에 두어 창보다 먼저 소멸하게 한다.
