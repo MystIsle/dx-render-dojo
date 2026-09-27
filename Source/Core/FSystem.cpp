@@ -47,7 +47,9 @@ void FSystem::Frame()
 	}
 
 	Application.Update();
+	Graphics.BeginScene();
 	Application.Render();
+	Graphics.EndScene();
 }
 
 void FSystem::OnWindowMessage(UINT Message, WPARAM WParam, [[maybe_unused]] LPARAM LParam)

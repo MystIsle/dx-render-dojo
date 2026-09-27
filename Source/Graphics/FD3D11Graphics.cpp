@@ -10,6 +10,8 @@ using Microsoft::WRL::ComPtr;
 
 void FD3D11Graphics::Initialize(HWND WindowHandle, int Width, int Height, bool bEnableVSync)
 {
+	bVSync = bEnableVSync;
+
 	UINT FactoryFlags = 0;
 
 	ComPtr<IDXGIFactory2> Factory;
@@ -61,6 +63,17 @@ void FD3D11Graphics::Initialize(HWND WindowHandle, int Width, int Height, bool b
 	CHECK_FATAL(Factory->MakeWindowAssociation(WindowHandle, DXGI_MWA_NO_ALT_ENTER));
 
 	CreateSizeDependentResources();
+}
+
+void FD3D11Graphics::BeginScene()
+{
+	// ClearRenderTargetView 는 float 4개 배열을 받는다. DXGI_RGBA 는 r·g·b·a 를 이 순서로 이어 둔다.
+	Context->ClearRenderTargetView(RenderTargetView.Get(), &ClearColor.r);
+}
+
+void FD3D11Graphics::EndScene()
+{
+	CHECK_FATAL(SwapChain->Present(bVSync ? 1 : 0, 0));
 }
 
 void FD3D11Graphics::CreateSizeDependentResources()
