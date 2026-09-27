@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Windows.h>
+#include <functional>
 #include <string>
 #include <string_view>
 
@@ -40,6 +41,9 @@ namespace Return
 	                              std::wstring_view File,
 	                              int Line);
 	bool IsFatal();
+
+	// 치명 실패로 끝나기 직전에 한 번 부른다. 쌓여 있던 진단 메시지를 로그로 내보낼 기회를 준다.
+	void SetFatalHook(std::function<void()> Hook);
 
 	void ReportResurrection(std::string_view TypeName);
 } // namespace Return

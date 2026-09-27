@@ -13,8 +13,17 @@
 
 using Microsoft::WRL::ComPtr;
 
+FD3D11Graphics::~FD3D11Graphics()
+{
+	// Initialize 가 건 훅이 사라진 객체를 부르지 않게 푼다.
+	::Return::SetFatalHook(nullptr);
+}
+
 void FD3D11Graphics::Initialize(HWND WindowHandle, int Width, int Height, bool bEnableVSync)
 {
+	// 치명 실패로 끝나기 직전에 쌓인 디버그 메시지와 장치 제거 원인을 로그로 남긴다.
+	::Return::SetFatalHook([this] { OnFatal(); });
+
 	bVSync = bEnableVSync;
 
 	UINT FactoryFlags = 0;
@@ -189,4 +198,19 @@ void FD3D11Graphics::FlushDebugMessages()
 	}
 
 	InfoQueue->ClearStoredMessages(DXGI_DEBUG_ALL);
+}
+
+void FD3D11Graphics::OnFatal()
+{
+	FlushDebugMessages();
+
+	// Present·ResizeBuffers 가 돌려주는 장치 제거 코드만으로는 원인을 알 수 없다.
+	if (Device != nullptr)
+	{
+		const HRESULT RemovedReason = Device->GetDeviceRemovedReason();
+		if (FAILED(RemovedReason))
+		{
+			FLog::Error(std::format(L"장치 제거 원인 : {}", ::Return::Describe(RemovedReason)));
+		}
+	}
 }

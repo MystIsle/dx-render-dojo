@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <format>
 #include <string>
+#include <utility>
 
 #include "Utility/FLog.h"
 #include "Utility/FStringConv.h"
@@ -11,6 +12,7 @@
 namespace
 {
 	bool bFatal = false;
+	std::function<void()> FatalHook;
 
 	std::wstring FormatFailure(std::wstring_view Prefix,
 	                           std::wstring_view Expression,
@@ -44,6 +46,13 @@ namespace Return
 	{
 		bFatal = true;
 
+		if (FatalHook)
+		{
+			const std::function<void()> Hook = std::move(FatalHook);
+			FatalHook = nullptr;
+			Hook();
+		}
+
 		const std::wstring Message = FormatFailure(L"[CHECK FATAL] ", Expression, Detail, File, Line);
 		FLog::Error(Message);
 
@@ -56,6 +65,11 @@ namespace Return
 	bool IsFatal()
 	{
 		return bFatal;
+	}
+
+	void SetFatalHook(std::function<void()> Hook)
+	{
+		FatalHook = std::move(Hook);
 	}
 
 	void ReportResurrection(std::string_view TypeName)
