@@ -103,3 +103,18 @@
 - `tut04` 코드를 `/W4` 로 빌드하면 새 경고는 C4100(쓰지 않는 매개변수) 4건뿐이었습니다. 7절에 `[[maybe_unused]]` 줄을 넣었습니다. `Check.h` 가 이미 이 모양이라 맞췄습니다
 - 기각 : `UNREFERENCED_PARAMETER`(DirectXTK 게임 템플릿의 `wWinMain`). 본문에 줄이 늘고 Windows 매크로입니다. 이름 지우기는 7절 "매개변수 이름 항상 표기" 와 부딪힙니다
 - 적용 : 빌드 설정과 코드는 소급 목록과 묶어 01·02편 이력에 반영합니다
+
+**소급 묶음 적용 (2026-09-27)**
+
+2026-09-26 의 규약 개편, 관용구 점검, 어색한 코드 점검에서 정한 코드 일을 02~04편에 반영하고 이력을 다시 썼습니다. 옛 이력은 `archive/before-rewrite-2026-09-27` 태그에 있습니다.
+
+- 조은님 판정
+  - 좁은 문자열 넓히기 `FStringConv::ToWide` 는 02편 1단계에 둡니다. 쓰는 곳 셋(`Check`, 디버그 메시지, 셰이더 컴파일)이 처음부터 이 함수를 부릅니다. 기각 : 셋째가 생기는 04편에서 뽑기. 04편이 02·03편 파일을 고치는 곁가지를 떠안습니다
+  - ESC 는 `FSystem::Frame` 이 `FInput` 을 읽어 처리합니다. `FApplication::Update` 는 빈 함수입니다. 기각 : `OnWindowMessage` 에서 바로 끝내기. `FInput` 을 읽는 곳이 없어집니다
+  - 03편 `FD3D11Graphics::Initialize(HWND, int, int, bool bEnableVSync)`. 인자와 멤버가 둘 다 `bVSync` 면 `/W4` 가 C4458 을 냅니다. 기각 : 멤버 `SyncInterval`(이 교재가 다루는 것은 켬/끔), 인자 `bInVSync`(6절에 없는 `In` 접두)
+  - 지우는 색은 03편 `DXGI_RGBA`, 04편부터 `XMFLOAT4` 이고 첫 멤버 주소(`&ClearColor.x`)로 넘깁니다. 기각 : `XMVECTORF32` 멤버. 정렬 16 이 `FSystem` 까지 번지고, DirectXTK 템플릿도 색 상수를 멤버로 들지 않습니다. 기각 : `std::array<float, 4>`. DirectXMath 형으로 모양을 맞추는 쪽을 골랐습니다. `XMFLOAT4` 를 `float` 배열로 내주는 공식 함수는 없습니다(`DirectXMath.h` 확인)
+  - `InputElements` 는 구조체 안에 선언하고 `FVertexTypes.cpp` 에 `offsetof` 로 정의합니다. DirectXTK `VertexTypes.cpp` 와 같은 자리입니다. 구조체 안 `static constexpr` 초기화에서는 `offsetof` 가 C2027(아직 완성되지 않은 형)로 실패합니다. 기각 : 헤더의 `inline constexpr` 정의. 드문 문법을 하나 더 가르칩니다
+  - `NOMINMAX` 는 01편에 둡니다. `WIN32_LEAN_AND_MEAN` 은 02편 1단계에서 그 옆에 붙습니다
+- 확인한 것
+  - `SetBreakOnSeverity` : cdb 로 돌리면 D3D11 에러(정점 셰이더 없이 그리기)는 그 호출 안(`DrawIndexed`)에서 예외 0x87A 로 멈춥니다. DXGI 스왑체인 에러(`BufferCount` 1)는 호출 안에서 멈추지 않고 `CHECK_FATAL` 줄에서 멈춥니다. Visual Studio F5 에서 이 예외 뒤로 계속할 수 있는지는 [미확인] 입니다
+  - 장치 제거 원인 로그(`OnFatal`)는 실제로 디바이스를 잃게 해서 돌려 보지 않았습니다 [미확인]
