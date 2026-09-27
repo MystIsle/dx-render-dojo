@@ -45,4 +45,27 @@ void FD3D11Graphics::Initialize(HWND WindowHandle, int Width, int Height, bool b
 	                              Device.ReleaseAndGetAddressOf(),
 	                              nullptr,
 	                              Context.ReleaseAndGetAddressOf()));
+
+	DXGI_SWAP_CHAIN_DESC1 SwapChainDesc = {};
+	SwapChainDesc.Width = static_cast<UINT>(Width);
+	SwapChainDesc.Height = static_cast<UINT>(Height);
+	SwapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	SwapChainDesc.SampleDesc.Count = 1;
+	SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	SwapChainDesc.BufferCount = 2;
+	SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+	CHECK_FATAL(Factory->CreateSwapChainForHwnd(
+	    Device.Get(), WindowHandle, &SwapChainDesc, nullptr, nullptr, SwapChain.ReleaseAndGetAddressOf()));
+
+	// DXGI 는 기본으로 Alt+Enter 에 독점 전체 화면 전환을 건다. 이 앱은 테두리 없는 창만 쓴다.
+	CHECK_FATAL(Factory->MakeWindowAssociation(WindowHandle, DXGI_MWA_NO_ALT_ENTER));
+
+	CreateSizeDependentResources();
+}
+
+void FD3D11Graphics::CreateSizeDependentResources()
+{
+	ComPtr<ID3D11Texture2D> BackBuffer;
+	CHECK_FATAL(SwapChain->GetBuffer(0, IID_PPV_ARGS(BackBuffer.ReleaseAndGetAddressOf())));
+	CHECK_FATAL(Device->CreateRenderTargetView(BackBuffer.Get(), nullptr, RenderTargetView.ReleaseAndGetAddressOf()));
 }

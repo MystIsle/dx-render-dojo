@@ -1,6 +1,7 @@
 #pragma once
 
 #include <d3d11.h>
+#include <dxgi1_2.h>
 #include <wrl/client.h>
 
 class FD3D11Graphics
@@ -13,6 +14,10 @@ public:
 	void Initialize(HWND WindowHandle, int Width, int Height, bool bEnableVSync);
 
 private:
+	void CreateSizeDependentResources();
+
 	Microsoft::WRL::ComPtr<ID3D11Device> Device;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> Context;
+	Microsoft::WRL::ComPtr<IDXGISwapChain1> SwapChain;
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> RenderTargetView;
 };
