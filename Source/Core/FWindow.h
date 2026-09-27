@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Windows.h>
+#include <functional>
 
 #include "Core/FDisplaySettings.h"
 
@@ -21,6 +22,8 @@ public:
 	int GetWidth() const { return Width; }
 	int GetHeight() const { return Height; }
 
+	void SetMessageCallback(std::function<void(UINT, WPARAM, LPARAM)> Callback);
+
 private:
 	LRESULT HandleMessage(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam);
 
@@ -28,4 +31,5 @@ private:
 	int Width = 0;
 	int Height = 0;
 	bool bCursorHidden = false;
+	std::function<void(UINT, WPARAM, LPARAM)> MessageCallback;
 };

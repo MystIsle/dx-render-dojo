@@ -1,5 +1,7 @@
 #include "Core/FWindow.h"
 
+#include <utility>
+
 #include "Utility/Check.h"
 
 LRESULT CALLBACK FWindow::WndProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam)
@@ -27,6 +29,9 @@ LRESULT CALLBACK FWindow::WndProc(HWND WindowHandle, UINT Message, WPARAM WParam
 
 FWindow::~FWindow()
 {
+	// 콜백을 먼저 끊는다. DestroyWindow 가 부르는 메시지가 이미 사라진 FInput·FApplication 에 닿지 않게 한다.
+	MessageCallback = nullptr;
+
 	if (bCursorHidden)
 	{
 		ShowCursor(TRUE);
@@ -105,6 +110,11 @@ void FWindow::Initialize(const FDisplaySettings& Settings, int ShowCmd)
 	ShowWindow(Handle, ShowCmd);
 }
 
+void FWindow::SetMessageCallback(std::function<void(UINT, WPARAM, LPARAM)> Callback)
+{
+	MessageCallback = std::move(Callback);
+}
+
 LRESULT FWindow::HandleMessage(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam)
 {
 	switch (Message)
@@ -123,6 +133,10 @@ LRESULT FWindow::HandleMessage(HWND WindowHandle, UINT Message, WPARAM WParam, L
 		return 0;
 
 	default:
+		if (MessageCallback)
+		{
+			MessageCallback(Message, WParam, LParam);
+		}
 		return DefWindowProcW(WindowHandle, Message, WParam, LParam);
 	}
 }
