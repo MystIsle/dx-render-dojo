@@ -8,6 +8,8 @@ class FModel
 public:
 	void Initialize(ID3D11Device* Device);
 
+	void Draw(ID3D11DeviceContext* Context) const;
+
 private:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> VertexBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> IndexBuffer;

@@ -12,6 +12,9 @@ void FApplication::Update()
 {
 }
 
-void FApplication::Render()
+void FApplication::Render(FD3D11Graphics& Graphics)
 {
+	ID3D11DeviceContext* Context = Graphics.GetContext();
+	ColorShader.Bind(Context);
+	Model.Draw(Context);
 }

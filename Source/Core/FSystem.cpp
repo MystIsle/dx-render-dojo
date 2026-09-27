@@ -49,7 +49,7 @@ void FSystem::Frame()
 
 	Application.Update();
 	Graphics.BeginScene();
-	Application.Render();
+	Application.Render(Graphics);
 	Graphics.EndScene();
 }
 

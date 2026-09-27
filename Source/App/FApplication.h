@@ -11,7 +11,7 @@ public:
 	void Initialize(FD3D11Graphics& Graphics);
 
 	void Update();
-	void Render();
+	void Render(FD3D11Graphics& Graphics);
 
 private:
 	FModel Model;

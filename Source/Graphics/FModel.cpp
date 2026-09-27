@@ -38,3 +38,13 @@ void FModel::Initialize(ID3D11Device* Device)
 
 	IndexCount = static_cast<UINT>(Indices.size());
 }
+
+void FModel::Draw(ID3D11DeviceContext* Context) const
+{
+	constexpr UINT Stride = sizeof(FVertexPositionColor);
+	constexpr UINT Offset = 0;
+	Context->IASetVertexBuffers(0, 1, VertexBuffer.GetAddressOf(), &Stride, &Offset);
+	Context->IASetIndexBuffer(IndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+	Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	Context->DrawIndexed(IndexCount, 0, 0);
+}
