@@ -27,7 +27,7 @@
 - `Source/App/` : 편마다 바뀌는 장면 코드 (`FApplication`)
 - `Source/Graphics/` : 03편부터. 디바이스·카메라·모델
 - `Source/Shaders/` : 04편부터. HLSL 을 감싸는 C++ 클래스
-- `Source/Utility/` : 02편부터. 공통 도구. 로그(`FLog`)·검사 매크로(`Check.h`)·싱글톤 틀(`TSingleton`)
+- `Source/Utility/` : 02편부터. 공통 도구. 로그(`FLog`)·검사 매크로(`Check.h`)·싱글톤 틀(`TSingleton`)·문자열 넓히기(`FStringConv`)
 
 새 소스는 `DxRenderDojo.vcxproj`(+ `.vcxproj.filters`)와 `CMakeLists.txt` 양쪽에 등록
 
