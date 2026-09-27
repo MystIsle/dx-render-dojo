@@ -31,7 +31,7 @@
 - `Source/Core/` : 창·메시지 루프·입력·설정. D3D 를 부르는 곳은 `FSystem` 이 프레임 앞뒤와 크기 변경에서 `FD3D11Graphics` 를 부르는 자리뿐
 - `Source/App/` : 편마다 바뀌는 장면 코드 (`FApplication`)
 - `Source/Graphics/` : 03편부터. `FD3D11Graphics`(디바이스·스왑체인·파이프라인 전역 상태)·카메라·모델
-- `Source/Shaders/` : 04편부터. HLSL 파일(`.vs`·`.ps`, BOM 없음)과 그것을 감싸는 C++ 클래스. 빌드가 HLSL 파일을 exe 옆 `Shaders/` 로 복사하고, 코드는 exe 폴더 기준으로 읽음
+- `Source/Shaders/` : 04편부터. HLSL 파일(`.hlsl`, BOM 없음)과 그것을 감싸는 C++ 클래스. 빌드가 HLSL 파일을 exe 옆 `Shaders/` 로 복사하고, 코드는 exe 폴더 기준으로 읽음
 - `Source/Utility/` : 02편부터. 공통 도구. 로그(`FLog`)·검사 매크로(`Check.h`)·싱글톤 틀(`TSingleton`)·문자열 넓히기(`FStringConv`)·실행 파일 기준 경로(`FPaths`)
 - `external/DirectXMath/` : 공식 DirectXMath 릴리스의 `Inc/` 헤더. MSVC·mingw 가 같은 사본을 씀. 버전을 올릴 때는 통째로 바꿈
 
@@ -59,7 +59,7 @@ clang-tidy -p build-win <파일>
 ## 인코딩·줄끝
 
 - 모든 텍스트 : BOM 없는 UTF-8 (`.editorconfig`)
-- 셰이더 `.hlsl` `.vs` `.ps` : BOM 이 있으면 `D3DCompileFromFile` 이 `(1,1): error X3000` 으로 실패
+- 셰이더 `.hlsl` : BOM 이 있으면 `D3DCompileFromFile` 이 `(1,1): error X3000` 으로 실패
 - C++ : BOM 이 없으므로 프로젝트 파일(vcxproj·CMake)에 `/utf-8` 필수. 없으면 MSVC 가 한글을 CP949 로 읽음
 - 줄끝 : `.gitattributes`. C++·셰이더·sln·vcxproj 는 CRLF, sh·cmake·md·json·xml 은 LF
 

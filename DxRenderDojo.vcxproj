@@ -100,5 +100,10 @@
     <None Include="DxRenderDojo.manifest" />
     <None Include="DxRenderDojo.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="Source\Shaders\Color.hlsl">
+      <DestinationFolders>$(OutDir)Shaders</DestinationFolders>
+    </CopyFileToFolders>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>
