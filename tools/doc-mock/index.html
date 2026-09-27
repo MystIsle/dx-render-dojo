@@ -208,31 +208,37 @@ section.stage { margin-top: 3rem; }
 	</header>
 
 	<section class="stage">
-		<div class="stage-head"><span class="stage-no">STAGE 1</span><h2 id="stage1">기초 셋업</h2><span class="stage-range">tut01~05</span><span class="track common">공통 진도</span></div>
-		<p class="stage-desc">빈 프로젝트에서 시작해 창을 띄우고 D3D11 을 초기화해요. 버퍼와 셰이더로 첫 삼각형을 그린 뒤 텍스처를 입혀요.</p>
+		<div class="stage-head"><span class="stage-no">STAGE 1</span><h2 id="stage1">첫 삼각형</h2><span class="stage-range">tut01~04</span><span class="track common">공통 진도</span></div>
+		<p class="stage-desc">빈 프로젝트에서 창을 띄우고 D3D11 을 초기화해요. 버퍼와 셰이더로 첫 삼각형을 그려요.</p>
 		<ol class="rows">
 			<li class="entry"><a class="row" href="tutorial-01.html"><span class="num">01</span><span class="title">개발 환경 셋업</span><span class="orig">Setting up DirectX 11 with Visual Studio 2022</span><span class="summary">빈 Windows 프로그램 하나를 빌드하고 실행해요.</span></a></li>
 			<li class="entry"><a class="row" href="tutorial-02.html"><span class="num">02</span><span class="title">프레임워크와 창</span><span class="orig">Creating a Framework and Window</span><span class="summary">창을 띄우고 메시지를 받고 ESC 를 누르면 끝나는 프로그램을 만들어요.</span></a></li>
 			<li class="entry"><a class="row" href="tutorial-03.html"><span class="num">03</span><span class="title">DirectX 11 초기화</span><span class="orig">Initializing DirectX 11</span><span class="summary">D3D11 을 초기화하고 창 안쪽을 회색으로 지워요.</span></a></li>
 			<li class="entry"><a class="row" href="tutorial-04.html"><span class="num">04</span><span class="title">버퍼·셰이더·HLSL</span><span class="orig">Buffers, Shaders, and HLSL</span><span class="summary">정점 버퍼와 HLSL 셰이더로 초록 삼각형 하나를 그려요.</span></a></li>
-			<li class="entry todo"><div class="row"><span class="num">05</span><span class="title">텍스처링</span><span class="orig">Texturing</span></div></li>
 		</ol>
 	</section>
 	<section class="stage">
-		<div class="stage-head"><span class="stage-no">STAGE 2</span><h2 id="stage2">3D 모델 &amp; 조명</h2><span class="stage-range">tut06~11</span><span class="track common">공통 진도</span></div>
-		<p class="stage-desc">파일에서 모델을 읽어 배치하고 빛을 계산해요. 디퓨즈·앰비언트·스페큘러와 여러 점광원을 다뤄요.</p>
+		<div class="stage-head"><span class="stage-no">STAGE 2</span><h2 id="stage2">3D 물체 그리기</h2><span class="stage-range">tut05~08</span><span class="track common">공통 진도</span></div>
+		<p class="stage-desc">텍스처를 입히고 빛을 받게 해요. 파일에서 모델을 읽어 크기·회전·위치를 정해 배치해요.</p>
 		<ol class="rows">
+			<li class="entry todo"><div class="row"><span class="num">05</span><span class="title">텍스처링</span><span class="orig">Texturing</span></div></li>
 			<li class="entry todo"><div class="row"><span class="num">06</span><span class="title">디퓨즈 라이팅</span><span class="orig">Diffuse Lighting</span></div></li>
 			<li class="entry todo"><div class="row"><span class="num">07</span><span class="title">3D 모델 렌더링</span><span class="orig">3D Model Rendering</span></div></li>
 			<li class="entry todo"><div class="row"><span class="num">08</span><span class="title">스케일·회전·이동</span><span class="orig">Scaling, Rotation, and Translation</span></div></li>
+		</ol>
+	</section>
+	<section class="stage">
+		<div class="stage-head"><span class="stage-no">STAGE 3</span><h2 id="stage3">조명 더하기</h2><span class="stage-range">tut09~11</span><span class="track common">공통 진도</span></div>
+		<p class="stage-desc">주변광과 정반사광을 더하고 점광원 여러 개를 한 번에 다뤄요.</p>
+		<ol class="rows">
 			<li class="entry todo"><div class="row"><span class="num">09</span><span class="title">앰비언트 라이팅</span><span class="orig">Ambient Lighting</span></div></li>
 			<li class="entry todo"><div class="row"><span class="num">10</span><span class="title">스페큘러 라이팅</span><span class="orig">Specular Lighting</span></div></li>
 			<li class="entry todo"><div class="row"><span class="num">11</span><span class="title">다중 점광원</span><span class="orig">Multiple Point Lights</span></div></li>
 		</ol>
 	</section>
 	<section class="stage">
-		<div class="stage-head"><span class="stage-no">STAGE 3</span><h2 id="stage3">2D · 텍스트 · 입력</h2><span class="stage-range">tut12~16</span><span class="track common">공통 진도</span></div>
-		<p class="stage-desc">직교 투영으로 2D 이미지·스프라이트·글자를 그려요. 키보드와 마우스는 DirectInput 으로 읽어요.</p>
+		<div class="stage-head"><span class="stage-no">STAGE 4</span><h2 id="stage4">2D · 시간 · 입력</h2><span class="stage-range">tut12~16</span><span class="track common">공통 진도</span></div>
+		<p class="stage-desc">직교 투영으로 이미지·스프라이트·글자를 그려요. 시간을 재어 FPS 를 찍고 키보드와 마우스를 DirectInput 으로 읽어요.</p>
 		<ol class="rows">
 			<li class="entry todo"><div class="row"><span class="num">12</span><span class="title">2D 렌더링</span><span class="orig">2D Rendering</span></div></li>
 			<li class="entry todo"><div class="row"><span class="num">13</span><span class="title">스프라이트·타이머</span><span class="orig">Sprites and Timers</span></div></li>
@@ -242,8 +248,8 @@ section.stage { margin-top: 3rem; }
 		</ol>
 	</section>
 	<section class="stage">
-		<div class="stage-head"><span class="stage-no">STAGE 4</span><h2 id="stage4">텍스처 매핑</h2><span class="stage-range">tut17~21</span><span class="track common">공통 진도</span></div>
-		<p class="stage-desc">한 표면에 텍스처 여러 장을 섞어 디테일을 더해요. 라이트 맵·알파 맵·노멀 맵·스페큘러 맵을 다뤄요.</p>
+		<div class="stage-head"><span class="stage-no">STAGE 5</span><h2 id="stage5">텍스처 맵</h2><span class="stage-range">tut17~21</span><span class="track common">공통 진도</span></div>
+		<p class="stage-desc">한 표면에 텍스처 여러 장을 섞어요. 라이트맵·알파맵·노멀맵·스페큘러맵으로 표면에 디테일을 더해요.</p>
 		<ol class="rows">
 			<li class="entry todo"><div class="row"><span class="num">17</span><span class="title">멀티텍스처링</span><span class="orig">Multitexturing</span></div></li>
 			<li class="entry todo"><div class="row"><span class="num">18</span><span class="title">라이트 맵</span><span class="orig">Light Maps</span></div></li>
@@ -253,19 +259,19 @@ section.stage { margin-top: 3rem; }
 		</ol>
 	</section>
 	<section class="stage">
-		<div class="stage-head"><span class="stage-no">STAGE 5</span><h2 id="stage5">엔진 구조</h2><span class="stage-range">tut22~25</span><span class="track common">공통 진도</span></div>
-		<p class="stage-desc">셰이더 여러 개를 관리하고 화면 밖 물체를 걸러요. 장면을 텍스처에 그리는 렌더 투 텍스처가 뒤 스테이지의 바탕이 돼요.</p>
+		<div class="stage-head"><span class="stage-no">STAGE 6</span><h2 id="stage6">셰이더와 장면 관리</h2><span class="stage-range">tut22~24</span><span class="track common">공통 진도</span></div>
+		<p class="stage-desc">셰이더 여러 개를 한곳에서 관리하고 화면 밖 물체를 걸러요. 모델링 도구에서 내보낸 모델도 읽어요.</p>
 		<ol class="rows">
 			<li class="entry todo"><div class="row"><span class="num">22</span><span class="title">다중 셰이더 관리</span><span class="orig">Managing Multiple Shaders</span></div></li>
 			<li class="entry todo"><div class="row"><span class="num">23</span><span class="title">프러스텀 컬링</span><span class="orig">Frustum Culling</span></div></li>
 			<li class="entry todo"><div class="row"><span class="num">24</span><span class="title">Maya 모델 로딩</span><span class="orig">Loading Maya Models</span></div></li>
-			<li class="entry todo"><div class="row"><span class="num">25</span><span class="title">렌더 투 텍스처</span><span class="orig">Render to Texture</span></div></li>
 		</ol>
 	</section>
 	<section class="stage">
-		<div class="stage-head"><span class="stage-no">STAGE 6</span><h2 id="stage6">렌더 기법 기초</h2><span class="stage-range">tut26~30</span><span class="track common">공통 진도</span></div>
-		<p class="stage-desc">안개·클리핑 평면·텍스처 이동·투명도를 다루고 평면 반사로 마무리해요.</p>
+		<div class="stage-head"><span class="stage-no">STAGE 7</span><h2 id="stage7">렌더 투 텍스처와 반사</h2><span class="stage-range">tut25~30</span><span class="track common">공통 진도</span></div>
+		<p class="stage-desc">장면을 텍스처에 그려요. 안개·클리핑 평면·텍스처 이동·투명도를 차례로 더해 평면 반사를 만들어요.</p>
 		<ol class="rows">
+			<li class="entry todo"><div class="row"><span class="num">25</span><span class="title">렌더 투 텍스처</span><span class="orig">Render to Texture</span></div></li>
 			<li class="entry todo"><div class="row"><span class="num">26</span><span class="title">안개</span><span class="orig">Fog</span></div></li>
 			<li class="entry todo"><div class="row"><span class="num">27</span><span class="title">클리핑 평면</span><span class="orig">Clipping Planes</span></div></li>
 			<li class="entry todo"><div class="row"><span class="num">28</span><span class="title">텍스처 평행이동</span><span class="orig">Texture Translation</span></div></li>
@@ -274,8 +280,8 @@ section.stage { margin-top: 3rem; }
 		</ol>
 	</section>
 	<section class="stage">
-		<div class="stage-head"><span class="stage-no">STAGE 7</span><h2 id="stage7">자연 효과</h2><span class="stage-range">tut31~34</span><span class="track optional">각자 선택</span></div>
-		<p class="stage-desc">굴절과 노이즈로 물·유리·얼음·불을 흉내 내요. 먼 물체는 카메라를 향하는 판으로 바꿔 그려요.</p>
+		<div class="stage-head"><span class="stage-no">STAGE 8</span><h2 id="stage8">물 · 유리 · 불</h2><span class="stage-range">tut31~34</span><span class="track optional">각자 선택</span></div>
+		<p class="stage-desc">앞 스테이지의 반사에 굴절과 노이즈를 더해 물·유리·얼음·불을 만들어요. 카메라를 향해 도는 판도 다뤄요.</p>
 		<ol class="rows">
 			<li class="entry todo"><div class="row"><span class="num">31</span><span class="title">물</span><span class="orig">Water</span></div></li>
 			<li class="entry todo"><div class="row"><span class="num">32</span><span class="title">유리와 얼음</span><span class="orig">Glass and Ice</span></div></li>
@@ -284,8 +290,8 @@ section.stage { margin-top: 3rem; }
 		</ol>
 	</section>
 	<section class="stage">
-		<div class="stage-head"><span class="stage-no">STAGE 8</span><h2 id="stage8">후처리 · 파티클</h2><span class="stage-range">tut35~40</span><span class="track optional">각자 선택</span></div>
-		<p class="stage-desc">장면을 텍스처에 그린 뒤 블러·페이드 같은 후처리를 걸어요. 파티클과 투영 텍스처도 다뤄요.</p>
+		<div class="stage-head"><span class="stage-no">STAGE 9</span><h2 id="stage9">화면 효과와 투영</h2><span class="stage-range">tut35~40</span><span class="track optional">각자 선택</span></div>
+		<p class="stage-desc">깊이 값을 읽고 블러·페이드 같은 화면 효과와 파티클을 만들어요. 텍스처를 장면에 비추는 투영 텍스처도 다뤄요.</p>
 		<ol class="rows">
 			<li class="entry todo"><div class="row"><span class="num">35</span><span class="title">깊이 버퍼</span><span class="orig">Depth Buffer</span></div></li>
 			<li class="entry todo"><div class="row"><span class="num">36</span><span class="title">블러</span><span class="orig">Blur</span></div></li>
@@ -296,8 +302,8 @@ section.stage { margin-top: 3rem; }
 		</ol>
 	</section>
 	<section class="stage">
-		<div class="stage-head"><span class="stage-no">STAGE 9</span><h2 id="stage9">그림자</h2><span class="stage-range">tut41~45</span><span class="track common">공통 진도</span></div>
-		<p class="stage-desc">광원 시점의 깊이로 그림자를 그려요. 광원 여러 개, 방향광, 부드러운 가장자리, 투명한 물체의 그림자로 넓혀요.</p>
+		<div class="stage-head"><span class="stage-no">STAGE 10</span><h2 id="stage10">그림자</h2><span class="stage-range">tut41~45</span><span class="track common">공통 진도</span></div>
+		<p class="stage-desc">광원에서 본 깊이로 그림자를 만들어요. 광원 여러 개, 방향광, 부드러운 가장자리, 투명한 물체로 넓혀요.</p>
 		<ol class="rows">
 			<li class="entry todo"><div class="row"><span class="num">41</span><span class="title">섀도우 매핑</span><span class="orig">Shadow Mapping</span></div></li>
 			<li class="entry todo"><div class="row"><span class="num">42</span><span class="title">다중 광원 섀도우 매핑</span><span class="orig">Multiple Light Shadow Mapping</span></div></li>
@@ -307,47 +313,29 @@ section.stage { margin-top: 3rem; }
 		</ol>
 	</section>
 	<section class="stage">
-		<div class="stage-head"><span class="stage-no">STAGE 10</span><h2 id="stage10">고급 렌더</h2><span class="stage-range">tut46~49</span><span class="track optional">각자 선택</span></div>
-		<p class="stage-desc">글로우·피킹·인스턴싱·하드웨어 테셀레이션을 다뤄요.</p>
+		<div class="stage-head"><span class="stage-no">STAGE 11</span><h2 id="stage11">고급 기법</h2><span class="stage-range">tut46~53</span><span class="track optional">각자 선택</span></div>
+		<p class="stage-desc">글로우·피킹·인스턴싱·테셀레이션을 다루고, 디퍼드 셰이딩·SSAO·물리 기반 렌더링·열 왜곡으로 넓혀요.</p>
 		<ol class="rows">
 			<li class="entry todo"><div class="row"><span class="num">46</span><span class="title">글로우</span><span class="orig">Glow</span></div></li>
 			<li class="entry todo"><div class="row"><span class="num">47</span><span class="title">피킹</span><span class="orig">Picking</span></div></li>
 			<li class="entry todo"><div class="row"><span class="num">48</span><span class="title">인스턴싱</span><span class="orig">Instancing</span></div></li>
 			<li class="entry todo"><div class="row"><span class="num">49</span><span class="title">하드웨어 테셀레이션</span><span class="orig">Hardware Tessellation</span></div></li>
-		</ol>
-	</section>
-	<section class="stage">
-		<div class="stage-head"><span class="stage-no">STAGE 11</span><h2 id="stage11">현대 파이프라인</h2><span class="stage-range">tut50~52</span><span class="track optional">각자 선택</span></div>
-		<p class="stage-desc">디퍼드 셰이딩·SSAO·물리 기반 렌더링을 다뤄요.</p>
-		<ol class="rows">
 			<li class="entry todo"><div class="row"><span class="num">50</span><span class="title">디퍼드 셰이딩</span><span class="orig">Deferred Shading</span></div></li>
 			<li class="entry todo"><div class="row"><span class="num">51</span><span class="title">화면 공간 앰비언트 오클루전</span><span class="orig">Screen Space Ambient Occlusion</span></div></li>
 			<li class="entry todo"><div class="row"><span class="num">52</span><span class="title">물리 기반 렌더링</span><span class="orig">Physically Based Rendering</span></div></li>
-		</ol>
-	</section>
-	<section class="stage">
-		<div class="stage-head"><span class="stage-no">STAGE 12</span><h2 id="stage12">추가 효과</h2><span class="stage-range">tut53·54·59</span><span class="track optional">각자 선택</span></div>
-		<p class="stage-desc">앞 스테이지의 기법을 섞어 열 아지랑이·패럴랙스 스크롤링·애니메이션 파티클을 만들어요.</p>
-		<ol class="rows">
 			<li class="entry todo"><div class="row"><span class="num">53</span><span class="title">열 아지랑이</span><span class="orig">Heat</span></div></li>
-			<li class="entry todo"><div class="row"><span class="num">54</span><span class="title">패럴랙스 스크롤링</span><span class="orig">Parallax Scrolling</span></div></li>
-			<li class="entry todo"><div class="row"><span class="num">59</span><span class="title">애니메이션 파티클</span><span class="orig">Animated Particles</span></div></li>
 		</ol>
 	</section>
 	<section class="stage">
-		<div class="stage-head"><span class="stage-no">STAGE 13</span><h2 id="stage13">사운드</h2><span class="stage-range">tut55~58</span><span class="track optional">각자 선택</span></div>
-		<p class="stage-desc">DirectSound 와 XAudio2 로 소리를 내고 3D 위치에 따라 섞어요.</p>
+		<div class="stage-head"><span class="stage-no">STAGE 12</span><h2 id="stage12">소리 · 입력과 그 밖</h2><span class="stage-range">tut54~61</span><span class="track optional">각자 선택</span></div>
+		<p class="stage-desc">DirectSound·XAudio2 로 소리를 내고 XInput 으로 게임패드를 읽어요. 패럴랙스 스크롤·애니메이션 파티클·컬러 그레이딩도 다뤄요.</p>
 		<ol class="rows">
+			<li class="entry todo"><div class="row"><span class="num">54</span><span class="title">패럴랙스 스크롤링</span><span class="orig">Parallax Scrolling</span></div></li>
 			<li class="entry todo"><div class="row"><span class="num">55</span><span class="title">다이렉트사운드</span><span class="orig">Direct Sound</span></div></li>
 			<li class="entry todo"><div class="row"><span class="num">56</span><span class="title">3D 사운드</span><span class="orig">3D Sound</span></div></li>
 			<li class="entry todo"><div class="row"><span class="num">57</span><span class="title">XAudio2</span><span class="orig">XAudio2</span></div></li>
 			<li class="entry todo"><div class="row"><span class="num">58</span><span class="title">X3DAudio</span><span class="orig">X3DAudio</span></div></li>
-		</ol>
-	</section>
-	<section class="stage">
-		<div class="stage-head"><span class="stage-no">STAGE 14</span><h2 id="stage14">입력 · 피날레</h2><span class="stage-range">tut60~61</span><span class="track optional">각자 선택</span></div>
-		<p class="stage-desc">XInput 으로 게임패드를 읽어요. 마지막 편은 3D LUT 로 색을 보정하는 후처리예요.</p>
-		<ol class="rows">
+			<li class="entry todo"><div class="row"><span class="num">59</span><span class="title">애니메이션 파티클</span><span class="orig">Animated Particles</span></div></li>
 			<li class="entry todo"><div class="row"><span class="num">60</span><span class="title">XInput</span><span class="orig">XInput</span></div></li>
 			<li class="entry todo"><div class="row"><span class="num">61</span><span class="title">컬러 그레이딩</span><span class="orig">Color Grading</span></div></li>
 		</ol>
@@ -370,20 +358,18 @@ section.stage { margin-top: 3rem; }
 
 <nav class="rail" aria-label="스테이지">
 	<ol>
-		<li><a href="#stage1"><span class="n">1</span>기초 셋업</a></li>
-		<li><a href="#stage2"><span class="n">2</span>3D 모델 &amp; 조명</a></li>
-		<li><a href="#stage3"><span class="n">3</span>2D · 텍스트 · 입력</a></li>
-		<li><a href="#stage4"><span class="n">4</span>텍스처 매핑</a></li>
-		<li><a href="#stage5"><span class="n">5</span>엔진 구조</a></li>
-		<li><a href="#stage6"><span class="n">6</span>렌더 기법 기초</a></li>
-		<li><a href="#stage7"><span class="n">7</span>자연 효과</a></li>
-		<li><a href="#stage8"><span class="n">8</span>후처리 · 파티클</a></li>
-		<li><a href="#stage9"><span class="n">9</span>그림자</a></li>
-		<li><a href="#stage10"><span class="n">10</span>고급 렌더</a></li>
-		<li><a href="#stage11"><span class="n">11</span>현대 파이프라인</a></li>
-		<li><a href="#stage12"><span class="n">12</span>추가 효과</a></li>
-		<li><a href="#stage13"><span class="n">13</span>사운드</a></li>
-		<li><a href="#stage14"><span class="n">14</span>입력 · 피날레</a></li>
+		<li><a href="#stage1"><span class="n">1</span>첫 삼각형</a></li>
+		<li><a href="#stage2"><span class="n">2</span>3D 물체 그리기</a></li>
+		<li><a href="#stage3"><span class="n">3</span>조명 더하기</a></li>
+		<li><a href="#stage4"><span class="n">4</span>2D · 시간 · 입력</a></li>
+		<li><a href="#stage5"><span class="n">5</span>텍스처 맵</a></li>
+		<li><a href="#stage6"><span class="n">6</span>셰이더와 장면 관리</a></li>
+		<li><a href="#stage7"><span class="n">7</span>렌더 투 텍스처와 반사</a></li>
+		<li><a href="#stage8"><span class="n">8</span>물 · 유리 · 불</a></li>
+		<li><a href="#stage9"><span class="n">9</span>화면 효과와 투영</a></li>
+		<li><a href="#stage10"><span class="n">10</span>그림자</a></li>
+		<li><a href="#stage11"><span class="n">11</span>고급 기법</a></li>
+		<li><a href="#stage12"><span class="n">12</span>소리 · 입력과 그 밖</a></li>
 		<li><a href="#extra"><span class="n">α</span>원문에 없는 편</a></li>
 	</ol>
 </nav>

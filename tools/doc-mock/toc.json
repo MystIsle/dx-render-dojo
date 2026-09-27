@@ -10,31 +10,37 @@
 	},
 	"stages": [
 		{
-			"no": 1, "name": "기초 셋업", "common": true,
-			"desc": "빈 프로젝트에서 시작해 창을 띄우고 D3D11 을 초기화해요. 버퍼와 셰이더로 첫 삼각형을 그린 뒤 텍스처를 입혀요.",
+			"no": 1, "name": "첫 삼각형", "common": true,
+			"desc": "빈 프로젝트에서 창을 띄우고 D3D11 을 초기화해요. 버퍼와 셰이더로 첫 삼각형을 그려요.",
 			"lessons": [
 				{ "tag": "tut01", "base": null, "title": "개발 환경 셋업", "original": "Setting up DirectX 11 with Visual Studio 2022" },
 				{ "tag": "tut02", "base": "tut01", "title": "프레임워크와 창", "original": "Creating a Framework and Window" },
 				{ "tag": "tut03", "base": "tut02", "title": "DirectX 11 초기화", "original": "Initializing DirectX 11" },
-				{ "tag": "tut04", "base": "tut03", "title": "버퍼·셰이더·HLSL", "original": "Buffers, Shaders, and HLSL" },
-				{ "tag": "tut05", "base": "tut04", "title": "텍스처링", "original": "Texturing" }
+				{ "tag": "tut04", "base": "tut03", "title": "버퍼·셰이더·HLSL", "original": "Buffers, Shaders, and HLSL" }
 			]
 		},
 		{
-			"no": 2, "name": "3D 모델 & 조명", "common": true,
-			"desc": "파일에서 모델을 읽어 배치하고 빛을 계산해요. 디퓨즈·앰비언트·스페큘러와 여러 점광원을 다뤄요.",
+			"no": 2, "name": "3D 물체 그리기", "common": true,
+			"desc": "텍스처를 입히고 빛을 받게 해요. 파일에서 모델을 읽어 크기·회전·위치를 정해 배치해요.",
 			"lessons": [
+				{ "tag": "tut05", "base": "tut04", "title": "텍스처링", "original": "Texturing" },
 				{ "tag": "tut06", "base": "tut05", "title": "디퓨즈 라이팅", "original": "Diffuse Lighting" },
 				{ "tag": "tut07", "base": "tut06", "title": "3D 모델 렌더링", "original": "3D Model Rendering" },
-				{ "tag": "tut08", "base": "tut07", "title": "스케일·회전·이동", "original": "Scaling, Rotation, and Translation" },
+				{ "tag": "tut08", "base": "tut07", "title": "스케일·회전·이동", "original": "Scaling, Rotation, and Translation" }
+			]
+		},
+		{
+			"no": 3, "name": "조명 더하기", "common": true,
+			"desc": "주변광과 정반사광을 더하고 점광원 여러 개를 한 번에 다뤄요.",
+			"lessons": [
 				{ "tag": "tut09", "base": "tut08", "title": "앰비언트 라이팅", "original": "Ambient Lighting" },
 				{ "tag": "tut10", "base": "tut09", "title": "스페큘러 라이팅", "original": "Specular Lighting" },
 				{ "tag": "tut11", "base": "tut10", "title": "다중 점광원", "original": "Multiple Point Lights" }
 			]
 		},
 		{
-			"no": 3, "name": "2D · 텍스트 · 입력", "common": true,
-			"desc": "직교 투영으로 2D 이미지·스프라이트·글자를 그려요. 키보드와 마우스는 DirectInput 으로 읽어요.",
+			"no": 4, "name": "2D · 시간 · 입력", "common": true,
+			"desc": "직교 투영으로 이미지·스프라이트·글자를 그려요. 시간을 재어 FPS 를 찍고 키보드와 마우스를 DirectInput 으로 읽어요.",
 			"lessons": [
 				{ "tag": "tut12", "base": "tut11", "title": "2D 렌더링", "original": "2D Rendering" },
 				{ "tag": "tut13", "base": "tut12", "title": "스프라이트·타이머", "original": "Sprites and Timers" },
@@ -44,8 +50,8 @@
 			]
 		},
 		{
-			"no": 4, "name": "텍스처 매핑", "common": true,
-			"desc": "한 표면에 텍스처 여러 장을 섞어 디테일을 더해요. 라이트 맵·알파 맵·노멀 맵·스페큘러 맵을 다뤄요.",
+			"no": 5, "name": "텍스처 맵", "common": true,
+			"desc": "한 표면에 텍스처 여러 장을 섞어요. 라이트맵·알파맵·노멀맵·스페큘러맵으로 표면에 디테일을 더해요.",
 			"lessons": [
 				{ "tag": "tut17", "base": "tut16", "title": "멀티텍스처링", "original": "Multitexturing" },
 				{ "tag": "tut18", "base": "tut17", "title": "라이트 맵", "original": "Light Maps" },
@@ -55,19 +61,19 @@
 			]
 		},
 		{
-			"no": 5, "name": "엔진 구조", "common": true,
-			"desc": "셰이더 여러 개를 관리하고 화면 밖 물체를 걸러요. 장면을 텍스처에 그리는 렌더 투 텍스처가 뒤 스테이지의 바탕이 돼요.",
+			"no": 6, "name": "셰이더와 장면 관리", "common": true,
+			"desc": "셰이더 여러 개를 한곳에서 관리하고 화면 밖 물체를 걸러요. 모델링 도구에서 내보낸 모델도 읽어요.",
 			"lessons": [
 				{ "tag": "tut22", "base": "tut21", "title": "다중 셰이더 관리", "original": "Managing Multiple Shaders" },
 				{ "tag": "tut23", "base": "tut22", "title": "프러스텀 컬링", "original": "Frustum Culling" },
-				{ "tag": "tut24", "base": "tut23", "title": "Maya 모델 로딩", "original": "Loading Maya Models" },
-				{ "tag": "tut25", "base": "tut24", "title": "렌더 투 텍스처", "original": "Render to Texture" }
+				{ "tag": "tut24", "base": "tut23", "title": "Maya 모델 로딩", "original": "Loading Maya Models" }
 			]
 		},
 		{
-			"no": 6, "name": "렌더 기법 기초", "common": true,
-			"desc": "안개·클리핑 평면·텍스처 이동·투명도를 다루고 평면 반사로 마무리해요.",
+			"no": 7, "name": "렌더 투 텍스처와 반사", "common": true,
+			"desc": "장면을 텍스처에 그려요. 안개·클리핑 평면·텍스처 이동·투명도를 차례로 더해 평면 반사를 만들어요.",
 			"lessons": [
+				{ "tag": "tut25", "base": "tut24", "title": "렌더 투 텍스처", "original": "Render to Texture" },
 				{ "tag": "tut26", "base": "tut25", "title": "안개", "original": "Fog" },
 				{ "tag": "tut27", "base": "tut26", "title": "클리핑 평면", "original": "Clipping Planes" },
 				{ "tag": "tut28", "base": "tut27", "title": "텍스처 평행이동", "original": "Texture Translation" },
@@ -76,8 +82,8 @@
 			]
 		},
 		{
-			"no": 7, "name": "자연 효과", "common": false,
-			"desc": "굴절과 노이즈로 물·유리·얼음·불을 흉내 내요. 먼 물체는 카메라를 향하는 판으로 바꿔 그려요.",
+			"no": 8, "name": "물 · 유리 · 불", "common": false,
+			"desc": "앞 스테이지의 반사에 굴절과 노이즈를 더해 물·유리·얼음·불을 만들어요. 카메라를 향해 도는 판도 다뤄요.",
 			"lessons": [
 				{ "tag": "tut31", "base": "tut30", "title": "물", "original": "Water" },
 				{ "tag": "tut32", "base": "tut31", "title": "유리와 얼음", "original": "Glass and Ice" },
@@ -86,8 +92,8 @@
 			]
 		},
 		{
-			"no": 8, "name": "후처리 · 파티클", "common": false,
-			"desc": "장면을 텍스처에 그린 뒤 블러·페이드 같은 후처리를 걸어요. 파티클과 투영 텍스처도 다뤄요.",
+			"no": 9, "name": "화면 효과와 투영", "common": false,
+			"desc": "깊이 값을 읽고 블러·페이드 같은 화면 효과와 파티클을 만들어요. 텍스처를 장면에 비추는 투영 텍스처도 다뤄요.",
 			"lessons": [
 				{ "tag": "tut35", "base": "tut34", "title": "깊이 버퍼", "original": "Depth Buffer" },
 				{ "tag": "tut36", "base": "tut35", "title": "블러", "original": "Blur" },
@@ -98,8 +104,8 @@
 			]
 		},
 		{
-			"no": 9, "name": "그림자", "common": true,
-			"desc": "광원 시점의 깊이로 그림자를 그려요. 광원 여러 개, 방향광, 부드러운 가장자리, 투명한 물체의 그림자로 넓혀요.",
+			"no": 10, "name": "그림자", "common": true,
+			"desc": "광원에서 본 깊이로 그림자를 만들어요. 광원 여러 개, 방향광, 부드러운 가장자리, 투명한 물체로 넓혀요.",
 			"lessons": [
 				{ "tag": "tut41", "base": "tut40", "title": "섀도우 매핑", "original": "Shadow Mapping" },
 				{ "tag": "tut42", "base": "tut41", "title": "다중 광원 섀도우 매핑", "original": "Multiple Light Shadow Mapping" },
@@ -109,47 +115,29 @@
 			]
 		},
 		{
-			"no": 10, "name": "고급 렌더", "common": false,
-			"desc": "글로우·피킹·인스턴싱·하드웨어 테셀레이션을 다뤄요.",
+			"no": 11, "name": "고급 기법", "common": false,
+			"desc": "글로우·피킹·인스턴싱·테셀레이션을 다루고, 디퍼드 셰이딩·SSAO·물리 기반 렌더링·열 왜곡으로 넓혀요.",
 			"lessons": [
 				{ "tag": "tut46", "base": "tut45", "title": "글로우", "original": "Glow" },
 				{ "tag": "tut47", "base": "tut46", "title": "피킹", "original": "Picking" },
 				{ "tag": "tut48", "base": "tut47", "title": "인스턴싱", "original": "Instancing" },
-				{ "tag": "tut49", "base": "tut48", "title": "하드웨어 테셀레이션", "original": "Hardware Tessellation" }
-			]
-		},
-		{
-			"no": 11, "name": "현대 파이프라인", "common": false,
-			"desc": "디퍼드 셰이딩·SSAO·물리 기반 렌더링을 다뤄요.",
-			"lessons": [
+				{ "tag": "tut49", "base": "tut48", "title": "하드웨어 테셀레이션", "original": "Hardware Tessellation" },
 				{ "tag": "tut50", "base": "tut49", "title": "디퍼드 셰이딩", "original": "Deferred Shading" },
 				{ "tag": "tut51", "base": "tut50", "title": "화면 공간 앰비언트 오클루전", "original": "Screen Space Ambient Occlusion" },
-				{ "tag": "tut52", "base": "tut51", "title": "물리 기반 렌더링", "original": "Physically Based Rendering" }
+				{ "tag": "tut52", "base": "tut51", "title": "물리 기반 렌더링", "original": "Physically Based Rendering" },
+				{ "tag": "tut53", "base": "tut52", "title": "열 아지랑이", "original": "Heat" }
 			]
 		},
 		{
-			"no": 12, "name": "추가 효과", "common": false,
-			"desc": "앞 스테이지의 기법을 섞어 열 아지랑이·패럴랙스 스크롤링·애니메이션 파티클을 만들어요.",
+			"no": 12, "name": "소리 · 입력과 그 밖", "common": false,
+			"desc": "DirectSound·XAudio2 로 소리를 내고 XInput 으로 게임패드를 읽어요. 패럴랙스 스크롤·애니메이션 파티클·컬러 그레이딩도 다뤄요.",
 			"lessons": [
-				{ "tag": "tut53", "base": "tut52", "title": "열 아지랑이", "original": "Heat" },
 				{ "tag": "tut54", "base": "tut53", "title": "패럴랙스 스크롤링", "original": "Parallax Scrolling" },
-				{ "tag": "tut59", "base": "tut58", "title": "애니메이션 파티클", "original": "Animated Particles" }
-			]
-		},
-		{
-			"no": 13, "name": "사운드", "common": false,
-			"desc": "DirectSound 와 XAudio2 로 소리를 내고 3D 위치에 따라 섞어요.",
-			"lessons": [
 				{ "tag": "tut55", "base": "tut54", "title": "다이렉트사운드", "original": "Direct Sound" },
 				{ "tag": "tut56", "base": "tut55", "title": "3D 사운드", "original": "3D Sound" },
 				{ "tag": "tut57", "base": "tut56", "title": "XAudio2", "original": "XAudio2" },
-				{ "tag": "tut58", "base": "tut57", "title": "X3DAudio", "original": "X3DAudio" }
-			]
-		},
-		{
-			"no": 14, "name": "입력 · 피날레", "common": false,
-			"desc": "XInput 으로 게임패드를 읽어요. 마지막 편은 3D LUT 로 색을 보정하는 후처리예요.",
-			"lessons": [
+				{ "tag": "tut58", "base": "tut57", "title": "X3DAudio", "original": "X3DAudio" },
+				{ "tag": "tut59", "base": "tut58", "title": "애니메이션 파티클", "original": "Animated Particles" },
 				{ "tag": "tut60", "base": "tut59", "title": "XInput", "original": "XInput" },
 				{ "tag": "tut61", "base": "tut60", "title": "컬러 그레이딩", "original": "Color Grading" }
 			]
