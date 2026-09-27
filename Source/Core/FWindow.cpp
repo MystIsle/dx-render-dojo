@@ -4,7 +4,19 @@
 
 LRESULT CALLBACK FWindow::WndProc(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam)
 {
-	return DefWindowProcW(WindowHandle, Message, WParam, LParam);
+	if (Message == WM_NCCREATE)
+	{
+		const CREATESTRUCTW* CreateInfo = reinterpret_cast<const CREATESTRUCTW*>(LParam);
+		SetWindowLongPtrW(WindowHandle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(CreateInfo->lpCreateParams));
+	}
+
+	FWindow* Window = reinterpret_cast<FWindow*>(GetWindowLongPtrW(WindowHandle, GWLP_USERDATA));
+	if (Window == nullptr)
+	{
+		return DefWindowProcW(WindowHandle, Message, WParam, LParam);
+	}
+
+	return Window->HandleMessage(WindowHandle, Message, WParam, LParam);
 }
 
 void FWindow::Initialize(const FDisplaySettings& Settings, int ShowCmd)
@@ -72,4 +84,9 @@ void FWindow::Initialize(const FDisplaySettings& Settings, int ShowCmd)
 	}
 
 	ShowWindow(Handle, ShowCmd);
+}
+
+LRESULT FWindow::HandleMessage(HWND WindowHandle, UINT Message, WPARAM WParam, LPARAM LParam)
+{
+	return DefWindowProcW(WindowHandle, Message, WParam, LParam);
 }
