@@ -411,7 +411,6 @@ details.diff-file summary .why { color: var(--slate); }
 		<p class="lede">창을 띄우고 메시지를 받고 ESC 를 누르면 끝나는 프로그램을 만들어요. 화면에 보이는 것은 검은 창 하나뿐이지만 03편부터 모든 편이 이 코드에서 출발해요.</p>
 		<ul class="meta">
 			<li><b>태그</b><code>tut02</code></li>
-			<li><b>원문</b><a href="https://www.rastertek.com/dx11win10tut02.html">Tutorial 2</a></li>
 			<li><b>이전 태그</b><code>tut01</code></li>
 		</ul>
 		<div class="scanline" aria-label="전체 진도에서 이 편의 위치">
@@ -433,29 +432,6 @@ details.diff-file summary .why { color: var(--slate); }
 			<li><span class="label">실패와 로그</span><span><code>CHECK_RETURN</code>·<code>CHECK_FATAL</code> 로 실패를 잡고 <code>FLog</code> 로 결과를 찍는 법</span></li>
 			<li><span class="label">창 크기</span><span>창 크기가 바뀌면 <code>FSystem::OnResize</code> 가 새 크기를 받음. 03편이 그림 버퍼 크기를 맞출 때 씀</span></li>
 		</ul>
-	</section>
-
-	<section id="diverge" data-block="diverge" data-source="직접">
-		<h2>원문과 다른 점</h2>
-		<details class="fold">
-			<summary>Rastertek 원문을 옆에 두고 읽을 때 보는 대조표</summary>
-		<div class="diverge">
-			<div class="diverge-row diverge-head"><span>항목</span><span>원문</span><span>이 교재</span></div>
-			<div class="diverge-row"><span class="topic">클래스</span><span class="orig"><code>SystemClass</code>, <code>InputClass</code>, <code>ApplicationClass</code></span><span><code>FSystem</code>, <code>FInput</code> 은 <code>Core/</code><br><code>FApplication</code> 은 <code>App/</code></span></div>
-			<div class="diverge-row"><span class="topic">설정 상수</span><span class="orig"><code>applicationclass.h</code> 의 전역 상수 4개</span><span><code>FDisplaySettings</code> 구조체를 <code>FSystem</code> 멤버로<br>VSync·화면 깊이 값은 쓰기 시작하는 편에서 추가</span></div>
-			<div class="diverge-row"><span class="topic">생성과 해제</span><span class="orig"><code>new</code> / <code>delete</code>, <code>Shutdown</code></span><span>값 멤버와 소멸자<br>싱글톤만 <code>Prepare</code> / <code>Release</code></span></div>
-			<div class="diverge-row"><span class="topic">창 만들기</span><span class="orig"><code>SystemClass</code> 안의 <code>InitializeWindows</code>, <code>ShutdownWindows</code></span><span><code>FWindow</code> 클래스로 분리<br>파괴는 소멸자에서</span></div>
-			<div class="diverge-row"><span class="topic">창 스타일</span><span class="orig">창 모드도 <code>WS_POPUP</code><br>테두리 없음, 크기 고정</span><span><code>WS_OVERLAPPEDWINDOW</code><br>크기 변경 가능, 최소 320×240</span></div>
-			<div class="diverge-row"><span class="topic">메시지 전달</span><span class="orig">전역 포인터 <code>ApplicationHandle</code></span><span>창마다 <code>FWindow</code> 주소를 저장 (<code>GWLP_USERDATA</code>)</span></div>
-			<div class="diverge-row"><span class="topic">메시지 루프</span><span class="orig">한 바퀴에 메시지 하나, 프레임 하나</span><span>쌓인 메시지를 모두 처리한 뒤 프레임 하나</span></div>
-			<div class="diverge-row"><span class="topic">종료</span><span class="orig"><code>bool done</code> 플래그와 <code>Frame</code> 의 반환값</span><span><code>WM_QUIT</code> 하나로<br>닫기 단추·ESC·Windows 종료가 같은 길</span></div>
-			<div class="diverge-row"><span class="topic">실패 검사</span><span class="orig"><code>if (!result) return false;</code></span><span>계속할 수 없는 실패는 <code>CHECK_FATAL</code> 이 그 줄에서 멈춤<br>계속해도 되는 실패는 <code>CHECK_RETURN</code></span></div>
-			<div class="diverge-row"><span class="topic">로그</span><span class="orig">없음<br>원문 Tutorial 3 부터 실패마다 <code>MessageBox</code></span><span><code>FLog</code> : 출력 창과 디버그 콘솔<br>치명 실패는 <code>CHECK_FATAL</code> 이 상자로 알림</span></div>
-			<div class="diverge-row"><span class="topic">전체 화면</span><span class="orig"><code>FULL_SCREEN</code> 을 바꿔 다시 빌드<br><code>WS_POPUP</code> 창과 <code>ChangeDisplaySettings</code></span><span>실행 중에 Alt+Enter 로 테두리 없는 전체 화면을 켜고 끔</span></div>
-			<div class="diverge-row"><span class="topic">배율</span><span class="orig">없음</span><span>매니페스트로 배율을 직접 처리하겠다고 선언<br>창 크기를 배율에 맞춤</span></div>
-			<div class="diverge-row"><span class="topic">진입점</span><span class="orig"><code>WinMain</code> (ANSI)</span><span><code>wWinMain</code> : 한글 경로가 깨지지 않음</span></div>
-		</div>
-		</details>
 	</section>
 
 	<section id="overview" data-block="overview" data-source="직접">
@@ -535,19 +511,20 @@ details.diff-file summary .why { color: var(--slate); }
 
 	<section id="steps" data-block="steps" data-source="직접">
 		<h2>따라 하기</h2>
-		<p class="section-note">코드 조각 위의 경로는 리포 루트 기준이에요. 새 파일은 그 폴더에 만들어요. Visual Studio 의 새 항목 추가는 기본 위치가 프로젝트 파일 옆이라 위치를 그 폴더로 바꿔야 해요. 배지는 할 일이에요. <b>신규</b>는 새 파일이나 새 함수를 넣기, <b>수정</b>은 있던 것을 고치기, <b>삭제</b>는 지우기예요. 통째로 보이는 조각은 그대로 넣거나 바꿔 넣고, diff 조각은 초록 줄을 넣고 빨간 줄을 지워요. 단계마다 끝의 <b>여기까지</b> 상자대로 빌드하고 실행해 보세요.</p>
+		<p class="section-note">코드 조각 위의 경로는 리포 루트 기준이에요. 새 파일은 그 폴더에 만들어요. Visual Studio 의 새 항목 추가는 기본 위치가 프로젝트 파일 옆이라 위치를 그 폴더로 바꿔야 해요. 배지는 할 일이에요. <b>신규</b>는 새 파일이나 새 함수를 넣기, <b>수정</b>은 있던 것을 고치기, <b>삭제</b>는 지우기예요. 통째로 보이는 조각은 그대로 넣거나 바꿔 넣고, diff 조각은 초록 줄을 넣고 빨간 줄을 지워요. 빌드와 실행은 7단계까지 친 뒤 <a href="#check">다 됐는지 확인</a>에서 한 번 해요.</p>
 		<ol class="steps">
 
 			<li class="step" id="step-tools">
 				<div class="step-body">
-					<h3>공통 도구 셋을 미리 만들어 둔다</h3>
-					<p>창을 만들기 전에 도구 세 개를 먼저 넣어요. 2단계부터 쓰고 뒤 편에서도 계속 써요. 이 편의 주제는 따로 있으니 하는 일만 알고 넘어가도 돼요.</p>
+					<h3>공통 도구를 미리 만들어 둔다</h3>
+					<p>창을 만들기 전에 도구 네 개를 먼저 넣어요. 2단계부터 쓰고 뒤 편에서도 계속 써요. 이 편의 주제는 따로 있으니 하는 일만 알고 넘어가도 돼요.</p>
 					<ul class="labeled">
 						<li><span class="label">CHECK_*</span><span>실패를 검사함. <code>CHECK_RETURN</code> 은 로그를 남기고 함수에서 돌아가고, <code>CHECK_FATAL</code> 은 그 줄에서 멈춤</span></li>
 						<li><span class="label">TSingleton</span><span>프로그램에 하나뿐인 객체의 틀. 처음 <code>Get()</code> 할 때 만들어지고, <code>Prepare</code>·<code>Release</code> 로 만들고 없앨 때를 정할 수 있음</span></li>
 						<li><span class="label">FLog</span><span>Visual Studio 출력 창과 콘솔 창에 로그를 찍음. 콘솔 창은 디버그 빌드에서만 열림</span></li>
+						<li><span class="label">FStringConv</span><span>API 가 주는 <code>char</code> 문자열을 로그가 받는 <code>wchar_t</code> 문자열로 바꿈</span></li>
 					</ul>
-					<p>다섯 파일은 모두 <code>Source/Utility</code> 에 새로 만들어요.</p>
+					<p>일곱 파일은 모두 <code>Source/Utility</code> 에 새로 만들어요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Utility/Check.h</span><span class="badge new">신규</span><span class="badge">파일 전체</span></figcaption>
 <pre class="src" data-lang="cpp">#pragma once
@@ -743,6 +720,19 @@ private:
 };</pre>
 					</figure>
 					<figure class="code">
+						<figcaption><span class="path">Source/Utility/FStringConv.h</span><span class="badge new">신규</span><span class="badge">파일 전체</span></figcaption>
+<pre class="src" data-lang="cpp">#pragma once
+
+#include &lt;string&gt;
+#include &lt;string_view&gt;
+
+class FStringConv
+{
+public:
+	static std::wstring ToWide(std::string_view Text);
+};</pre>
+					</figure>
+					<figure class="code">
 						<figcaption><span class="path">Source/Utility/Check.cpp</span><span class="badge new">신규</span><span class="badge">파일 전체</span></figcaption>
 <pre class="src" data-lang="cpp">#include "Utility/Check.h"
 
@@ -752,6 +742,7 @@ private:
 #include &lt;string&gt;
 
 #include "Utility/FLog.h"
+#include "Utility/FStringConv.h"
 
 namespace
 {
@@ -796,8 +787,7 @@ namespace Return
 
 	void ReportResurrection(std::string_view TypeName)
 	{
-		const std::wstring Name(TypeName.begin(), TypeName.end());
-		FLog::Warning(std::format(L"해제한 싱글톤이 다시 만들어졌다 : {}", Name));
+		FLog::Warning(std::format(L"해제한 싱글톤이 다시 만들어졌다 : {}", FStringConv::ToWide(TypeName)));
 	}
 } // namespace Return</pre>
 					</figure>
@@ -856,6 +846,21 @@ void FLog::Write(std::wstring_view Prefix, std::wstring_view Message)
 	}
 }</pre>
 					</figure>
+					<figure class="code">
+						<figcaption><span class="path">Source/Utility/FStringConv.cpp</span><span class="badge new">신규</span><span class="badge">파일 전체</span></figcaption>
+<pre class="src" data-lang="cpp">#include "Utility/FStringConv.h"
+
+#include &lt;Windows.h&gt;
+
+std::wstring FStringConv::ToWide(std::string_view Text)
+{
+	// 코드 페이지를 모르는 좁은 문자열은 시스템 코드 페이지(CP_ACP)로 읽는다.
+	const int TextLength = static_cast&lt;int&gt;(Text.size());
+	std::wstring Wide(MultiByteToWideChar(CP_ACP, 0, Text.data(), TextLength, nullptr, 0), L'\0');
+	MultiByteToWideChar(CP_ACP, 0, Text.data(), TextLength, Wide.data(), static_cast&lt;int&gt;(Wide.size()));
+	return Wide;
+}</pre>
+					</figure>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
@@ -863,6 +868,8 @@ void FLog::Write(std::wstring_view Prefix, std::wstring_view Message)
 							<li class="entry"><code>namespace { ... }</code> 이름 없는 네임스페이스. 안의 변수와 함수는 이 파일에서만 보임</li>
 							<li class="entry"><code>MB_TASKMODAL</code> 부모 창을 넘기지 않아도 상자가 떠 있는 동안 이 스레드의 창이 입력을 받지 않음</li>
 							<li class="entry"><code>std::_Exit(1)</code> 표준 함수. <code>exit</code> 와 달리 <code>atexit</code> 로 등록한 함수도 부르지 않음</li>
+							<li class="entry"><code>MultiByteToWideChar(CP_ACP, ...)</code> 좁은 문자열을 넓힘. 처음에는 결과 길이만 받고, 그 길이로 버퍼를 잡은 뒤 다시 불러 채움. <code>CP_ACP</code> 는 시스템 코드 페이지로, 한국어 Windows 에서는 CP949</li>
+							<li class="entry"><code>FStringConv::ToWide(TypeName)</code> 싱글톤 경고에 붙일 타입 이름. 바이트 하나를 글자 하나로 옮기면 한글처럼 여러 바이트인 글자가 깨짐</li>
 						</ul>
 					</details>
 					<p>Visual Studio 에서는 솔루션 탐색기에 <code>Utility</code> 필터를 만들고 새 <code>.h</code>·<code>.cpp</code> 를 기존 항목 추가로 넣어요. <code>Main.cpp</code> 는 필터에 넣지 않고 그대로 둬요. 프로젝트 속성은 아래 둘을 고쳐요. 이 조작들이 <code>DxRenderDojo.vcxproj</code> 와 <code>DxRenderDojo.vcxproj.filters</code> 를 바꿔요.</p>
@@ -870,51 +877,6 @@ void FLog::Write(std::wstring_view Prefix, std::wstring_view Message)
 						<li>모든 구성 · C/C++ › 일반 › 추가 포함 디렉터리 : <code>$(ProjectDir)Source</code>. <code>#include "Utility/Check.h"</code> 처럼 <code>Source/</code> 기준으로 폴더까지 적을 수 있게 함</li>
 						<li>Debug·Release 각각 · C/C++ › 전처리기 › 전처리기 정의 : <code>WIN32_LEAN_AND_MEAN</code> 추가. <code>Windows.h</code> 가 잘 쓰지 않는 헤더를 빼고 읽게 함</li>
 					</ul>
-					<details class="fold">
-						<summary>참고 : 위 조작이 프로젝트 파일에 남기는 diff · 따로 치지 않음</summary>
-					<figure class="code">
-						<figcaption><span class="path">DxRenderDojo.vcxproj</span><span class="badge mod">수정</span><span class="badge">include 경로, 전처리기 정의, 새 파일</span></figcaption>
-<pre class="diff" data-lang="xml">@@ -42,6 +42,7 @@
-       &lt;ConformanceMode&gt;true&lt;/ConformanceMode&gt;
-       &lt;LanguageStandard&gt;stdcpp20&lt;/LanguageStandard&gt;
-       &lt;AdditionalOptions&gt;/utf-8 %(AdditionalOptions)&lt;/AdditionalOptions&gt;
-+      &lt;AdditionalIncludeDirectories&gt;$(ProjectDir)Source;%(AdditionalIncludeDirectories)&lt;/AdditionalIncludeDirectories&gt;
-     &lt;/ClCompile&gt;
-     &lt;Link&gt;
-       &lt;SubSystem&gt;Windows&lt;/SubSystem&gt;
-@@ -50,14 +51,14 @@
-   &lt;/ItemDefinitionGroup&gt;
-   &lt;ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'"&gt;
-     &lt;ClCompile&gt;
--      &lt;PreprocessorDefinitions&gt;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)&lt;/PreprocessorDefinitions&gt;
-+      &lt;PreprocessorDefinitions&gt;_DEBUG;_WINDOWS;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)&lt;/PreprocessorDefinitions&gt;
-     &lt;/ClCompile&gt;
-   &lt;/ItemDefinitionGroup&gt;
-   &lt;ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'"&gt;
-     &lt;ClCompile&gt;
-       &lt;FunctionLevelLinking&gt;true&lt;/FunctionLevelLinking&gt;
-       &lt;IntrinsicFunctions&gt;true&lt;/IntrinsicFunctions&gt;
--      &lt;PreprocessorDefinitions&gt;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)&lt;/PreprocessorDefinitions&gt;
-+      &lt;PreprocessorDefinitions&gt;NDEBUG;_WINDOWS;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)&lt;/PreprocessorDefinitions&gt;
-     &lt;/ClCompile&gt;
-     &lt;Link&gt;
-       &lt;EnableCOMDATFolding&gt;true&lt;/EnableCOMDATFolding&gt;
-@@ -66,6 +67,13 @@
-   &lt;/ItemDefinitionGroup&gt;
-   &lt;ItemGroup&gt;
-     &lt;ClCompile Include="Source\Main.cpp" /&gt;
-+    &lt;ClCompile Include="Source\Utility\Check.cpp" /&gt;
-+    &lt;ClCompile Include="Source\Utility\FLog.cpp" /&gt;
-+  &lt;/ItemGroup&gt;
-+  &lt;ItemGroup&gt;
-+    &lt;ClInclude Include="Source\Utility\Check.h" /&gt;
-+    &lt;ClInclude Include="Source\Utility\FLog.h" /&gt;
-+    &lt;ClInclude Include="Source\Utility\TSingleton.h" /&gt;
-   &lt;/ItemGroup&gt;
-   &lt;Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" /&gt;
- &lt;/Project&gt;</pre>
-					</figure>
-					</details>
 					<details class="fold">
 						<summary>CMake · 맥 빌드와 검사용, VS 만 쓰면 건너뜀</summary>
 						<p>CMake 는 <code>Source/</code> 아래의 <code>.cpp</code> 를 모두 모아 빌드하니 새 파일은 적지 않아요. 프로젝트 속성에서 고친 두 값만 옮겨요.</p>
@@ -926,17 +888,13 @@ void FLog::Write(std::wstring_view Prefix, std::wstring_view Message)
  add_executable(DxRenderDojo WIN32 ${SourceFiles})
 +target_include_directories(DxRenderDojo PRIVATE Source)
  target_compile_features(DxRenderDojo PRIVATE cxx_std_20)
--target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE)
-+target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN)
+-target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE NOMINMAX)
++target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN)
  
  if(MSVC)
- 	target_compile_options(DxRenderDojo PRIVATE /W3 /utf-8)</pre>
+ 	target_compile_options(DxRenderDojo PRIVATE /W4 /utf-8)</pre>
 					</figure>
 					</details>
-					<div class="checkpoint">
-						<p class="box-label">여기까지</p>
-						<p>빌드하면 경고 없이 끝나요. 도구를 부르는 코드가 아직 없어서 실행하면 곧바로 끝나요.</p>
-					</div>
 				</div>
 			</li>
 
@@ -1148,7 +1106,6 @@ private:
 
 #include &lt;Windows.h&gt;
 
-#include "Core/FDisplaySettings.h"
 #include "Core/FWindow.h"
 #include "Utility/TSingleton.h"
 
@@ -1160,7 +1117,6 @@ public:
 	int Run();
 
 private:
-	FDisplaySettings Display;
 	FWindow Window;
 };</pre>
 					</figure>
@@ -1170,11 +1126,13 @@ private:
 
 #include &lt;format&gt;
 
+#include "Core/FDisplaySettings.h"
 #include "Utility/FLog.h"
 
 void FSystem::Initialize(int ShowCmd)
 {
-	Window.Initialize(Display, ShowCmd);
+	const FDisplaySettings Settings;
+	Window.Initialize(Settings, ShowCmd);
 
 	FLog::Info(std::format(L"창 생성 : {}x{}", Window.GetWidth(), Window.GetHeight()));
 }
@@ -1200,6 +1158,7 @@ int FSystem::Run()
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
 							<li class="entry"><code>class FSystem : public TSingleton&lt;FSystem&gt;</code> <a href="#step-tools">1단계</a>의 <code>TSingleton</code> 을 상속. 어디서든 <code>FSystem::Get()</code> 으로 부를 수 있음</li>
+							<li class="entry"><code>const FDisplaySettings Settings;</code> 시작 설정. 창을 만들 때 넘기고 멤버로 남기지 않음. 만든 뒤의 창 크기와 전체 화면 여부는 <code>FWindow</code> 가 들고 있어서 두 곳에 두면 한쪽이 낡음</li>
 							<li class="entry"><code>PM_REMOVE</code> 꺼낸 메시지를 큐에서 지움</li>
 							<li class="entry"><code>return static_cast&lt;int&gt;(Message.wParam);</code> <code>WM_QUIT</code> 의 <code>wParam</code> 은 끝내기를 요청한 쪽이 넘긴 값. 진입점이 이 값을 프로세스 종료 코드로 돌려줌</li>
 						</ul>
@@ -1212,7 +1171,10 @@ int FSystem::Run()
 #include "Core/FSystem.h"
 #include "Utility/FLog.h"
 
-int WINAPI wWinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _In_ PWSTR CmdLine, _In_ int ShowCmd)
+int WINAPI wWinMain([[maybe_unused]] _In_ HINSTANCE Instance,
+                    [[maybe_unused]] _In_opt_ HINSTANCE PrevInstance,
+                    [[maybe_unused]] _In_ PWSTR CmdLine,
+                    _In_ int ShowCmd)
 {
 	// 디버그 빌드의 로그 콘솔을 창보다 먼저 연다. 창 뒤에 열리면 콘솔이 앞에 와서 키 입력을 가져간다.
 	FLog::Prepare();
@@ -1230,6 +1192,7 @@ int WINAPI wWinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _I
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
+								<li class="entry"><code>_In_ int ShowCmd</code> 이제 <code>FSystem::Initialize</code> 로 넘겨서 쓰니 <code>[[maybe_unused]]</code> 를 뗌</li>
 								<li class="entry"><code>FLog::Prepare();</code> <a href="#step-tools">1단계</a>에서 친 <code>TSingleton</code> 의 함수. 부르지 않아도 첫 <code>Get()</code> 이 만들지만, 만드는 때를 여기로 정함</li>
 								<li class="entry"><code>FSystem::Prepare();</code> 같은 함수로 <code>FSystem</code> 을 만드는 때도 정함. 해제하는 때는 아래 <code>Release</code></li>						</ul>
 					</details>
@@ -1239,32 +1202,6 @@ int WINAPI wWinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _I
 						<p><code>FSystem::Release</code> 는 <code>Run</code> 이 돌아온 바로 다음 줄에서 창을 치워요. 이 줄이 없어도 프로그램이 끝날 때 싱글톤은 저절로 해제돼요. 다만 <code>FSystem</code> 과 <code>FLog</code> 중 어느 쪽이 먼저 해제될지는 정해져 있지 않아요. <code>FLog</code> 가 먼저 사라지면 <code>FSystem</code> 을 정리하는 코드가 이미 없는 로그를 부르게 될 수 있어요. 여기서 직접 해제하면 그때 <code>FLog</code> 는 아직 살아 있어요.</p>
 					</details>
 					<p>Visual Studio 에서는 솔루션 탐색기에 <code>Core</code> 필터를 만들고 새 <code>.h</code>·<code>.cpp</code> 를 기존 항목 추가로 넣어요.</p>
-					<details class="fold">
-						<summary>참고 : 위 조작이 프로젝트 파일에 남기는 diff · 따로 치지 않음</summary>
-					<figure class="code">
-						<figcaption><span class="path">DxRenderDojo.vcxproj</span><span class="badge mod">수정</span><span class="badge">새 파일</span></figcaption>
-<pre class="diff" data-lang="xml">@@ -67,10 +67,15 @@
-   &lt;/ItemDefinitionGroup&gt;
-   &lt;ItemGroup&gt;
-     &lt;ClCompile Include="Source\Main.cpp" /&gt;
-+    &lt;ClCompile Include="Source\Core\FSystem.cpp" /&gt;
-+    &lt;ClCompile Include="Source\Core\FWindow.cpp" /&gt;
-     &lt;ClCompile Include="Source\Utility\Check.cpp" /&gt;
-     &lt;ClCompile Include="Source\Utility\FLog.cpp" /&gt;
-   &lt;/ItemGroup&gt;
-   &lt;ItemGroup&gt;
-+    &lt;ClInclude Include="Source\Core\FDisplaySettings.h" /&gt;
-+    &lt;ClInclude Include="Source\Core\FSystem.h" /&gt;
-+    &lt;ClInclude Include="Source\Core\FWindow.h" /&gt;
-     &lt;ClInclude Include="Source\Utility\Check.h" /&gt;
-     &lt;ClInclude Include="Source\Utility\FLog.h" /&gt;
-     &lt;ClInclude Include="Source\Utility\TSingleton.h" /&gt;</pre>
-					</figure>
-					</details>
-					<div class="checkpoint">
-						<p class="box-label">여기까지</p>
-						<p>검은 창이 화면 가운데에 뜨고 로그에 <code>창 생성 : 800x600</code> 이 찍혀요. 디버그 빌드는 로그를 보여 줄 콘솔 창도 함께 뜨는데, 맨 앞에 오는 것은 검은 창이에요. 닫기 단추를 누르면 창은 사라지는데 프로그램은 끝나지 않아요. 창이 없어도 루프는 <code>WM_QUIT</code> 을 기다리며 계속 돌아서 Visual Studio 의 디버깅 중지로 꺼야 해요.</p>
-					</div>
 				</div>
 			</li>
 
@@ -1361,10 +1298,6 @@ int WINAPI wWinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _I
 						<p><code>this</code> 는 <code>WM_NCCREATE</code> 에서 넣어요. <a href="#step-window">2단계</a>의 <code>CreateWindowExW</code> 에 넘긴 <code>this</code> 가 처음 돌아오는 메시지예요.</p>
 						<p>이 메시지가 창의 첫 메시지는 아니에요. 창의 최소·최대 크기를 묻는 <code>WM_GETMINMAXINFO</code> 가 먼저 와요. 그때 칸에서 꺼낸 값은 아직 <code>nullptr</code> 이라 그 메시지는 <code>DefWindowProcW</code> 에 맡겨요. 이 검사를 빼면 <code>nullptr</code> 로 멤버 함수를 부르게 돼요.</p>
 					</details>
-					<div class="checkpoint">
-						<p class="box-label">여기까지</p>
-						<p>겉모습은 2단계와 같아요. <code>HandleMessage</code> 첫 줄에 중단점을 걸고 디버거로 실행하면 창이 보이기 전에 멈춰요. 이때 <code>Message</code> 는 <code>129</code>(<code>0x0081</code>, <code>WM_NCCREATE</code>)예요. 조사식 창은 기본으로 10진수를 보여 줘요. 주소를 저장한 바로 그 메시지부터 객체로 와요.</p>
-					</div>
 				</div>
 			</li>
 
@@ -1440,8 +1373,8 @@ int WINAPI wWinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _I
 								<li class="entry"><code>PostQuitMessage</code> 큐에 <code>WM_QUIT</code> 을 넣는 함수</li>
 							</ul>
 						</aside>
-						<p><code>WM_CLOSE</code> 를 <code>return 0</code> 으로 끝내지 않고 <code>DefWindowProcW</code> 에 넘기면 그쪽에서 창을 곧바로 파괴해요. 2단계에서 창만 사라지고 프로그램이 남았던 것이 이 때문이에요. 창이 파괴돼도 <code>WM_QUIT</code> 은 오지 않아서 루프가 계속 돌았어요.</p>
-						<p>원문은 소멸자에 정리 코드를 두지 않아요. <code>ExitThread()</code> 같은 함수가 소멸자를 부르지 않고 스레드를 끝내 버릴 수 있다는 이유로 정리를 전부 <code>Shutdown()</code> 에 모아 두고 끝날 때 직접 불러요. 저는 반대로 정했어요. 파괴하는 곳을 소멸자 하나로 두면 어느 길로 끝나든 정리가 빠지지 않아요. 이 프로그램에는 <code>ExitThread</code> 를 부르는 곳이 없어서 원문이 걱정한 상황도 생기지 않아요.</p>
+						<p><code>WM_CLOSE</code> 를 <code>return 0</code> 으로 끝내지 않고 <code>DefWindowProcW</code> 에 넘기면 그쪽에서 창을 곧바로 파괴해요. 2단계까지의 코드가 그래요. 창이 파괴돼도 <code>WM_QUIT</code> 은 오지 않아서 창만 사라지고 루프는 계속 돌아요.</p>
+						<p>정리를 <code>Shutdown()</code> 같은 함수에 모아 두고 끝날 때 직접 부르는 코드도 흔해요. 저는 파괴하는 곳을 소멸자 하나로 두었어요. 그러면 어느 길로 끝나든 정리가 빠지지 않아요.</p>
 						<p>Windows 를 끌 때는 <code>WM_ENDSESSION</code> 을 처리하고 돌아온 뒤 정리가 끝나기 전에 프로세스가 끝날 수 있어요. 지금은 저장할 것이 없어서 그대로 둬요.</p>
 					</details>
 					<p><code>CHECK_FATAL</code> 로 멈출 때는 <code>WM_QUIT</code> 도 소멸자도 거치지 않고 곧바로 끝나요. 실패를 알리는 상자가 떠 있는 동안 창 메시지가 실패한 객체로 가지 않게 막는 코드를 더해요.</p>
@@ -1458,7 +1391,7 @@ int WINAPI wWinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _I
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/Utility/Check.cpp</span><span class="badge mod">수정</span><span class="badge">bFatal, ReportFatal 첫 줄, IsFatal</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -9,6 +9,8 @@
+<pre class="diff" data-lang="cpp">@@ -10,6 +10,8 @@
  
  namespace
  {
@@ -1467,7 +1400,7 @@ int WINAPI wWinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _I
  	std::wstring FormatFailure(std::wstring_view Prefix,
  	                           std::wstring_view Expression,
  	                           std::wstring_view Detail,
-@@ -39,6 +41,8 @@
+@@ -40,6 +42,8 @@
  
  	void ReportFatal(std::wstring_view Expression, std::wstring_view Detail, std::wstring_view File, int Line)
  	{
@@ -1476,7 +1409,7 @@ int WINAPI wWinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _I
  		const std::wstring Message = FormatFailure(L"[CHECK FATAL] ", Expression, Detail, File, Line);
  		FLog::Error(Message);
  
-@@ -48,6 +52,11 @@
+@@ -49,6 +53,11 @@
  		std::_Exit(1);
  	}
  
@@ -1487,7 +1420,7 @@ int WINAPI wWinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _I
 +
  	void ReportResurrection(std::string_view TypeName)
  	{
- 		const std::wstring Name(TypeName.begin(), TypeName.end());</pre>
+ 		FLog::Warning(std::format(L"해제한 싱글톤이 다시 만들어졌다 : {}", FStringConv::ToWide(TypeName)));</pre>
 					</figure>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
@@ -1511,17 +1444,13 @@ int WINAPI wWinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _I
 						<p>소멸자를 거치지 않는 것은 실패한 상태에서 정리 코드가 다시 실패할 수 있어서예요.</p>
 						<p>상자가 떠 있는 동안에도 <code>WndProc</code> 는 불려요. <code>MessageBoxW</code> 는 상자를 닫을 때까지 돌아오지 않지만 그동안 자기 메시지 루프를 돌리고, 이 루프가 우리 창의 메시지도 꺼내 보내요. <code>MB_TASKMODAL</code> 은 입력만 막아서 다시 그리기나 크기 같은 메시지는 계속 와요. 실패한 객체로 메시지가 가지 않게 <code>WndProc</code> 맨 앞에서 <code>IsFatal</code> 을 보고 <code>DefWindowProcW</code> 로 돌려요.</p>
 					</details>
-					<div class="checkpoint">
-						<p class="box-label">여기까지</p>
-						<p>닫기 단추로 끝나고 Visual Studio 출력 창의 마지막 줄에 종료 코드 0 이 찍혀요. 멈추는 길도 일부러 실패시켜 확인해요. <code>FWindow::Initialize</code> 에서 <code>CreateWindowExW</code> 의 두 번째 인자 <code>ClassName</code> 을 <code>L"Wrong"</code> 으로 바꾸면 등록하지 않은 창 클래스라 창을 만들지 못해요. F5 로 실행했다면 Visual Studio 가 <code>CHECK_FATAL(Handle);</code> 줄에서 먼저 멈춰요. 계속(F5)을 누르면 상자에 <code>[CHECK FATAL] Handle</code> 과 파일 이름·줄 번호가 뜨고, 확인을 누르면 종료 코드 1 로 끝나요. Ctrl+F5 로 실행하면 곧바로 상자가 떠요. 확인했으면 되돌려요.</p>
-					</div>
 				</div>
 			</li>
 
 			<li class="step" id="step-route">
 				<div class="step-body">
 					<h3>메시지를 맡을 곳으로 나눠 보낸다</h3>
-					<p>ESC 로 끝내려면 키 메시지가 창 밖의 입력 객체까지 가고, 장면이 프레임마다 그 입력을 봐야 해요. <code>HandleMessage</code> 는 <code>FWindow</code> 가 직접 처리할 메시지만 남기고 나머지를 밖으로 넘겨요. 넘긴 메시지는 <code>FSystem</code> 이 받아서 <code>FInput</code> 에 전달하고, 루프는 큐가 빌 때마다 장면을 한 프레임씩 돌려요.</p>
+					<p>ESC 로 끝내려면 키 메시지가 창 밖의 입력 객체까지 가고, 루프가 프레임마다 그 입력을 봐야 해요. <code>HandleMessage</code> 는 <code>FWindow</code> 가 직접 처리할 메시지만 남기고 나머지를 밖으로 넘겨요. 넘긴 메시지는 <code>FSystem</code> 이 받아서 <code>FInput</code> 에 전달하고, 루프는 큐가 빌 때마다 장면을 한 프레임씩 돌려요.</p>
 					<p><code>FInput</code> 은 Windows 가 키마다 매긴 번호인 가상 키 코드 256개가 지금 눌려 있는지를 기록해요. 장면 클래스 <code>FApplication</code> 은 프레임마다 불릴 <code>Update</code> 와 <code>Render</code> 를 가져요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FInput.h</span><span class="badge new">신규</span><span class="badge">파일 전체</span></figcaption>
@@ -1532,10 +1461,6 @@ int WINAPI wWinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _I
 class FInput
 {
 public:
-	FInput() = default;
-	FInput(const FInput&amp; Other) = delete;
-	FInput&amp; operator=(const FInput&amp; Other) = delete;
-
 	bool IsKeyDown(unsigned int Key) const { return Keys[Key]; }
 
 	void KeyDown(unsigned int Key);
@@ -1552,10 +1477,6 @@ private:
 class FApplication
 {
 public:
-	FApplication() = default;
-	FApplication(const FApplication&amp; Other) = delete;
-	FApplication&amp; operator=(const FApplication&amp; Other) = delete;
-
 	void Update();
 	void Render();
 };</pre>
@@ -1567,7 +1488,6 @@ public:
 #include &lt;Windows.h&gt;
 
 #include "App/FApplication.h"
-#include "Core/FDisplaySettings.h"
 #include "Core/FInput.h"
 #include "Core/FWindow.h"
 #include "Utility/TSingleton.h"
@@ -1577,19 +1497,15 @@ class FSystem : public TSingleton&lt;FSystem&gt;
 public:
 	void Initialize(int ShowCmd);
 
-	const FInput&amp; GetInput() const { return Input; }
-
 	int Run();
-	void RequestExit();
 
 private:
 	void Frame();
 
 	void OnWindowMessage(UINT Message, WPARAM WParam, LPARAM LParam);
 
-	// 선언 순서가 곧 생성 순서이고 소멸은 그 역순이다.
-	// 창을 쓰는 멤버는 FWindow 뒤에 둔다.
-	FDisplaySettings Display;
+	// 멤버는 선언의 역순으로 소멸한다.
+	// 창을 쓰는 멤버는 FWindow 뒤에 두어 창보다 먼저 소멸하게 한다.
 	FWindow Window;
 	FInput Input;
 	FApplication Application;
@@ -1599,7 +1515,7 @@ private:
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
 							<li class="entry"><code>FApplication Application;</code> 장면을 맡는 클래스</li>
-							<li class="entry"><code>const FInput&amp; GetInput() const { return Input; }</code> 장면 코드가 입력을 읽는 길. <code>Update</code> 가 씀</li>
+							<li class="entry"><code>// 멤버는 선언의 역순으로 소멸한다.</code> 뒤에 선언한 <code>FInput</code>·<code>FApplication</code> 이 <code>FWindow</code> 보다 먼저 소멸함</li>
 						</ul>
 					</details>
 					<figure class="code">
@@ -1683,7 +1599,7 @@ private:
 						<summary>자세히 · 메시지를 콜백으로 넘기는 이유</summary>
 						<p><code>HandleMessage</code> 에서 <code>case</code> 가 있는 것은 닫기처럼 창에 대한 메시지라 <code>FWindow</code> 가 처리하고 <code>return 0</code> 으로 끝내요. 키 입력 같은 나머지 메시지는 <code>default</code> 에서 <code>MessageCallback</code> 으로 넘긴 다음 <code>DefWindowProcW</code> 에 맡겨요.</p>
 						<p>받는 쪽이 누구인지 <code>FWindow</code> 는 몰라요. <code>FInput</code> 을 직접 부르지 않고 <code>FSystem</code> 을 거치게 하면 받는 객체가 늘어나도 누가 어떤 순서로 받는지가 <code>OnWindowMessage</code> 의 <code>switch</code> 하나에 모여요.</p>
-						<p>소멸자가 콜백부터 비우는 것은 멤버가 소멸하는 순서 때문이에요. <code>FSystem</code> 이 해제되면 멤버가 선언 역순으로, <code>FApplication</code>, <code>FInput</code>, <code>FWindow</code>, <code>FDisplaySettings</code> 순서로 소멸해요. <code>FWindow</code> 가 소멸할 때는 <code>FInput</code>·<code>FApplication</code> 이 이미 없어요. <code>DestroyWindow</code> 가 파괴 도중에 보내는 <code>WM_DESTROY</code> 가 콜백을 타고 가면 없는 객체를 부르게 돼요.</p>
+						<p>소멸자가 콜백부터 비우는 것은 멤버가 소멸하는 순서 때문이에요. <code>FSystem</code> 이 해제되면 멤버가 선언 역순으로, <code>FApplication</code>, <code>FInput</code>, <code>FWindow</code> 순서로 소멸해요. <code>FWindow</code> 가 소멸할 때는 <code>FInput</code>·<code>FApplication</code> 이 이미 없어요. <code>DestroyWindow</code> 가 파괴 도중에 보내는 <code>WM_DESTROY</code> 가 콜백을 타고 가면 없는 객체를 부르게 돼요.</p>
 					</details>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FInput.cpp</span><span class="badge new">신규</span><span class="badge">파일 전체</span></figcaption>
@@ -1703,27 +1619,20 @@ void FInput::KeyUp(unsigned int Key)
 						<figcaption><span class="path">Source/App/FApplication.cpp</span><span class="badge new">신규</span><span class="badge">파일 전체</span></figcaption>
 <pre class="src" data-lang="cpp">#include "App/FApplication.h"
 
-#include &lt;Windows.h&gt;
-
-#include "Core/FSystem.h"
-
 void FApplication::Update()
 {
-	if (FSystem::Get().GetInput().IsKeyDown(VK_ESCAPE))
-	{
-		FSystem::Get().RequestExit();
-	}
 }
 
 void FApplication::Render()
 {
 }</pre>
 					</figure>
-					<p>한 프레임은 <code>Update</code> 와 <code>Render</code> 로 나뉘어요. 뒤 편의 장면 코드도 입력 처리와 움직임은 <code>Update</code> 에, 그리기는 <code>Render</code> 에 둬요. ESC 가 부르는 <code>RequestExit</code> 는 <code>PostQuitMessage(0)</code> 하나라서 닫기 단추와 같은 길로 끝나요.</p>
+					<p>한 프레임은 <code>Update</code> 와 <code>Render</code> 로 나뉘어요. 뒤 편의 장면 코드는 움직임을 <code>Update</code> 에, 그리기를 <code>Render</code> 에 둬요. 이 편에서는 둘 다 비어 있어요.</p>
+					<p>ESC 는 <code>FSystem::Frame</code> 이 봐요. 프로그램을 끝내는 일은 루프를 가진 <code>FSystem</code> 몫이라서예요. <code>PostQuitMessage(0)</code> 을 불러 닫기 단추와 같은 길로 끝나요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge mod">수정</span><span class="badge">콜백 걸기, Run 의 Frame, 새 함수 셋</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -9,6 +9,9 @@
- 	Window.Initialize(Display, ShowCmd);
+						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge mod">수정</span><span class="badge">콜백 걸기, Run 의 Frame, 새 함수 둘</span></figcaption>
+<pre class="diff" data-lang="cpp">@@ -11,6 +11,9 @@
+ 	Window.Initialize(Settings, ShowCmd);
  
  	FLog::Info(std::format(L"창 생성 : {}x{}", Window.GetWidth(), Window.GetHeight()));
 +
@@ -1732,7 +1641,7 @@ void FApplication::Render()
  }
  
  int FSystem::Run()
-@@ -22,7 +25,35 @@
+@@ -24,7 +27,38 @@
  			DispatchMessageW(&amp;Message);
  			continue;
  		}
@@ -1743,25 +1652,28 @@ void FApplication::Render()
  	return static_cast&lt;int&gt;(Message.wParam);
  }
 +
-+void FSystem::RequestExit()
-+{
-+	PostQuitMessage(0);
-+}
-+
 +void FSystem::Frame()
 +{
++	if (Input.IsKeyDown(VK_ESCAPE))
++	{
++		PostQuitMessage(0);
++	}
++
 +	Application.Update();
 +	Application.Render();
 +}
 +
-+void FSystem::OnWindowMessage(UINT Message, WPARAM WParam, LPARAM LParam)
++void FSystem::OnWindowMessage(UINT Message, WPARAM WParam, [[maybe_unused]] LPARAM LParam)
 +{
 +	switch (Message)
 +	{
++	// Alt 를 누른 채 누른 키와 뗀 키는 WM_SYSKEYDOWN·WM_SYSKEYUP 으로 온다.
 +	case WM_KEYDOWN:
++	case WM_SYSKEYDOWN:
 +		Input.KeyDown(static_cast&lt;unsigned int&gt;(WParam));
 +		break;
 +	case WM_KEYUP:
++	case WM_SYSKEYUP:
 +		Input.KeyUp(static_cast&lt;unsigned int&gt;(WParam));
 +		break;
 +	default:
@@ -1770,38 +1682,17 @@ void FApplication::Render()
 +}</pre>
 					</figure>
 					<p><code>Run</code> 은 큐가 비었을 때만 <code>Frame</code> 을 불러요. 그래서 프레임 하나가 시작될 때는 그동안 쌓인 입력이 전부 <code>FInput</code> 에 반영돼 있어요.</p>
-					<p>Visual Studio 에서는 <code>App</code> 필터를 만들어 <code>FApplication</code> 두 파일을 넣고, <code>FInput</code> 두 파일은 <code>Core</code> 필터에 넣어요.</p>
 					<details class="fold">
-						<summary>참고 : 위 조작이 프로젝트 파일에 남기는 diff · 따로 치지 않음</summary>
-					<figure class="code">
-						<figcaption><span class="path">DxRenderDojo.vcxproj</span><span class="badge mod">수정</span><span class="badge">새 파일</span></figcaption>
-<pre class="diff" data-lang="xml">@@ -67,13 +67,17 @@
-   &lt;/ItemDefinitionGroup&gt;
-   &lt;ItemGroup&gt;
-     &lt;ClCompile Include="Source\Main.cpp" /&gt;
-+    &lt;ClCompile Include="Source\App\FApplication.cpp" /&gt;
-+    &lt;ClCompile Include="Source\Core\FInput.cpp" /&gt;
-     &lt;ClCompile Include="Source\Core\FSystem.cpp" /&gt;
-     &lt;ClCompile Include="Source\Core\FWindow.cpp" /&gt;
-     &lt;ClCompile Include="Source\Utility\Check.cpp" /&gt;
-     &lt;ClCompile Include="Source\Utility\FLog.cpp" /&gt;
-   &lt;/ItemGroup&gt;
-   &lt;ItemGroup&gt;
-+    &lt;ClInclude Include="Source\App\FApplication.h" /&gt;
-     &lt;ClInclude Include="Source\Core\FDisplaySettings.h" /&gt;
-+    &lt;ClInclude Include="Source\Core\FInput.h" /&gt;
-     &lt;ClInclude Include="Source\Core\FSystem.h" /&gt;
-     &lt;ClInclude Include="Source\Core\FWindow.h" /&gt;
-     &lt;ClInclude Include="Source\Utility\Check.h" /&gt;</pre>
-					</figure>
+						<summary>줄 단위 풀이</summary>
+						<ul class="walk">
+							<li class="entry"><code>case WM_SYSKEYDOWN:</code> · <code>case WM_SYSKEYUP:</code> Alt 를 누른 채 누르거나 뗀 키는 이 메시지로 옴. 받지 않으면 키를 누른 채 Alt 를 누르고 키를 뗐을 때 그 키가 눌린 채로 남음</li>
+							<li class="entry"><code>[[maybe_unused]] LPARAM LParam</code> 콜백 모양을 맞추려고 받지만 이 함수는 쓰지 않음</li>
+						</ul>
 					</details>
+					<p>Visual Studio 에서는 <code>App</code> 필터를 만들어 <code>FApplication</code> 두 파일을 넣고, <code>FInput</code> 두 파일은 <code>Core</code> 필터에 넣어요.</p>
 					<div class="learn">
 						<p class="box-label">스스로 설명해 보기</p>
 						<p>F1 키를 누르면 <code>FInput</code> 의 어느 칸이 바뀔까요? Windows 가 <code>WndProc</code> 를 부르는 데서 시작해 거쳐 가는 함수를 차례로 말해 보세요.</p>
-					</div>
-					<div class="checkpoint">
-						<p class="box-label">여기까지</p>
-						<p>ESC 를 누르면 끝나고 종료 코드는 0 이에요. 창을 먼저 누르지 않아도 키가 창으로 가요. <a href="#step-window">2단계</a>에서 콘솔을 창보다 먼저 열었기 때문이에요. CPU 코어 하나를 다 쓰는 것은 2단계부터 그랬어요. 루프가 기다리지 않고 돌기 때문이라 정상이에요.</p>
 					</div>
 				</div>
 			</li>
@@ -1907,18 +1798,18 @@ void FApplication::Render()
 					<p>알림은 <code>FSystem::OnResize</code> 가 받아 로그를 남겨요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FSystem.h</span><span class="badge mod">수정</span><span class="badge">OnResize</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -22,6 +22,7 @@
+<pre class="diff" data-lang="cpp">@@ -18,6 +18,7 @@
  	void Frame();
  
  	void OnWindowMessage(UINT Message, WPARAM WParam, LPARAM LParam);
 +	void OnResize(int NewWidth, int NewHeight);
  
- 	// 선언 순서가 곧 생성 순서이고 소멸은 그 역순이다.
- 	// 창을 쓰는 멤버는 FWindow 뒤에 둔다.</pre>
+ 	// 멤버는 선언의 역순으로 소멸한다.
+ 	// 창을 쓰는 멤버는 FWindow 뒤에 두어 창보다 먼저 소멸하게 한다.</pre>
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge mod">수정</span><span class="badge">크기 콜백 걸기와 OnResize</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -12,6 +12,7 @@
+<pre class="diff" data-lang="cpp">@@ -14,6 +14,7 @@
  
  	Window.SetMessageCallback([this](UINT Message, WPARAM WParam, LPARAM LParam)
  	                          { OnWindowMessage(Message, WParam, LParam); });
@@ -1926,7 +1817,7 @@ void FApplication::Render()
  }
  
  int FSystem::Run()
-@@ -57,3 +58,8 @@
+@@ -62,3 +63,8 @@
  		break;
  	}
  }
@@ -1936,10 +1827,6 @@ void FApplication::Render()
 +	FLog::Info(std::format(L"창 크기 변경 : {}x{}", NewWidth, NewHeight));
 +}</pre>
 					</figure>
-					<div class="checkpoint">
-						<p class="box-label">여기까지</p>
-						<p>테두리를 끌었다 놓으면 <code>창 크기 변경</code> 로그가 그때 한 번 찍혀요. 최대화해도 찍혀요. 창을 최소 크기까지 줄이면 로그에 <code>304x201</code> 이 찍혀요(배율 100%).</p>
-					</div>
 				</div>
 			</li>
 
@@ -1978,33 +1865,6 @@ void FApplication::Render()
 						<li><code>DxRenderDojo.manifest</code>·<code>DxRenderDojo.rc</code> : 파일 속성의 구성 속성 › 일반 › 항목 형식을 빌드에 참여 안 함으로 바꿈. <code>.rc</code> 가 기본값인 리소스 컴파일러로 남으면 <a href="#pitfalls">흔한 실수</a> 3번의 <code>CVT1100</code></li>
 					</ul>
 					<details class="fold">
-						<summary>참고 : 위 조작이 프로젝트 파일에 남기는 diff · 따로 치지 않음</summary>
-					<figure class="code">
-						<figcaption><span class="path">DxRenderDojo.vcxproj</span><span class="badge mod">수정</span><span class="badge">매니페스트</span></figcaption>
-<pre class="diff" data-lang="xml">@@ -48,6 +48,10 @@
-       &lt;SubSystem&gt;Windows&lt;/SubSystem&gt;
-       &lt;GenerateDebugInformation&gt;true&lt;/GenerateDebugInformation&gt;
-     &lt;/Link&gt;
-+    &lt;Manifest&gt;
-+      &lt;EnableDpiAwareness&gt;false&lt;/EnableDpiAwareness&gt;
-+      &lt;AdditionalManifestFiles&gt;$(ProjectDir)DxRenderDojo.manifest;%(AdditionalManifestFiles)&lt;/AdditionalManifestFiles&gt;
-+    &lt;/Manifest&gt;
-   &lt;/ItemDefinitionGroup&gt;
-   &lt;ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'"&gt;
-     &lt;ClCompile&gt;
-@@ -84,5 +88,9 @@
-     &lt;ClInclude Include="Source\Utility\FLog.h" /&gt;
-     &lt;ClInclude Include="Source\Utility\TSingleton.h" /&gt;
-   &lt;/ItemGroup&gt;
-+  &lt;ItemGroup&gt;
-+    &lt;None Include="DxRenderDojo.manifest" /&gt;
-+    &lt;None Include="DxRenderDojo.rc" /&gt;
-+  &lt;/ItemGroup&gt;
-   &lt;Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" /&gt;
- &lt;/Project&gt;</pre>
-					</figure>
-					</details>
-					<details class="fold">
 						<summary>자세히 · 매니페스트가 하는 일과 넣는 길이 둘인 이유</summary>
 						<p>선언이 없으면 Windows 는 앱이 배율을 모른다고 보고, 800×600 으로 그린 창을 배율만큼 늘려 보여 줘요. 늘린 그림이라 흐릿해요. 선언이 있으면 앱이 창 크기를 배율에 맞춰 직접 키우고 선명하게 그려요.</p>
 						<p>매니페스트를 exe 에 넣는 방법이 MSVC 와 mingw 에서 달라요. MSVC 는 링커가 매니페스트 파일을 받아 넣고, mingw 는 <code>.rc</code> 리소스로 넣어요. MSVC 빌드에 <code>.rc</code> 까지 넣으면 매니페스트가 두 번 들어가 <code>CVT1100</code> 링크 에러가 나요.</p>
@@ -2016,7 +1876,7 @@ void FApplication::Render()
 <pre class="diff" data-lang="cmake">@@ -9,10 +9,14 @@
  
  if(MSVC)
- 	target_compile_options(DxRenderDojo PRIVATE /W3 /utf-8)
+ 	target_compile_options(DxRenderDojo PRIVATE /W4 /utf-8)
 +	target_sources(DxRenderDojo PRIVATE DxRenderDojo.manifest)
  else()
  	target_compile_options(DxRenderDojo PRIVATE -Wall)
@@ -2232,9 +2092,9 @@ void FApplication::Render()
 					<p>창을 만든 로그도 배율을 함께 찍어요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge mod">수정</span><span class="badge">FSystem::Initialize 의 창 생성 로그</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -8,7 +8,9 @@
- {
- 	Window.Initialize(Display, ShowCmd);
+<pre class="diff" data-lang="cpp">@@ -10,7 +10,9 @@
+ 	const FDisplaySettings Settings;
+ 	Window.Initialize(Settings, ShowCmd);
  
 -	FLog::Info(std::format(L"창 생성 : {}x{}", Window.GetWidth(), Window.GetHeight()));
 +	const int ScalePercent = MulDiv(static_cast&lt;int&gt;(Window.GetDpi()), 100, USER_DEFAULT_SCREEN_DPI);
@@ -2320,10 +2180,6 @@ void FWindow::ToggleFullScreen()
 							<li class="entry"><code>rcMonitor</code> 작업 표시줄까지 포함한 모니터 전체 사각형</li>
 						</ul>
 					</details>
-					<div class="checkpoint">
-						<p class="box-label">여기까지</p>
-						<p>시작 로그에 배율이 붙어요. 배율 100% 면 <code>창 생성 : 800x600 (DPI 96, 배율 100%)</code>, 150% 면 <code>1200x900 (DPI 144, 배율 150%)</code> 이에요. 검은 창을 한 번 누른 뒤 Alt+Enter 를 누르면 창이 모니터를 채우고 <code>전체 화면 : 켬</code> 과 모니터 크기가 찍혀요. 다시 누르면 원래 위치와 크기로 돌아와요. 이제 <a href="#check">다 됐는지 확인</a> 목록과 맞춰 보세요.</p>
-					</div>
 				</div>
 			</li>
 
@@ -2381,22 +2237,24 @@ void FWindow::ToggleFullScreen()
 		<p class="section-note">새 파일은 전체 코드, 바뀐 파일은 diff 예요. 전부 접어 뒀으니 필요한 것만 펼쳐 보세요. 묶음은 파일이 맡은 일로 나눴어요.</p>
 		<ul class="file-list">
 			<li><span class="mark a">+</span><span class="name">Source/Core/FDisplaySettings.h</span><span class="note">+9</span></li>
-			<li><span class="mark a">+</span><span class="name">Source/Core/FInput.h</span><span class="note">+19</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/Core/FInput.h</span><span class="note">+15</span></li>
 			<li><span class="mark a">+</span><span class="name">Source/Core/FInput.cpp</span><span class="note">+11</span></li>
-			<li><span class="mark a">+</span><span class="name">Source/App/FApplication.h</span><span class="note">+12</span></li>
-			<li><span class="mark a">+</span><span class="name">Source/App/FApplication.cpp</span><span class="note">+17</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/App/FApplication.h</span><span class="note">+8</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/App/FApplication.cpp</span><span class="note">+9</span></li>
 			<li><span class="mark a">+</span><span class="name">Source/Utility/TSingleton.h</span><span class="note">+56</span></li>
 			<li><span class="mark a">+</span><span class="name">Source/Utility/FLog.h</span><span class="note">+22</span></li>
 			<li><span class="mark a">+</span><span class="name">Source/Utility/FLog.cpp</span><span class="note">+52</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/Utility/FStringConv.h</span><span class="note">+10</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/Utility/FStringConv.cpp</span><span class="note">+12</span></li>
 			<li><span class="mark a">+</span><span class="name">Source/Utility/Check.h</span><span class="note">+71</span></li>
 			<li><span class="mark a">+</span><span class="name">Source/Utility/Check.cpp</span><span class="note">+65</span></li>
 			<li><span class="mark a">+</span><span class="name">Source/Core/FWindow.h</span><span class="note">+46</span></li>
 			<li><span class="mark a">+</span><span class="name">Source/Core/FWindow.cpp</span><span class="note">+294</span></li>
-			<li><span class="mark a">+</span><span class="name">Source/Core/FSystem.h</span><span class="note">+33</span></li>
-			<li><span class="mark a">+</span><span class="name">Source/Core/FSystem.cpp</span><span class="note">+67</span></li>
-			<li><span class="mark m">~</span><span class="name">Source/Main.cpp</span><span class="note">+13 −1</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/Core/FSystem.h</span><span class="note">+28</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/Core/FSystem.cpp</span><span class="note">+72</span></li>
+			<li><span class="mark m">~</span><span class="name">Source/Main.cpp</span><span class="note">+14 −2</span></li>
 			<li><span class="mark m">~</span><span class="name">CMakeLists.txt</span><span class="note">+6 −1</span></li>
-			<li><span class="mark m">~</span><span class="name">DxRenderDojo.vcxproj</span><span class="note">+27 −2</span></li>
+			<li><span class="mark m">~</span><span class="name">DxRenderDojo.vcxproj</span><span class="note">+29 −2</span></li>
 			<li><span class="mark a">+</span><span class="name">DxRenderDojo.manifest</span><span class="note">+15 · DPI 인식과 OS 호환 선언</span></li>
 			<li><span class="mark a">+</span><span class="name">DxRenderDojo.rc</span><span class="note">+3 · mingw 빌드에만 들어감</span></li>
 			<li><span class="mark a">+</span><span class="name">DxRenderDojo.vcxproj.filters</span><span class="note">VS 폴더 표시. 본문 생략</span></li>
@@ -2417,7 +2275,7 @@ struct FDisplaySettings
 };</pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">Source/Core/FInput.h</span><span class="stat"><span class="plus">+19</span></span><span class="why">키 256개의 눌림 상태</span></summary>
+				<summary><span class="path">Source/Core/FInput.h</span><span class="stat"><span class="plus">+15</span></span><span class="why">키 256개의 눌림 상태</span></summary>
 <pre class="src" data-lang="cpp">#pragma once
 
 #include &lt;array&gt;
@@ -2425,10 +2283,6 @@ struct FDisplaySettings
 class FInput
 {
 public:
-	FInput() = default;
-	FInput(const FInput&amp; Other) = delete;
-	FInput&amp; operator=(const FInput&amp; Other) = delete;
-
 	bool IsKeyDown(unsigned int Key) const { return Keys[Key]; }
 
 	void KeyDown(unsigned int Key);
@@ -2455,7 +2309,7 @@ void FInput::KeyUp(unsigned int Key)
 		</div>
 
 		<div class="file-group">
-			<h3>공통 도구 셋</h3>
+			<h3>공통 도구</h3>
 			<details class="diff-file">
 				<summary><span class="path">Source/Utility/TSingleton.h</span><span class="stat"><span class="plus">+56</span></span><span class="why">전역 접근과 수명</span></summary>
 <pre class="src" data-lang="cpp">#pragma once
@@ -2596,6 +2450,34 @@ void FLog::Write(std::wstring_view Prefix, std::wstring_view Message)
 }</pre>
 			</details>
 			<details class="diff-file">
+				<summary><span class="path">Source/Utility/FStringConv.h</span><span class="stat"><span class="plus">+10</span></span><span class="why">좁은 문자열 넓히기</span></summary>
+<pre class="src" data-lang="cpp">#pragma once
+
+#include &lt;string&gt;
+#include &lt;string_view&gt;
+
+class FStringConv
+{
+public:
+	static std::wstring ToWide(std::string_view Text);
+};</pre>
+			</details>
+			<details class="diff-file">
+				<summary><span class="path">Source/Utility/FStringConv.cpp</span><span class="stat"><span class="plus">+12</span></span><span class="why">MultiByteToWideChar 두 번</span></summary>
+<pre class="src" data-lang="cpp">#include "Utility/FStringConv.h"
+
+#include &lt;Windows.h&gt;
+
+std::wstring FStringConv::ToWide(std::string_view Text)
+{
+	// 코드 페이지를 모르는 좁은 문자열은 시스템 코드 페이지(CP_ACP)로 읽는다.
+	const int TextLength = static_cast&lt;int&gt;(Text.size());
+	std::wstring Wide(MultiByteToWideChar(CP_ACP, 0, Text.data(), TextLength, nullptr, 0), L'\0');
+	MultiByteToWideChar(CP_ACP, 0, Text.data(), TextLength, Wide.data(), static_cast&lt;int&gt;(Wide.size()));
+	return Wide;
+}</pre>
+			</details>
+			<details class="diff-file">
 				<summary><span class="path">Source/Utility/Check.h</span><span class="stat"><span class="plus">+71</span></span><span class="why">CHECK_RETURN·CHECK_FATAL 매크로와 판정</span></summary>
 <pre class="src" data-lang="cpp">#pragma once
 
@@ -2679,6 +2561,7 @@ namespace Return
 #include &lt;string&gt;
 
 #include "Utility/FLog.h"
+#include "Utility/FStringConv.h"
 
 namespace
 {
@@ -2732,8 +2615,7 @@ namespace Return
 
 	void ReportResurrection(std::string_view TypeName)
 	{
-		const std::wstring Name(TypeName.begin(), TypeName.end());
-		FLog::Warning(std::format(L"해제한 싱글톤이 다시 만들어졌다 : {}", Name));
+		FLog::Warning(std::format(L"해제한 싱글톤이 다시 만들어졌다 : {}", FStringConv::ToWide(TypeName)));
 	}
 } // namespace Return</pre>
 			</details>
@@ -3092,13 +2974,12 @@ void FWindow::FitToMonitor()
 		<div class="file-group">
 			<h3>루프와 장면</h3>
 			<details class="diff-file">
-				<summary><span class="path">Source/Core/FSystem.h</span><span class="stat"><span class="plus">+33</span></span><span class="why">멤버 넷과 선언 순서</span></summary>
+				<summary><span class="path">Source/Core/FSystem.h</span><span class="stat"><span class="plus">+28</span></span><span class="why">멤버 셋과 소멸 순서</span></summary>
 <pre class="src" data-lang="cpp">#pragma once
 
 #include &lt;Windows.h&gt;
 
 #include "App/FApplication.h"
-#include "Core/FDisplaySettings.h"
 #include "Core/FInput.h"
 #include "Core/FWindow.h"
 #include "Utility/TSingleton.h"
@@ -3108,10 +2989,7 @@ class FSystem : public TSingleton&lt;FSystem&gt;
 public:
 	void Initialize(int ShowCmd);
 
-	const FInput&amp; GetInput() const { return Input; }
-
 	int Run();
-	void RequestExit();
 
 private:
 	void Frame();
@@ -3119,25 +2997,26 @@ private:
 	void OnWindowMessage(UINT Message, WPARAM WParam, LPARAM LParam);
 	void OnResize(int NewWidth, int NewHeight);
 
-	// 선언 순서가 곧 생성 순서이고 소멸은 그 역순이다.
-	// 창을 쓰는 멤버는 FWindow 뒤에 둔다.
-	FDisplaySettings Display;
+	// 멤버는 선언의 역순으로 소멸한다.
+	// 창을 쓰는 멤버는 FWindow 뒤에 두어 창보다 먼저 소멸하게 한다.
 	FWindow Window;
 	FInput Input;
 	FApplication Application;
 };</pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">Source/Core/FSystem.cpp</span><span class="stat"><span class="plus">+67</span></span><span class="why">메시지 루프·프레임·메시지 라우팅</span></summary>
+				<summary><span class="path">Source/Core/FSystem.cpp</span><span class="stat"><span class="plus">+72</span></span><span class="why">메시지 루프·프레임과 ESC·메시지 라우팅</span></summary>
 <pre class="src" data-lang="cpp">#include "Core/FSystem.h"
 
 #include &lt;format&gt;
 
+#include "Core/FDisplaySettings.h"
 #include "Utility/FLog.h"
 
 void FSystem::Initialize(int ShowCmd)
 {
-	Window.Initialize(Display, ShowCmd);
+	const FDisplaySettings Settings;
+	Window.Initialize(Settings, ShowCmd);
 
 	const int ScalePercent = MulDiv(static_cast&lt;int&gt;(Window.GetDpi()), 100, USER_DEFAULT_SCREEN_DPI);
 	FLog::Info(std::format(
@@ -3166,25 +3045,28 @@ int FSystem::Run()
 	return static_cast&lt;int&gt;(Message.wParam);
 }
 
-void FSystem::RequestExit()
-{
-	PostQuitMessage(0);
-}
-
 void FSystem::Frame()
 {
+	if (Input.IsKeyDown(VK_ESCAPE))
+	{
+		PostQuitMessage(0);
+	}
+
 	Application.Update();
 	Application.Render();
 }
 
-void FSystem::OnWindowMessage(UINT Message, WPARAM WParam, LPARAM LParam)
+void FSystem::OnWindowMessage(UINT Message, WPARAM WParam, [[maybe_unused]] LPARAM LParam)
 {
 	switch (Message)
 	{
+	// Alt 를 누른 채 누른 키와 뗀 키는 WM_SYSKEYDOWN·WM_SYSKEYUP 으로 온다.
 	case WM_KEYDOWN:
+	case WM_SYSKEYDOWN:
 		Input.KeyDown(static_cast&lt;unsigned int&gt;(WParam));
 		break;
 	case WM_KEYUP:
+	case WM_SYSKEYUP:
 		Input.KeyUp(static_cast&lt;unsigned int&gt;(WParam));
 		break;
 	default:
@@ -3198,34 +3080,22 @@ void FSystem::OnResize(int NewWidth, int NewHeight)
 }</pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">Source/App/FApplication.h</span><span class="stat"><span class="plus">+12</span></span><span class="why">Update 와 Render</span></summary>
+				<summary><span class="path">Source/App/FApplication.h</span><span class="stat"><span class="plus">+8</span></span><span class="why">Update 와 Render</span></summary>
 <pre class="src" data-lang="cpp">#pragma once
 
 class FApplication
 {
 public:
-	FApplication() = default;
-	FApplication(const FApplication&amp; Other) = delete;
-	FApplication&amp; operator=(const FApplication&amp; Other) = delete;
-
 	void Update();
 	void Render();
 };</pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">Source/App/FApplication.cpp</span><span class="stat"><span class="plus">+17</span></span><span class="why">ESC 판정. Render 는 03편부터</span></summary>
+				<summary><span class="path">Source/App/FApplication.cpp</span><span class="stat"><span class="plus">+9</span></span><span class="why">Update 와 Render. 이 편에서는 둘 다 비어 있음</span></summary>
 <pre class="src" data-lang="cpp">#include "App/FApplication.h"
-
-#include &lt;Windows.h&gt;
-
-#include "Core/FSystem.h"
 
 void FApplication::Update()
 {
-	if (FSystem::Get().GetInput().IsKeyDown(VK_ESCAPE))
-	{
-		FSystem::Get().RequestExit();
-	}
 }
 
 void FApplication::Render()
@@ -3237,14 +3107,18 @@ void FApplication::Render()
 		<div class="file-group">
 			<h3>호출부와 빌드</h3>
 			<details class="diff-file">
-				<summary><span class="path">Source/Main.cpp</span><span class="stat"><span class="plus">+13</span> <span class="minus">−1</span></span><span class="why">FLog 를 먼저, FSystem 을 만들어 돌림</span></summary>
-<pre class="diff" data-lang="cpp">@@ -1,6 +1,18 @@
+				<summary><span class="path">Source/Main.cpp</span><span class="stat"><span class="plus">+14</span> <span class="minus">−2</span></span><span class="why">FLog 를 먼저, FSystem 을 만들어 돌림</span></summary>
+<pre class="diff" data-lang="cpp">@@ -1,9 +1,21 @@
  #include &lt;Windows.h&gt;
  
 +#include "Core/FSystem.h"
 +#include "Utility/FLog.h"
 +
- int WINAPI wWinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _In_ PWSTR CmdLine, _In_ int ShowCmd)
+ int WINAPI wWinMain([[maybe_unused]] _In_ HINSTANCE Instance,
+                     [[maybe_unused]] _In_opt_ HINSTANCE PrevInstance,
+                     [[maybe_unused]] _In_ PWSTR CmdLine,
+-                    [[maybe_unused]] _In_ int ShowCmd)
++                    _In_ int ShowCmd)
  {
 -	return 0;
 +	// 디버그 빌드의 로그 콘솔을 창보다 먼저 연다. 창 뒤에 열리면 콘솔이 앞에 와서 키 입력을 가져간다.
@@ -3267,11 +3141,11 @@ void FApplication::Render()
  add_executable(DxRenderDojo WIN32 ${SourceFiles})
 +target_include_directories(DxRenderDojo PRIVATE Source)
  target_compile_features(DxRenderDojo PRIVATE cxx_std_20)
--target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE)
-+target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN)
+-target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE NOMINMAX)
++target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN)
  
  if(MSVC)
- 	target_compile_options(DxRenderDojo PRIVATE /W3 /utf-8)
+ 	target_compile_options(DxRenderDojo PRIVATE /W4 /utf-8)
 +	target_sources(DxRenderDojo PRIVATE DxRenderDojo.manifest)
  else()
  	target_compile_options(DxRenderDojo PRIVATE -Wall)
@@ -3285,7 +3159,7 @@ void FApplication::Render()
  endif()</pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">DxRenderDojo.vcxproj</span><span class="stat"><span class="plus">+27</span> <span class="minus">−2</span></span><span class="why">같은 내용을 VS 프로젝트에</span></summary>
+				<summary><span class="path">DxRenderDojo.vcxproj</span><span class="stat"><span class="plus">+29</span> <span class="minus">−2</span></span><span class="why">같은 내용을 VS 프로젝트에</span></summary>
 <pre class="diff" data-lang="xml">@@ -42,22 +42,27 @@
        &lt;ConformanceMode&gt;true&lt;/ConformanceMode&gt;
        &lt;LanguageStandard&gt;stdcpp20&lt;/LanguageStandard&gt;
@@ -3303,20 +3177,20 @@ void FApplication::Render()
    &lt;/ItemDefinitionGroup&gt;
    &lt;ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'"&gt;
      &lt;ClCompile&gt;
--      &lt;PreprocessorDefinitions&gt;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)&lt;/PreprocessorDefinitions&gt;
-+      &lt;PreprocessorDefinitions&gt;_DEBUG;_WINDOWS;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)&lt;/PreprocessorDefinitions&gt;
+-      &lt;PreprocessorDefinitions&gt;_DEBUG;_WINDOWS;NOMINMAX;%(PreprocessorDefinitions)&lt;/PreprocessorDefinitions&gt;
++      &lt;PreprocessorDefinitions&gt;_DEBUG;_WINDOWS;NOMINMAX;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)&lt;/PreprocessorDefinitions&gt;
      &lt;/ClCompile&gt;
    &lt;/ItemDefinitionGroup&gt;
    &lt;ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'"&gt;
      &lt;ClCompile&gt;
        &lt;FunctionLevelLinking&gt;true&lt;/FunctionLevelLinking&gt;
        &lt;IntrinsicFunctions&gt;true&lt;/IntrinsicFunctions&gt;
--      &lt;PreprocessorDefinitions&gt;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)&lt;/PreprocessorDefinitions&gt;
-+      &lt;PreprocessorDefinitions&gt;NDEBUG;_WINDOWS;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)&lt;/PreprocessorDefinitions&gt;
+-      &lt;PreprocessorDefinitions&gt;NDEBUG;_WINDOWS;NOMINMAX;%(PreprocessorDefinitions)&lt;/PreprocessorDefinitions&gt;
++      &lt;PreprocessorDefinitions&gt;NDEBUG;_WINDOWS;NOMINMAX;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)&lt;/PreprocessorDefinitions&gt;
      &lt;/ClCompile&gt;
      &lt;Link&gt;
        &lt;EnableCOMDATFolding&gt;true&lt;/EnableCOMDATFolding&gt;
-@@ -66,6 +71,26 @@
+@@ -66,6 +71,28 @@
    &lt;/ItemDefinitionGroup&gt;
    &lt;ItemGroup&gt;
      &lt;ClCompile Include="Source\Main.cpp" /&gt;
@@ -3326,6 +3200,7 @@ void FApplication::Render()
 +    &lt;ClCompile Include="Source\Core\FWindow.cpp" /&gt;
 +    &lt;ClCompile Include="Source\Utility\Check.cpp" /&gt;
 +    &lt;ClCompile Include="Source\Utility\FLog.cpp" /&gt;
++    &lt;ClCompile Include="Source\Utility\FStringConv.cpp" /&gt;
 +  &lt;/ItemGroup&gt;
 +  &lt;ItemGroup&gt;
 +    &lt;ClInclude Include="Source\App\FApplication.h" /&gt;
@@ -3335,6 +3210,7 @@ void FApplication::Render()
 +    &lt;ClInclude Include="Source\Core\FWindow.h" /&gt;
 +    &lt;ClInclude Include="Source\Utility\Check.h" /&gt;
 +    &lt;ClInclude Include="Source\Utility\FLog.h" /&gt;
++    &lt;ClInclude Include="Source\Utility\FStringConv.h" /&gt;
 +    &lt;ClInclude Include="Source\Utility\TSingleton.h" /&gt;
 +  &lt;/ItemGroup&gt;
 +  &lt;ItemGroup&gt;
@@ -3408,6 +3284,7 @@ void FApplication::Render()
 			<li><span class="label">1</span><span>창을 1280×720 으로 변경. 로그의 <code>창 생성</code> 줄에 같은 값이 찍히는지 확인 (배율 100%)</span></li>
 			<li><span class="label">2</span><span>ESC 말고 F4 로도 끝나게 변경</span></li>
 			<li><span class="label">3</span><span>제목 표시줄을 끌어 창을 옮기기만 해도 <code>창 크기 변경 : 800x600</code> 이 찍힘. 크기가 그대로면 알리지 않게 수정</span></li>
+			<li><span class="label">4</span><span><code>FWindow::Initialize</code> 의 <code>CreateWindowExW</code> 두 번째 인자 <code>ClassName</code> 을 <code>L"Wrong"</code> 으로 바꿔 실행. 등록하지 않은 창 클래스라 창을 만들지 못함. F5 면 <code>CHECK_FATAL(Handle);</code> 줄에서 먼저 멈추고, 계속하면 <code>[CHECK FATAL] Handle</code> 상자 뒤 종료 코드 1. Ctrl+F5 면 곧바로 상자</span></li>
 		</ul>
 	</section>
 
@@ -3444,7 +3321,6 @@ void FApplication::Render()
 <nav class="rail" aria-label="이 페이지" data-block="rail-outline" data-source="자동">
 	<ol id="page-outline">
 		<li><a href="#goal">이 편을 마치면</a></li>
-		<li><a href="#diverge">원문과 다른 점</a></li>
 		<li><a href="#overview">한눈에 보기</a></li>
 		<li><a href="#predict">먼저 예측</a></li>
 		<li><a href="#steps">따라 하기</a></li>
