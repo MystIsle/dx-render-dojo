@@ -16,6 +16,8 @@ public:
 
 	void Initialize(HWND WindowHandle, int Width, int Height, bool bEnableVSync);
 
+	ID3D11Device* GetDevice() const { return Device.Get(); }
+
 	void Resize(int Width, int Height);
 
 	void BeginScene();
