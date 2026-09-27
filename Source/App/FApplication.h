@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Graphics/FCamera.h"
 #include "Graphics/FModel.h"
 #include "Shaders/FColorShader.h"
 
@@ -14,6 +15,7 @@ public:
 	void Render(FD3D11Graphics& Graphics);
 
 private:
+	FCamera Camera;
 	FModel Model;
 	FColorShader ColorShader;
 };

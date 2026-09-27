@@ -4,6 +4,7 @@
 
 void FApplication::Initialize(FD3D11Graphics& Graphics)
 {
+	Camera.SetPosition(0.0f, 0.0f, -5.0f);
 	Model.Initialize(Graphics.GetDevice());
 	ColorShader.Initialize(Graphics.GetDevice());
 }
