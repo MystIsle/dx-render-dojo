@@ -65,6 +65,17 @@ void FD3D11Graphics::Initialize(HWND WindowHandle, int Width, int Height, bool b
 	CreateSizeDependentResources();
 }
 
+void FD3D11Graphics::Resize(int Width, int Height)
+{
+	// 백 버퍼를 가리키는 뷰가 남아 있으면 ResizeBuffers 가 실패한다. Flush 는 D3D 가 미뤄 둔 해제를 지금 끝낸다.
+	RenderTargetView.Reset();
+	Context->Flush();
+
+	CHECK_FATAL(
+	    SwapChain->ResizeBuffers(0, static_cast<UINT>(Width), static_cast<UINT>(Height), DXGI_FORMAT_UNKNOWN, 0));
+	CreateSizeDependentResources();
+}
+
 void FD3D11Graphics::BeginScene()
 {
 	// ClearRenderTargetView 는 float 4개 배열을 받는다. DXGI_RGBA 는 r·g·b·a 를 이 순서로 이어 둔다.

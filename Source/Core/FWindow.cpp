@@ -233,8 +233,17 @@ void FWindow::NotifyResize()
 {
 	RECT Client = {};
 	GetClientRect(Handle, &Client);
-	Width = Client.right - Client.left;
-	Height = Client.bottom - Client.top;
+	const int NewWidth = Client.right - Client.left;
+	const int NewHeight = Client.bottom - Client.top;
+
+	// 창을 옮기기만 해도 WM_EXITSIZEMOVE 가 온다. 크기가 그대로면 스왑체인을 다시 만들 이유가 없다.
+	if (NewWidth == Width && NewHeight == Height)
+	{
+		return;
+	}
+
+	Width = NewWidth;
+	Height = NewHeight;
 
 	if (ResizeCallback)
 	{

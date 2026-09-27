@@ -13,10 +13,13 @@ public:
 
 	void Initialize(HWND WindowHandle, int Width, int Height, bool bEnableVSync);
 
+	void Resize(int Width, int Height);
+
 	void BeginScene();
 	void EndScene();
 
 private:
+	// 창 크기를 따라가는 자원은 여기서 만든다. Initialize 와 Resize 가 같이 부른다.
 	void CreateSizeDependentResources();
 
 	Microsoft::WRL::ComPtr<ID3D11Device> Device;
