@@ -9,10 +9,14 @@ target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE NOMINMAX WIN32_
 
 if(MSVC)
 	target_compile_options(DxRenderDojo PRIVATE /W4 /utf-8)
+	target_sources(DxRenderDojo PRIVATE DxRenderDojo.manifest)
 else()
 	target_compile_options(DxRenderDojo PRIVATE -Wall)
 endif()
 
 if(MINGW)
+	enable_language(RC)
+	target_sources(DxRenderDojo PRIVATE DxRenderDojo.rc)
+	target_compile_definitions(DxRenderDojo PRIVATE _WIN32_WINNT=0x0A00 WINVER=0x0A00)
 	target_link_options(DxRenderDojo PRIVATE -municode -static -static-libgcc -static-libstdc++)
 endif()
