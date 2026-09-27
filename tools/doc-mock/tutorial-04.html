@@ -413,7 +413,6 @@ figure.code .diff-view { border-top: 0; }
 		<p class="lede">정점 버퍼와 HLSL 셰이더로 초록 삼각형 하나를 그려요. 그림을 받을 곳을 묶고, 정점을 GPU 버퍼에 올리고, 셰이더가 화면 위치와 색을 정하는 순서를 처음부터 끝까지 따라가요.</p>
 		<ul class="meta">
 			<li><b>태그</b><code>tut04</code></li>
-			<li><b>원문</b><a href="https://www.rastertek.com/dx11win10tut04.html">Tutorial 4</a></li>
 			<li><b>이전 태그</b><code>tut03</code></li>
 		</ul>
 		<div class="scanline" aria-label="전체 진도에서 이 편의 위치">
@@ -430,7 +429,7 @@ figure.code .diff-view { border-top: 0; }
 	<section id="goal" data-block="goal" data-source="직접">
 		<h2>이 편을 마치면</h2>
 		<ul class="labeled">
-			<li><span class="label">실행</span><span>검은 창 가운데에 초록 삼각형이 그려짐. 창을 가로로 넓혀도 삼각형이 옆으로 늘어나지 않음</span></li>
+			<li><span class="label">실행</span><span>회색 창 가운데에 초록 삼각형이 그려짐. 창을 가로로 넓혀도 삼각형이 옆으로 늘어나지 않음</span></li>
 			<li><span class="label">버퍼</span><span>정점과 인덱스를 GPU 버퍼에 담고 입력 조립기에 묶는 순서</span></li>
 			<li><span class="label">셰이더</span><span>HLSL 정점·픽셀 셰이더를 실행 중에 컴파일하고 입력 레이아웃으로 C++ 정점 구조체와 잇는 법</span></li>
 			<li><span class="label">행렬</span><span>월드·뷰·투영 행렬을 상수 버퍼로 셰이더에 넘겨 정점을 화면에 놓는 법</span></li>
@@ -438,37 +437,16 @@ figure.code .diff-view { border-top: 0; }
 		</ul>
 	</section>
 
-	<section id="diverge" data-block="diverge" data-source="직접">
-		<h2>원문과 다른 점</h2>
-		<details class="fold">
-			<summary>Rastertek 원문을 옆에 두고 읽을 때 보는 대조표</summary>
-		<div class="diverge">
-			<div class="diverge-row diverge-head"><span>항목</span><span>원문</span><span>이 교재</span></div>
-			<div class="diverge-row"><span class="topic">클래스</span><span class="orig"><code>CameraClass</code>, <code>ModelClass</code>, <code>ColorShaderClass</code></span><span><code>FCamera</code>·<code>FModel</code> 은 <code>Graphics/</code><br><code>FColorShader</code> 는 <code>Shaders/</code></span></div>
-			<div class="diverge-row"><span class="topic">투영·월드 행렬</span><span class="orig"><code>D3DClass</code> 가 초기화 때 만들어 게터로 내줌</span><span>투영은 <code>FCamera</code> 가 매 프레임 종횡비를 받아 계산<br>월드는 앱의 <code>XMMatrixIdentity()</code></span></div>
-			<div class="diverge-row"><span class="topic">렌더 타깃과 뷰포트</span><span class="orig">초기화 때 한 번 설정</span><span><code>BeginScene</code> 에서 매 프레임 묶음</span></div>
-			<div class="diverge-row"><span class="topic">카메라 회전</span><span class="orig"><code>SetRotation</code> 과 <code>Render</code> 로 뷰 행렬 갱신</span><span>위치만. 회전은 쓰기 시작하는 편에서 추가</span></div>
-			<div class="diverge-row"><span class="topic">셰이더 파일</span><span class="orig"><code>../Engine/color.vs</code><br>작업 디렉터리 기준</span><span><code>Source/Shaders/Color.vs</code><br>빌드가 exe 옆 <code>Shaders/</code> 로 복사</span></div>
-			<div class="diverge-row"><span class="topic">컴파일 오류</span><span class="orig"><code>shader-error.txt</code> 에 쓰고 메시지 상자</span><span>로그에 남기고 <code>CHECK_FATAL</code></span></div>
-			<div class="diverge-row"><span class="topic">정점·인덱스 데이터</span><span class="orig"><code>new</code> 로 만든 배열<br><code>D3D11_USAGE_DEFAULT</code> 버퍼</span><span>함수 안의 <code>constexpr std::array</code><br><code>D3D11_USAGE_IMMUTABLE</code> 버퍼</span></div>
-			<div class="diverge-row"><span class="topic">인덱스 형</span><span class="orig"><code>unsigned long</code></span><span><code>std::uint32_t</code></span></div>
-			<div class="diverge-row"><span class="topic">정점 셰이더 입력</span><span class="orig"><code>float4</code> 로 받고 w 를 1 로 덮어씀</span><span><code>float3</code> 로 받아 <code>float4(Position, 1.0f)</code></span></div>
-			<div class="diverge-row"><span class="topic">상수 버퍼</span><span class="orig">구조체 멤버가 <code>XMMATRIX</code><br>슬롯은 컴파일러가 정함</span><span>구조체 멤버가 <code>XMFLOAT4X4</code><br><code>register(b0)</code> 으로 슬롯을 적음</span></div>
-			<div class="diverge-row"><span class="topic">DirectXMath</span><span class="orig">Windows SDK 의 헤더</span><span>공식 릴리스를 <code>external/</code> 에</span></div>
-			<div class="diverge-row"><span class="topic">라이브러리 링크</span><span class="orig"><code>#pragma comment(lib, ...)</code></span><span>빌드 파일에 <code>d3dcompiler</code></span></div>
-		</div>
-		</details>
-	</section>
-
 	<section id="overview" data-block="overview" data-source="직접">
 		<h2>한눈에 보기</h2>
 		<p class="section-note">아래 흐름과 따라 하기에 계속 나오는 클래스예요. 이름과 맡은 일을 먼저 봐 두세요.</p>
 		<ul class="cast">
-			<li><code>FModel</code><span>새 클래스. 삼각형의 정점·인덱스 버퍼. 그릴 때 입력 조립기에 묶음</span></li>
-			<li><code>FColorShader</code><span>새 클래스. 셰이더 컴파일, 입력 레이아웃, 행렬 상수 버퍼, 그리기 명령</span></li>
+			<li><code>FVertexPositionColor</code><span>새 구조체. 위치와 색을 담은 정점 하나와 그 입력 요소 표</span></li>
+			<li><code>FModel</code><span>새 클래스. 삼각형의 정점·인덱스 버퍼. 그릴 때 입력 조립기에 묶고 <code>DrawIndexed</code> 를 부름</span></li>
+			<li><code>FColorShader</code><span>새 클래스. 셰이더 컴파일, 입력 레이아웃, 행렬 상수 버퍼. 그리기 전에 파이프라인에 묶음</span></li>
 			<li><code>FCamera</code><span>새 클래스. 위치와 렌즈(시야각·가까운 면·먼 면)로 뷰·투영 행렬을 계산</span></li>
 			<li><code>FApplication</code><span>위 셋을 멤버로 갖고 초기화와 그리기를 맡음</span></li>
-			<li><code>FD3D11Graphics</code><span>매 프레임 렌더 타깃과 뷰포트를 묶음. 디바이스·컨텍스트·종횡비를 내줌</span></li>
+			<li><code>FD3D11Graphics</code><span>매 프레임 렌더 타깃과 뷰포트를 묶음. 디바이스·컨텍스트·종횡비를 내줌. 지우는 색은 <code>XMFLOAT4</code> 로</span></li>
 			<li><code>FPaths</code><span>새 유틸리티. 실행 중인 exe 가 있는 폴더</span></li>
 		</ul>
 		<div class="flow">
@@ -487,8 +465,9 @@ figure.code .diff-view { border-top: 0; }
 				<div class="flow-steps">
 					<span class="node">BeginScene (지우기·RTV·뷰포트)</span><span class="arrow">→</span>
 					<span class="node">FApplication::Render (행렬 셋)</span><span class="arrow">→</span>
-					<span class="node">FModel::Render (버퍼 묶기)</span><span class="arrow">→</span>
-					<span class="node">FColorShader::Render (셰이더·DrawIndexed)</span><span class="arrow">→</span>
+					<span class="node">FColorShader::SetMatrices</span><span class="arrow">→</span>
+					<span class="node">FColorShader::Bind</span><span class="arrow">→</span>
+					<span class="node">FModel::Draw (버퍼 묶기·DrawIndexed)</span><span class="arrow">→</span>
 					<span class="node">EndScene (Present)</span>
 				</div>
 			</div>
@@ -502,11 +481,11 @@ figure.code .diff-view { border-top: 0; }
 				<rect class="dg-box" x="190" y="0" width="305" height="50" rx="6"/>
 				<text class="dg-s" x="204" y="20">정점 버퍼 · 인덱스 버퍼</text>
 				<text class="dg-ms" x="204" y="40">IASetVertexBuffers · IASetIndexBuffer</text>
-				<circle class="dg-step" cx="478" cy="17" r="10"/><text class="dg-step-n" x="474" y="21">3</text>
+				<circle class="dg-step" cx="478" cy="17" r="10"/><text class="dg-step-n" x="474" y="21">6</text>
 				<rect class="dg-box" x="515" y="0" width="305" height="50" rx="6"/>
 				<text class="dg-s" x="529" y="20">토폴로지</text>
 				<text class="dg-ms" x="529" y="40">IASetPrimitiveTopology</text>
-				<circle class="dg-step" cx="803" cy="17" r="10"/><text class="dg-step-n" x="799" y="21">3</text>
+				<circle class="dg-step" cx="803" cy="17" r="10"/><text class="dg-step-n" x="799" y="21">6</text>
 				<rect class="dg-box" x="190" y="62" width="305" height="50" rx="6"/>
 				<text class="dg-s" x="204" y="82">입력 레이아웃</text>
 				<text class="dg-ms" x="204" y="102">IASetInputLayout</text>
@@ -522,7 +501,7 @@ figure.code .diff-view { border-top: 0; }
 				<rect class="dg-box" x="515" y="142" width="305" height="50" rx="6"/>
 				<text class="dg-s" x="529" y="162">상수 버퍼 · 행렬 셋</text>
 				<text class="dg-ms" x="529" y="182">VSSetConstantBuffers</text>
-				<circle class="dg-step" cx="803" cy="159" r="10"/><text class="dg-step-n" x="799" y="163">7</text>
+				<circle class="dg-step" cx="803" cy="159" r="10"/><text class="dg-step-n" x="799" y="163">8</text>
 				<path class="dg-line" d="M85,192 L85,218" marker-end="url(#d4m-h)"/>
 				<rect class="dg-box accent" x="0" y="222" width="170" height="50" rx="8"/>
 				<text class="dg-t" x="16" y="245">래스터라이저</text>
@@ -568,24 +547,27 @@ figure.code .diff-view { border-top: 0; }
 			<p>800×600 창 가운데에 삼각형이 떠 있어요. 창을 1200×600 으로 넓히면 삼각형도 옆으로 늘어날까요?</p>
 			<details class="fold">
 				<summary>답 보기</summary>
-				<p>늘어나지 않아요. 800×600 에서도 1200×600 에서도 삼각형을 감싸는 상자는 약 290×290 픽셀이에요. 투영 행렬이 매 프레임 창의 가로세로 비율을 받아 넓어진 만큼 가로를 줄여요. (<a href="#step-camera">8단계</a>)</p>
+				<p>늘어나지 않아요. 800×600 에서도 1200×600 에서도 삼각형을 감싸는 상자는 약 290×290 픽셀이에요. 투영 행렬이 매 프레임 창의 가로세로 비율을 받아 넓어진 만큼 가로를 줄여요. (<a href="#step-camera">7단계</a>, <a href="#step-cbuffer">8단계</a>)</p>
 			</details>
 		</div>
 	</section>
 
 	<section id="steps" data-block="steps" data-source="직접">
 		<h2>따라 하기</h2>
-		<p class="section-note">코드 조각 위의 경로는 리포 루트 기준이에요. 새 파일은 그 폴더에 만들어요. Visual Studio 의 새 항목 추가는 기본 위치가 프로젝트 파일 옆이라 위치를 그 폴더로 바꿔야 해요. 배지는 할 일이에요. <b>신규</b>는 새 파일이나 새 함수를 넣기, <b>수정</b>은 있던 것을 고치기, <b>삭제</b>는 지우기예요. 통째로 보이는 조각은 그대로 넣거나 바꿔 넣고, diff 조각은 초록 줄을 넣고 빨간 줄을 지워요. 단계마다 끝의 <b>여기까지</b> 상자대로 빌드하고 실행해 보세요.</p>
+		<p class="section-note">코드 조각 위의 경로는 리포 루트 기준이에요. 새 파일은 그 폴더에 만들어요. Visual Studio 의 새 항목 추가는 기본 위치가 프로젝트 파일 옆이라 위치를 그 폴더로 바꿔야 해요. 배지는 할 일이에요. <b>신규</b>는 새 파일이나 새 함수를 넣기, <b>수정</b>은 있던 것을 고치기, <b>삭제</b>는 지우기예요. 통째로 보이는 조각은 그대로 넣거나 바꿔 넣고, diff 조각은 초록 줄을 넣고 빨간 줄을 지워요. 빌드와 실행은 8단계까지 친 뒤 <a href="#check">다 됐는지 확인</a>에서 한 번 해요.</p>
 		<ol class="steps">
 
 			<li class="step" id="step-math">
 				<div class="step-body">
 					<h3>DirectXMath 를 들인다</h3>
-					<p>04편부터 벡터와 행렬 계산에 DirectXMath 를 써요. Windows SDK 에도 들어 있지만 맥 빌드가 쓰는 mingw 의 헤더에는 행렬 형 <code>XMMATRIX</code> 가 없어요. 공식 릴리스를 리포의 <code>external/</code> 에 넣고 Visual Studio 빌드와 mingw 빌드가 같은 사본을 써요.</p>
-					<p>GitHub 의 <code>microsoft/DirectXMath</code> 에서 릴리스 <code>jun2026</code> 의 소스 zip 을 받아요. 압축을 풀어 <code>Inc</code> 폴더의 파일 10개를 <code>external/DirectXMath/Inc</code> 로, <code>LICENSE</code> 를 <code>external/DirectXMath</code> 로 옮겨요.</p>
+					<p>04편부터 벡터와 행렬 계산에 DirectXMath 를 써요. Windows SDK 에도 들어 있지만 리포는 공식 릴리스를 <code>external/</code> 에 넣고 그 사본을 써요. 어느 컴퓨터에서 빌드해도 같은 버전이 쓰여요.</p>
+					<p>GitHub 의 <code>microsoft/DirectXMath</code> 에서 릴리스 <code>jun2026</code> 의 소스 zip 을 받아요. 압축을 풀어 <code>Inc</code> 폴더의 파일 10개를 <code>external/DirectXMath/Inc</code> 로, <code>LICENSE</code> 를 <code>external/DirectXMath</code> 로 옮겨요. Visual Studio 에서는 프로젝트 속성을 아래처럼 고쳐요.</p>
+					<ul class="walk">
+						<li>모든 구성 · C/C++ › 일반 › 추가 포함 디렉터리 : <code>$(ProjectDir)Source;</code> 뒤에 <code>$(ProjectDir)external\DirectXMath\Inc;</code> 를 더함</li>
+					</ul>
 					<figure class="code">
 						<figcaption><span class="path">Source/Main.cpp</span><span class="badge mod">수정</span><span class="badge">include 와 wWinMain 첫 줄</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -1,10 +1,15 @@
+<pre class="diff" data-lang="cpp">@@ -1,6 +1,8 @@
 +#include &lt;DirectXMath.h&gt;
  #include &lt;Windows.h&gt;
  
@@ -593,7 +575,10 @@ figure.code .diff-view { border-top: 0; }
 +#include "Utility/Check.h"
  #include "Utility/FLog.h"
  
- int WINAPI wWinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _In_ PWSTR CmdLine, _In_ int ShowCmd)
+ int WINAPI wWinMain([[maybe_unused]] _In_ HINSTANCE Instance,
+@@ -8,6 +10,9 @@
+                     [[maybe_unused]] _In_ PWSTR CmdLine,
+                     _In_ int ShowCmd)
  {
 +	// DirectXMath 가 쓰는 SIMD 명령을 이 CPU 가 지원하는지 먼저 본다.
 +	CHECK_FATAL(DirectX::XMVerifyCPUSupport());
@@ -609,50 +594,43 @@ figure.code .diff-view { border-top: 0; }
 							<li class="entry"><code>#include "Utility/Check.h"</code> <code>CHECK_FATAL</code> 을 쓰려고 넣음</li>
 						</ul>
 					</details>
-					<p>Visual Studio 에서는 프로젝트 속성을 아래처럼 고쳐요. 이 조작이 <code>DxRenderDojo.vcxproj</code> 를 바꿔요.</p>
-					<ul class="walk">
-						<li>모든 구성 · C/C++ › 일반 › 추가 포함 디렉터리 : <code>$(ProjectDir)external\DirectXMath\Inc</code> 를 더함</li>
-					</ul>
-					<details class="fold">
-						<summary>참고 : 위 조작이 프로젝트 파일에 남기는 diff · 따로 치지 않음</summary>
+					<p>03편의 지우는 색은 DirectXMath 의 저장용 형 <code>XMFLOAT4</code> 로 옮겨요. 벡터와 행렬을 멤버로 둘 때는 이 편부터 저장용 형을 써요.</p>
 					<figure class="code">
-						<figcaption><span class="path">DxRenderDojo.vcxproj</span><span class="badge mod">수정</span><span class="badge">추가 포함 디렉터리</span></figcaption>
-<pre class="diff" data-lang="xml">@@ -42,7 +42,7 @@
-       &lt;ConformanceMode&gt;true&lt;/ConformanceMode&gt;
-       &lt;LanguageStandard&gt;stdcpp20&lt;/LanguageStandard&gt;
-       &lt;AdditionalOptions&gt;/utf-8 %(AdditionalOptions)&lt;/AdditionalOptions&gt;
--      &lt;AdditionalIncludeDirectories&gt;$(ProjectDir)Source;%(AdditionalIncludeDirectories)&lt;/AdditionalIncludeDirectories&gt;
-+      &lt;AdditionalIncludeDirectories&gt;$(ProjectDir)Source;$(ProjectDir)external\DirectXMath\Inc;%(AdditionalIncludeDirectories)&lt;/AdditionalIncludeDirectories&gt;
-     &lt;/ClCompile&gt;
-     &lt;Link&gt;
-       &lt;SubSystem&gt;Windows&lt;/SubSystem&gt;</pre>
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.h</span><span class="badge mod">수정</span><span class="badge">include 와 ClearColor</span></figcaption>
+<pre class="diff" data-lang="cpp">@@ -1,5 +1,6 @@
+ #pragma once
+ 
++#include &lt;DirectXMath.h&gt;
+ #include &lt;d3d11.h&gt;
+ #include &lt;dxgi1_2.h&gt;
+ #include &lt;dxgidebug.h&gt;
+@@ -32,6 +33,6 @@
+ 	Microsoft::WRL::ComPtr&lt;IDXGISwapChain1&gt; SwapChain;
+ 	Microsoft::WRL::ComPtr&lt;ID3D11RenderTargetView&gt; RenderTargetView;
+ 	Microsoft::WRL::ComPtr&lt;IDXGIInfoQueue&gt; InfoQueue;
+-	DXGI_RGBA ClearColor = {0.5f, 0.5f, 0.5f, 1.0f};
++	DirectX::XMFLOAT4 ClearColor = {0.5f, 0.5f, 0.5f, 1.0f};
+ 	bool bVSync = true;
+ };</pre>
 					</figure>
-					</details>
-					<details class="fold">
-						<summary>CMake · 맥 빌드와 검사용, VS 만 쓰면 건너뜀</summary>
 					<figure class="code">
-						<figcaption><span class="path">CMakeLists.txt</span><span class="badge mod">수정</span><span class="badge">포함 경로</span></figcaption>
-<pre class="diff" data-lang="cmake">@@ -4,6 +4,7 @@
- file(GLOB_RECURSE SourceFiles CONFIGURE_DEPENDS Source/*.cpp)
- add_executable(DxRenderDojo WIN32 ${SourceFiles})
- target_include_directories(DxRenderDojo PRIVATE Source)
-+target_include_directories(DxRenderDojo SYSTEM PRIVATE external/DirectXMath/Inc)
- target_compile_features(DxRenderDojo PRIVATE cxx_std_20)
- target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN)
- target_link_libraries(DxRenderDojo PRIVATE d3d11 dxgi)</pre>
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge mod">수정</span><span class="badge">FD3D11Graphics::BeginScene</span></figcaption>
+<pre class="snip" data-lang="cpp">void FD3D11Graphics::BeginScene()
+{
+	// ClearRenderTargetView 는 float 4개 배열을 받는다. XMFLOAT4 는 x·y·z·w 를 이 순서로 이어 둔다.
+	Context-&gt;ClearRenderTargetView(RenderTargetView.Get(), &amp;ClearColor.x);
+}</pre>
 					</figure>
-						<ul class="walk">
-							<li class="entry"><code>SYSTEM</code> 바깥 헤더로 표시. 그 헤더의 경고가 우리 코드의 경고와 섞이지 않음</li>
-						</ul>
-					</details>
 					<details class="fold">
-						<summary>원문과 비교</summary>
-						<p>원문은 Windows SDK 의 <code>directxmath.h</code> 를 쓰고 CPU 확인은 하지 않아요.</p>
+						<summary>자세히 · DirectXMath 의 두 가지 형</summary>
+						<aside class="concept">
+							<ul class="walk">
+								<li><strong>저장용</strong>(<code>XMFLOAT3</code>·<code>XMFLOAT4</code>·<code>XMFLOAT4X4</code>) : <code>float</code> 를 늘어놓은 평범한 구조체. 멤버나 배열로 오래 들고 있을 값</li>
+								<li><strong>계산용</strong>(<code>XMVECTOR</code>·<code>XMMATRIX</code>) : CPU 의 SIMD 레지스터에 맞춘 형. 함수 안에서 계산할 때만 씀. 16바이트 경계에 놓여야 해서 멤버로 두지 않음</li>
+								<li class="entry"><code>XMLoadFloat3</code>·<code>XMStoreFloat4x4</code> 저장용 값을 계산용으로 불러오고, 결과를 다시 저장용에 넣는 함수</li>
+							</ul>
+						</aside>
 					</details>
-					<div class="checkpoint">
-						<p class="box-label">여기까지</p>
-						<p>빌드하고 실행하면 03편과 같은 회색 창이 뜨고 로그도 같아요. 포함 경로를 빠뜨려도 Windows SDK 의 <code>DirectXMath.h</code> 로 빌드가 돼요. <code>Main.cpp</code> 의 <code>&lt;DirectXMath.h&gt;</code> 에 커서를 두고 Ctrl+Shift+G 로 열었을 때 경로가 <code>external\DirectXMath\Inc</code> 이면 돼요.</p>
-					</div>
 				</div>
 			</li>
 
@@ -673,11 +651,12 @@ figure.code .diff-view { border-top: 0; }
 					<p>뷰포트는 백 버퍼 크기를 따라가야 해서 멤버로 두고 <code>CreateSizeDependentResources</code> 가 채워요. 이 함수는 <code>Initialize</code> 와 <code>Resize</code> 가 같이 부르므로 창 크기가 바뀌거나 Alt+Enter 로 전체 화면이 돼도 뷰포트가 따라가요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.h</span><span class="badge mod">수정</span><span class="badge">뷰포트 멤버</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -34,5 +34,6 @@
+<pre class="diff" data-lang="cpp">@@ -33,6 +33,7 @@
  	Microsoft::WRL::ComPtr&lt;IDXGISwapChain1&gt; SwapChain;
  	Microsoft::WRL::ComPtr&lt;ID3D11RenderTargetView&gt; RenderTargetView;
  	Microsoft::WRL::ComPtr&lt;IDXGIInfoQueue&gt; InfoQueue;
 +	D3D11_VIEWPORT Viewport = {};
+ 	DirectX::XMFLOAT4 ClearColor = {0.5f, 0.5f, 0.5f, 1.0f};
  	bool bVSync = true;
  };</pre>
 					</figure>
@@ -686,8 +665,8 @@ figure.code .diff-view { border-top: 0; }
 <pre class="snip" data-lang="cpp">void FD3D11Graphics::CreateSizeDependentResources()
 {
 	ComPtr&lt;ID3D11Texture2D&gt; BackBuffer;
-	CHECK_FATAL(SwapChain-&gt;GetBuffer(0, IID_PPV_ARGS(BackBuffer.GetAddressOf())));
-	CHECK_FATAL(Device-&gt;CreateRenderTargetView(BackBuffer.Get(), nullptr, RenderTargetView.GetAddressOf()));
+	CHECK_FATAL(SwapChain-&gt;GetBuffer(0, IID_PPV_ARGS(BackBuffer.ReleaseAndGetAddressOf())));
+	CHECK_FATAL(Device-&gt;CreateRenderTargetView(BackBuffer.Get(), nullptr, RenderTargetView.ReleaseAndGetAddressOf()));
 
 	D3D11_TEXTURE2D_DESC BackBufferDesc = {};
 	BackBuffer-&gt;GetDesc(&amp;BackBufferDesc);
@@ -707,9 +686,10 @@ figure.code .diff-view { border-top: 0; }
 					<p>초기화 때 한 번만 묶어 두면 두 번째 프레임부터는 그린 것이 버려져요. 뷰포트는 <code>Present</code> 가 떼지 않지만 RTV 와 짝이라 같은 곳에서 넣어요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge mod">수정</span><span class="badge">FD3D11Graphics::BeginScene</span></figcaption>
-<pre class="snip" data-lang="cpp">void FD3D11Graphics::BeginScene(const std::array&lt;float, 4&gt;&amp; Color)
+<pre class="snip" data-lang="cpp">void FD3D11Graphics::BeginScene()
 {
-	Context-&gt;ClearRenderTargetView(RenderTargetView.Get(), Color.data());
+	// ClearRenderTargetView 는 float 4개 배열을 받는다. XMFLOAT4 는 x·y·z·w 를 이 순서로 이어 둔다.
+	Context-&gt;ClearRenderTargetView(RenderTargetView.Get(), &amp;ClearColor.x);
 	// 플립 모델은 Present 가 백 버퍼를 파이프라인에서 떼므로 매 프레임 다시 묶는다.
 	Context-&gt;OMSetRenderTargets(1, RenderTargetView.GetAddressOf(), nullptr);
 	Context-&gt;RSSetViewports(1, &amp;Viewport);
@@ -718,14 +698,14 @@ figure.code .diff-view { border-top: 0; }
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
-							<li class="entry"><code>OMSetRenderTargets(1, RenderTargetView.GetAddressOf(), nullptr)</code> RTV 하나를 묶음. 세 번째 인자는 깊이 버퍼 뷰. 이 편에는 깊이 버퍼가 없음</li>
+							<li class="entry"><code>OMSetRenderTargets(1, RenderTargetView.GetAddressOf(), nullptr)</code> RTV 하나를 묶음. 넘겨 주는 입력 배열이라 <code>GetAddressOf()</code>. 세 번째 인자는 깊이 버퍼 뷰. 이 편에는 깊이 버퍼가 없음</li>
 							<li class="entry"><code>RSSetViewports(1, &amp;Viewport)</code> 뷰포트 하나를 넣음</li>
 						</ul>
 					</details>
 					<p><code>Resize</code> 는 <code>ResizeBuffers</code> 전에 RTV 를 파이프라인에서도 떼요. 파이프라인에 묶인 RTV 도 백 버퍼를 참조해요. <code>Present</code> 가 이미 떼 두지만 그 규칙에 기대지 않아요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="badge mod">수정</span><span class="badge">FD3D11Graphics::Resize</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -125,6 +125,8 @@
+<pre class="diff" data-lang="cpp">@@ -135,6 +135,8 @@
  void FD3D11Graphics::Resize(int Width, int Height)
  {
 -	// 백 버퍼를 가리키는 뷰가 남아 있으면 ResizeBuffers 가 실패한다. Flush 는 D3D 가 미뤄 둔 해제를 지금 끝낸다.
@@ -737,10 +717,6 @@ figure.code .diff-view { border-top: 0; }
  </pre>
 					</figure>
 					<details class="fold">
-						<summary>원문과 비교</summary>
-						<p>원문은 <code>D3DClass::Initialize</code> 에서 <code>OMSetRenderTargets</code> 와 <code>RSSetViewports</code> 를 한 번 불러요. 원문 스왑체인은 <code>DXGI_SWAP_EFFECT_DISCARD</code> 라 <code>Present</code> 뒤에도 묶인 채로 남아요. 원문은 깊이 스텐실 뷰도 함께 묶어요. 이 교재는 깊이 버퍼를 쓰기 시작하는 편에서 넣어요.</p>
-					</details>
-					<details class="fold">
 						<summary>언리얼로 치면</summary>
 						<aside class="ue">
 							<p><strong>같은 점</strong> · D3D11 백엔드는 렌더 패스를 시작할 때(<code>FD3D11DynamicRHI::RHIBeginRenderPass</code>) 렌더 타깃을 묶고 지워요. 뷰포트는 <code>RHISetViewport</code> 가 따로 넣어요.</p>
@@ -750,10 +726,6 @@ figure.code .diff-view { border-top: 0; }
 					<div class="learn">
 						<p class="box-label">스스로 설명해 보기</p>
 						<p><code>RSSetViewports</code> 를 <code>BeginScene</code> 에서 빼고 <code>Initialize</code> 끝에서 한 번만 부르면, 창을 최대화한 뒤 그림은 창의 어디까지 펼쳐질까요? <code>CreateSizeDependentResources</code> 가 바꾸는 것이 무엇인지로 말해 보세요.</p>
-					</div>
-					<div class="checkpoint">
-						<p class="box-label">여기까지</p>
-						<p>화면은 1단계와 같아요. 그릴 것이 아직 없어 묶은 효과는 보이지 않아요. 창 크기를 바꾸고 Alt+Enter 를 눌러도 콘솔에 <code>[경고]</code> 줄이 없으면 돼요.</p>
 					</div>
 				</div>
 			</li>
@@ -774,42 +746,43 @@ figure.code .diff-view { border-top: 0; }
 							</ul>
 						</aside>
 					</details>
+					<p>정점 하나의 모양은 새 파일 <code>Source/Graphics/FVertexTypes.h</code> 의 구조체로 적어요. 버퍼를 만드는 <code>FModel</code> 과 <a href="#step-compile">5단계</a>의 셰이더가 함께 쓰는 형이에요.</p>
+					<figure class="code">
+						<figcaption><span class="path">Source/Graphics/FVertexTypes.h</span><span class="badge new">신규</span><span class="badge">파일 전체</span></figcaption>
+<pre class="src" data-lang="cpp">#pragma once
+
+#include &lt;DirectXMath.h&gt;
+
+struct FVertexPositionColor
+{
+	DirectX::XMFLOAT3 Position;
+	DirectX::XMFLOAT4 Color;
+};</pre>
+					</figure>
+					<details class="fold">
+						<summary>줄 단위 풀이</summary>
+						<ul class="walk">
+							<li class="entry"><code>struct FVertexPositionColor</code> 정점 하나. 위치 <code>XMFLOAT3</code>(12바이트) 다음에 색 <code>XMFLOAT4</code>(16바이트). 이름은 담은 값을 적은 것이라, 텍스처 좌표를 담는 정점은 다른 구조체가 됨</li>
+						</ul>
+					</details>
 					<figure class="code">
 						<figcaption><span class="path">Source/Graphics/FModel.h</span><span class="badge new">신규</span><span class="badge">파일 전체</span></figcaption>
 <pre class="src" data-lang="cpp">#pragma once
 
-#include &lt;DirectXMath.h&gt;
 #include &lt;d3d11.h&gt;
 #include &lt;wrl/client.h&gt;
 
 class FModel
 {
 public:
-	FModel() = default;
-	FModel(const FModel&amp; Other) = delete;
-	FModel&amp; operator=(const FModel&amp; Other) = delete;
-
 	void Initialize(ID3D11Device* Device);
 
-	void Render(ID3D11DeviceContext* Context) const;
-
 private:
-	struct FVertex
-	{
-		DirectX::XMFLOAT3 Position;
-		DirectX::XMFLOAT4 Color;
-	};
-
 	Microsoft::WRL::ComPtr&lt;ID3D11Buffer&gt; VertexBuffer;
 	Microsoft::WRL::ComPtr&lt;ID3D11Buffer&gt; IndexBuffer;
+	UINT IndexCount = 0;
 };</pre>
 					</figure>
-					<details class="fold">
-						<summary>줄 단위 풀이</summary>
-						<ul class="walk">
-							<li class="entry"><code>struct FVertex</code> 정점 하나. 위치 <code>XMFLOAT3</code>(12바이트) 다음에 색 <code>XMFLOAT4</code>(16바이트). <a href="#step-compile">5단계</a>의 입력 레이아웃이 이 배치를 그대로 적음</li>
-						</ul>
-					</details>
 					<figure class="code">
 						<figcaption><span class="path">Source/Graphics/FModel.cpp</span><span class="badge new">신규</span><span class="badge">파일 맨 위 include</span></figcaption>
 <pre class="snip" data-lang="cpp">#include "Graphics/FModel.h"
@@ -817,6 +790,7 @@ private:
 #include &lt;array&gt;
 #include &lt;cstdint&gt;
 
+#include "Graphics/FVertexTypes.h"
 #include "Utility/Check.h"
 
 using namespace DirectX;</pre>
@@ -826,7 +800,7 @@ using namespace DirectX;</pre>
 <pre class="snip" data-lang="cpp">void FModel::Initialize(ID3D11Device* Device)
 {
 	// 시계 방향으로 적어야 앞면이다. 반대로 적으면 뒷면으로 보고 그리지 않는다.
-	constexpr std::array&lt;FVertex, 3&gt; Vertices = {{
+	constexpr std::array&lt;FVertexPositionColor, 3&gt; Vertices = {{
 	    {XMFLOAT3(-1.0f, -1.0f, 0.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)},
 	    {XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)},
 	    {XMFLOAT3(1.0f, -1.0f, 0.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)},
@@ -840,7 +814,7 @@ using namespace DirectX;</pre>
 
 	D3D11_SUBRESOURCE_DATA VertexData = {};
 	VertexData.pSysMem = Vertices.data();
-	CHECK_FATAL(Device-&gt;CreateBuffer(&amp;VertexBufferDesc, &amp;VertexData, VertexBuffer.GetAddressOf()));
+	CHECK_FATAL(Device-&gt;CreateBuffer(&amp;VertexBufferDesc, &amp;VertexData, VertexBuffer.ReleaseAndGetAddressOf()));
 
 	D3D11_BUFFER_DESC IndexBufferDesc = {};
 	IndexBufferDesc.ByteWidth = sizeof(Indices);
@@ -849,7 +823,9 @@ using namespace DirectX;</pre>
 
 	D3D11_SUBRESOURCE_DATA IndexData = {};
 	IndexData.pSysMem = Indices.data();
-	CHECK_FATAL(Device-&gt;CreateBuffer(&amp;IndexBufferDesc, &amp;IndexData, IndexBuffer.GetAddressOf()));
+	CHECK_FATAL(Device-&gt;CreateBuffer(&amp;IndexBufferDesc, &amp;IndexData, IndexBuffer.ReleaseAndGetAddressOf()));
+
+	IndexCount = static_cast&lt;UINT&gt;(Indices.size());
 }</pre>
 					</figure>
 					<p>정점은 왼쪽 아래, 가운데 위, 오른쪽 아래 순서로 적어요. 화면에서 보면 시계 방향이에요. 기본 래스터라이저 상태는 시계 방향으로 도는 삼각형을 앞면으로 보고 뒷면은 그리지 않아요.</p>
@@ -876,53 +852,32 @@ using namespace DirectX;</pre>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
-							<li class="entry"><code>constexpr std::array&lt;FVertex, 3&gt; Vertices</code> 좌표는 z = 0 평면의 -1~1. 세 정점 모두 초록(0, 1, 0, 1)</li>
+							<li class="entry"><code>constexpr std::array&lt;FVertexPositionColor, 3&gt; Vertices</code> 좌표는 z = 0 평면의 -1~1. 세 정점 모두 초록(0, 1, 0, 1)</li>
 							<li class="entry"><code>ByteWidth = sizeof(Vertices)</code> 버퍼 크기(바이트). 정점 28바이트 × 3</li>
 							<li class="entry"><code>D3D11_USAGE_IMMUTABLE</code> 만들 때 채운 뒤 바뀌지 않는 버퍼. GPU 는 읽기만 하고 CPU 는 읽지도 쓰지도 못함. 만들 때 데이터를 반드시 넘겨야 함</li>
 							<li class="entry"><code>D3D11_BIND_VERTEX_BUFFER</code> 입력 조립기에 정점 버퍼로 묶을 버퍼</li>
 							<li class="entry"><code>VertexData.pSysMem = Vertices.data()</code> 처음 채울 데이터. <code>CreateBuffer</code> 가 복사하므로 함수가 끝나 배열이 사라져도 됨</li>
 							<li class="entry"><code>D3D11_BIND_INDEX_BUFFER</code> 인덱스 버퍼로 묶을 버퍼</li>
+							<li class="entry"><code>IndexCount = static_cast&lt;UINT&gt;(Indices.size());</code> 그릴 때 <code>DrawIndexed</code> 에 넘길 인덱스 개수를 기억해 둠</li>
 						</ul>
 					</details>
-					<p>그릴 때는 두 버퍼를 입력 조립기에 묶고 인덱스를 세 개씩 삼각형으로 읽으라고 알려요.</p>
+					<p><code>FApplication</code> 이 모델을 멤버로 갖고 초기화를 맡아요. 버퍼를 만들 디바이스는 <code>FD3D11Graphics</code> 가 내줘요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FModel.cpp</span><span class="badge new">신규</span><span class="badge">FModel::Render · Initialize 다음</span></figcaption>
-<pre class="snip" data-lang="cpp">void FModel::Render(ID3D11DeviceContext* Context) const
-{
-	constexpr UINT Stride = sizeof(FVertex);
-	constexpr UINT Offset = 0;
-	Context-&gt;IASetVertexBuffers(0, 1, VertexBuffer.GetAddressOf(), &amp;Stride, &amp;Offset);
-	Context-&gt;IASetIndexBuffer(IndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-	Context-&gt;IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-}</pre>
-					</figure>
-					<details class="fold">
-						<summary>줄 단위 풀이</summary>
-						<ul class="walk">
-							<li class="entry"><code>Stride = sizeof(FVertex)</code> 정점 하나의 바이트 수. 다음 정점까지 건너뛸 거리</li>
-							<li class="entry"><code>IASetVertexBuffers(0, 1, ...)</code> 입력 슬롯 0 에 버퍼 하나</li>
-							<li class="entry"><code>DXGI_FORMAT_R32_UINT</code> 인덱스 하나가 32비트 정수</li>
-						</ul>
-					</details>
-					<p><code>FApplication</code> 이 모델을 멤버로 갖고 초기화와 그리기를 맡아요. 버퍼를 만들 디바이스와 버퍼를 묶을 컨텍스트는 <code>FD3D11Graphics</code> 가 내줘요.</p>
-					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.h</span><span class="badge mod">수정</span><span class="badge">GetDevice·GetContext</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -19,6 +19,9 @@
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.h</span><span class="badge mod">수정</span><span class="badge">GetDevice</span></figcaption>
+<pre class="diff" data-lang="cpp">@@ -16,6 +16,8 @@
  
- 	void Initialize(const FWindow&amp; Window, const FDisplaySettings&amp; Settings);
+ 	void Initialize(HWND WindowHandle, int Width, int Height, bool bEnableVSync);
  
 +	ID3D11Device* GetDevice() const { return Device.Get(); }
-+	ID3D11DeviceContext* GetContext() const { return Context.Get(); }
 +
  	void Resize(int Width, int Height);
  
- 	void BeginScene(const std::array&lt;float, 4&gt;&amp; Color);</pre>
+ 	void BeginScene();</pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/App/FApplication.h</span><span class="badge mod">수정</span><span class="badge">Initialize, Render 인자, 모델 멤버</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -2,6 +2,10 @@
- 
- #include &lt;array&gt;
+						<figcaption><span class="path">Source/App/FApplication.h</span><span class="badge mod">수정</span><span class="badge">Initialize 와 모델 멤버</span></figcaption>
+<pre class="diff" data-lang="cpp">@@ -1,8 +1,17 @@
+ #pragma once
  
 +#include "Graphics/FModel.h"
 +
@@ -931,20 +886,12 @@ using namespace DirectX;</pre>
  class FApplication
  {
  public:
-@@ -9,11 +13,14 @@
- 	FApplication(const FApplication&amp; Other) = delete;
- 	FApplication&amp; operator=(const FApplication&amp; Other) = delete;
- 
 +	void Initialize(FD3D11Graphics&amp; Graphics);
 +
- 	const std::array&lt;float, 4&gt;&amp; GetClearColor() const { return ClearColor; }
- 
  	void Update();
--	void Render();
-+	void Render(FD3D11Graphics&amp; Graphics);
- 
- private:
- 	std::array&lt;float, 4&gt; ClearColor = {0.5f, 0.5f, 0.5f, 1.0f};
+ 	void Render();
++
++private:
 +	FModel Model;
  };</pre>
 					</figure>
@@ -955,80 +902,34 @@ using namespace DirectX;</pre>
 						</ul>
 					</details>
 					<figure class="code">
-						<figcaption><span class="path">Source/App/FApplication.cpp</span><span class="badge mod">수정</span><span class="badge">Initialize 와 Render</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -3,6 +3,12 @@
- #include &lt;Windows.h&gt;
+						<figcaption><span class="path">Source/App/FApplication.cpp</span><span class="badge mod">수정</span><span class="badge">include 와 FApplication::Initialize</span></figcaption>
+<pre class="diff" data-lang="cpp">@@ -1,5 +1,12 @@
+ #include "App/FApplication.h"
  
- #include "Core/FSystem.h"
 +#include "Graphics/FD3D11Graphics.h"
 +
 +void FApplication::Initialize(FD3D11Graphics&amp; Graphics)
 +{
 +	Model.Initialize(Graphics.GetDevice());
 +}
- 
++
  void FApplication::Update()
  {
-@@ -12,6 +18,8 @@
- 	}
- }
- 
--void FApplication::Render()
-+void FApplication::Render(FD3D11Graphics&amp; Graphics)
- {
-+	ID3D11DeviceContext* Context = Graphics.GetContext();
-+	Model.Render(Context);
  }</pre>
 					</figure>
 					<p><code>FSystem</code> 은 <code>Graphics</code> 를 초기화한 다음 <code>Application.Initialize</code> 를 불러요. 디바이스가 있어야 버퍼를 만들 수 있어요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge mod">수정</span><span class="badge">FSystem::Initialize 와 FSystem::Frame</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -13,6 +13,7 @@
+						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge mod">수정</span><span class="badge">FSystem::Initialize</span></figcaption>
+<pre class="diff" data-lang="cpp">@@ -15,6 +15,7 @@
  	    L"창 생성 : {}x{} (DPI {}, 배율 {}%)", Window.GetWidth(), Window.GetHeight(), Window.GetDpi(), ScalePercent));
  
- 	Graphics.Initialize(Window, Display);
+ 	Graphics.Initialize(Window.GetHandle(), Window.GetWidth(), Window.GetHeight(), Settings.bVSync);
 +	Application.Initialize(Graphics);
  
  	Window.SetMessageCallback([this](UINT Message, WPARAM WParam, LPARAM LParam)
- 	                          { OnWindowMessage(Message, WParam, LParam); });
-@@ -46,7 +47,7 @@
- {
- 	Application.Update();
- 	Graphics.BeginScene(Application.GetClearColor());
--	Application.Render();
-+	Application.Render(Graphics);
- 	Graphics.EndScene();
- }
- </pre>
+ 	                          { OnWindowMessage(Message, WParam, LParam); });</pre>
 					</figure>
-					<p>Visual Studio 에서는 <code>Graphics</code> 필터에 <code>FModel.h</code>·<code>FModel.cpp</code> 를 넣어요. 이 조작이 <code>DxRenderDojo.vcxproj</code> 와 <code>DxRenderDojo.vcxproj.filters</code> 를 바꿔요.</p>
-					<details class="fold">
-						<summary>참고 : 위 조작이 프로젝트 파일에 남기는 diff · 따로 치지 않음</summary>
-					<figure class="code">
-						<figcaption><span class="path">DxRenderDojo.vcxproj</span><span class="badge mod">수정</span><span class="badge">새 파일</span></figcaption>
-<pre class="diff" data-lang="xml">@@ -77,6 +77,7 @@
-     &lt;ClCompile Include="Source\Core\FSystem.cpp" /&gt;
-     &lt;ClCompile Include="Source\Core\FWindow.cpp" /&gt;
-     &lt;ClCompile Include="Source\Graphics\FD3D11Graphics.cpp" /&gt;
-+    &lt;ClCompile Include="Source\Graphics\FModel.cpp" /&gt;
-     &lt;ClCompile Include="Source\Utility\Check.cpp" /&gt;
-     &lt;ClCompile Include="Source\Utility\FLog.cpp" /&gt;
-   &lt;/ItemGroup&gt;
-@@ -87,6 +88,7 @@
-     &lt;ClInclude Include="Source\Core\FSystem.h" /&gt;
-     &lt;ClInclude Include="Source\Core\FWindow.h" /&gt;
-     &lt;ClInclude Include="Source\Graphics\FD3D11Graphics.h" /&gt;
-+    &lt;ClInclude Include="Source\Graphics\FModel.h" /&gt;
-     &lt;ClInclude Include="Source\Utility\Check.h" /&gt;
-     &lt;ClInclude Include="Source\Utility\FLog.h" /&gt;
-     &lt;ClInclude Include="Source\Utility\TSingleton.h" /&gt;</pre>
-					</figure>
-					</details>
-					<details class="fold">
-						<summary>원문과 비교</summary>
-						<p>원문은 <code>new</code> 로 정점·인덱스 배열을 만들어 채우고 버퍼를 만든 뒤 <code>delete</code> 해요. 버퍼는 <code>D3D11_USAGE_DEFAULT</code> 예요. 이 교재는 함수 안의 <code>constexpr</code> 배열을 쓰고, 한 번 채우고 바꾸지 않는 버퍼라 <code>D3D11_USAGE_IMMUTABLE</code> 로 만들어요.</p>
-						<p>원문의 인덱스 형 <code>unsigned long</code> 은 Windows 에서 32비트예요. 크기를 이름에 드러내려고 <code>std::uint32_t</code> 로 적었어요.</p>
-					</details>
+					<p>Visual Studio 에서는 <code>Graphics</code> 필터에 <code>FVertexTypes.h</code>·<code>FModel.h</code>·<code>FModel.cpp</code> 를 넣어요.</p>
 					<details class="fold">
 						<summary>언리얼로 치면</summary>
 						<aside class="ue">
@@ -1039,10 +940,6 @@ using namespace DirectX;</pre>
 					<div class="learn">
 						<p class="box-label">스스로 설명해 보기</p>
 						<p>삼각형 하나는 인덱스 버퍼 없이 정점 버퍼만으로도 그릴 수 있어요. 사각형을 삼각형 두 개로 그릴 때 인덱스 버퍼가 있으면 정점 버퍼에서 무엇이 줄어드는지 말해 보세요.</p>
-					</div>
-					<div class="checkpoint">
-						<p class="box-label">여기까지</p>
-						<p>화면은 그대로예요. 버퍼를 만들어 입력 조립기에 묶기만 하고 아직 그리지 않아요. 상자 없이 창이 뜨면 돼요.</p>
 					</div>
 				</div>
 			</li>
@@ -1062,16 +959,23 @@ using namespace DirectX;</pre>
 							</ul>
 						</aside>
 					</details>
-					<p>두 파일을 <code>Source/Shaders</code> 에 새로 만들어요. 인코딩은 BOM 없는 UTF-8 이어야 해요. BOM 이 있으면 컴파일이 첫 글자에서 실패해요(<a href="#pitfalls">흔한 실수</a> 3번). Visual Studio 에서는 저장할 때 파일 › 다른 이름으로 저장의 저장 단추 옆 ▾ › 인코딩하여 저장에서 "유니코드(서명 없는 UTF-8)" 을 골라요.</p>
+					<p>두 셰이더를 <code>Source/Shaders/Color.hlsl</code> 한 파일에 적어요. 정점 셰이더가 내보내고 픽셀 셰이더가 받는 구조체를 한 번만 적으려는 것이에요. 인코딩은 BOM 없는 UTF-8 이어야 해요. BOM 이 있으면 컴파일이 첫 글자에서 실패해요(<a href="#pitfalls">흔한 실수</a> 3번). Visual Studio 에서는 저장할 때 파일 › 다른 이름으로 저장의 저장 단추 옆 ▾ › 인코딩하여 저장에서 "유니코드(서명 없는 UTF-8)" 을 골라요.</p>
 					<figure class="code">
-						<figcaption><span class="path">Source/Shaders/Color.vs</span><span class="badge new">신규</span><span class="badge">파일 전체</span></figcaption>
-<pre class="src" data-lang="cpp">struct FVertexInput
+						<figcaption><span class="path">Source/Shaders/Color.hlsl</span><span class="badge new">신규</span><span class="badge">파일 전체</span></figcaption>
+<pre class="src" data-lang="cpp">cbuffer MatrixBuffer : register(b0)
+{
+	matrix World;
+	matrix View;
+	matrix Projection;
+};
+
+struct FVertexInput
 {
 	float3 Position : POSITION;
 	float4 Color : COLOR;
 };
 
-// 정점 셰이더의 출력이 픽셀 셰이더의 입력이 된다. 두 파일의 FPixelInput 이 같아야 한다.
+// 정점 셰이더의 출력이 픽셀 셰이더의 입력이 된다.
 struct FPixelInput
 {
 	float4 Position : SV_POSITION;
@@ -1081,96 +985,40 @@ struct FPixelInput
 FPixelInput ColorVertexShader(FVertexInput Input)
 {
 	FPixelInput Output;
-	Output.Position = float4(Input.Position, 1.0f);
+	Output.Position = mul(float4(Input.Position, 1.0f), World);
+	Output.Position = mul(Output.Position, View);
+	Output.Position = mul(Output.Position, Projection);
 	Output.Color = Input.Color;
 	return Output;
-}</pre>
-					</figure>
-					<details class="fold">
-						<summary>줄 단위 풀이</summary>
-						<ul class="walk">
-							<li class="entry"><code>float3 Position : POSITION</code> 정점 버퍼의 <code>XMFLOAT3</code> 를 받음</li>
-							<li class="entry"><code>Output.Position = float4(Input.Position, 1.0f);</code> 위치에 w = 1 을 붙여 네 성분으로 만들고 그대로 내보냄. 행렬은 <a href="#step-cbuffer">7단계</a>에서 곱함</li>
-						</ul>
-					</details>
-					<figure class="code">
-						<figcaption><span class="path">Source/Shaders/Color.ps</span><span class="badge new">신규</span><span class="badge">파일 전체</span></figcaption>
-<pre class="src" data-lang="cpp">// 정점 셰이더의 출력이 픽셀 셰이더의 입력이 된다. 두 파일의 FPixelInput 이 같아야 한다.
-struct FPixelInput
-{
-	float4 Position : SV_POSITION;
-	float4 Color : COLOR;
-};
+}
 
 float4 ColorPixelShader(FPixelInput Input) : SV_TARGET
 {
 	return Input.Color;
 }</pre>
 					</figure>
+					<details class="fold">
+						<summary>줄 단위 풀이</summary>
+						<ul class="walk">
+							<li class="entry"><code>cbuffer MatrixBuffer : register(b0)</code> C++ 이 넘길 행렬 셋을 받는 자리. 행렬은 <a href="#step-camera">7단계</a>에서 만들고 <a href="#step-cbuffer">8단계</a>에서 넘김</li>
+							<li class="entry"><code>matrix</code> 4×4 <code>float</code> 행렬</li>
+							<li class="entry"><code>float3 Position : POSITION</code> 정점 버퍼의 <code>XMFLOAT3</code> 를 받음</li>
+							<li class="entry"><code>mul(float4(Input.Position, 1.0f), World)</code> 위치에 w = 1 을 붙여 네 성분으로 만들고 행렬을 곱함. w 가 1 이라야 4×4 행렬의 이동 성분이 위치에 더해짐. 월드·뷰·투영 순서로 곱함</li>
+							<li class="entry"><code>struct FPixelInput</code> 정점 셰이더의 출력이자 픽셀 셰이더의 입력</li>
+							<li class="entry"><code>ColorVertexShader</code>·<code>ColorPixelShader</code> 컴파일할 때 고르는 시작 함수. 한 파일을 두 번 컴파일해 둘을 따로 뽑음</li>
+						</ul>
+					</details>
 					<p>픽셀 셰이더가 받는 <code>Input.Color</code> 는 정점 셰이더가 내보낸 색이에요. 래스터라이저가 삼각형 안쪽 픽셀마다 세 정점의 값을 섞어서 넘겨요.</p>
-					<p>셰이더 파일은 빌드할 때 exe 옆 <code>Shaders</code> 폴더로 복사해요. Visual Studio 에서는 새 <code>Shaders</code> 필터에 두 파일을 넣고 아래처럼 고쳐요. 이 조작들이 <code>DxRenderDojo.vcxproj</code> 와 <code>DxRenderDojo.vcxproj.filters</code> 를 바꿔요.</p>
+					<p>셰이더 파일은 빌드할 때 exe 옆 <code>Shaders</code> 폴더로 복사해요. Visual Studio 에서는 새 <code>Shaders</code> 필터에 <code>Color.hlsl</code> 을 넣고 아래처럼 고쳐요.</p>
 					<ul class="walk">
-						<li><code>Color.vs</code>·<code>Color.ps</code> 를 함께 골라 속성을 열고 구성을 모든 구성으로 둠</li>
-						<li>구성 속성 › 일반 › 항목 형식 : 파일 복사. 적용을 누르면 왼쪽에 파일 복사 항목이 생김</li>
+						<li><code>Color.hlsl</code> 의 속성을 열고 구성을 모든 구성으로 둠</li>
+						<li>구성 속성 › 일반 › 항목 형식 : 파일 복사. 기본값인 HLSL 컴파일러는 빌드할 때 셰이더를 컴파일하려 해서 바꿈. 적용을 누르면 왼쪽에 파일 복사 항목이 생김</li>
 						<li>파일 복사 › 일반 › 대상 디렉터리 : <code>$(OutDir)Shaders</code></li>
 					</ul>
 					<p>빌드할 때마다 exe 옆 <code>Shaders</code> 폴더로 복사되고 셰이더만 고쳐도 다시 복사돼요.</p>
-					<details class="fold">
-						<summary>참고 : 위 조작이 프로젝트 파일에 남기는 diff · 따로 치지 않음</summary>
-					<figure class="code">
-						<figcaption><span class="path">DxRenderDojo.vcxproj</span><span class="badge mod">수정</span><span class="badge">셰이더 복사</span></figcaption>
-<pre class="diff" data-lang="xml">@@ -97,5 +97,13 @@
-     &lt;None Include="DxRenderDojo.manifest" /&gt;
-     &lt;None Include="DxRenderDojo.rc" /&gt;
-   &lt;/ItemGroup&gt;
-+  &lt;ItemGroup&gt;
-+    &lt;CopyFileToFolders Include="Source\Shaders\Color.ps"&gt;
-+      &lt;DestinationFolders&gt;$(OutDir)Shaders&lt;/DestinationFolders&gt;
-+    &lt;/CopyFileToFolders&gt;
-+    &lt;CopyFileToFolders Include="Source\Shaders\Color.vs"&gt;
-+      &lt;DestinationFolders&gt;$(OutDir)Shaders&lt;/DestinationFolders&gt;
-+    &lt;/CopyFileToFolders&gt;
-+  &lt;/ItemGroup&gt;
-   &lt;Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" /&gt;
- &lt;/Project&gt;</pre>
-					</figure>
-					</details>
-					<details class="fold">
-						<summary>CMake · 맥 빌드와 검사용, VS 만 쓰면 건너뜀</summary>
-					<figure class="code">
-						<figcaption><span class="path">CMakeLists.txt</span><span class="badge mod">수정</span><span class="badge">셰이더 복사</span></figcaption>
-<pre class="diff" data-lang="cmake">@@ -9,6 +9,13 @@
- target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN)
- target_link_libraries(DxRenderDojo PRIVATE d3d11 dxgi)
- 
-+# 셰이더는 실행 중에 컴파일한다. exe 옆 Shaders 폴더로 복사하고, configure_file 은 원본이 바뀌면 다시 복사한다.
-+file(GLOB ShaderFiles CONFIGURE_DEPENDS Source/Shaders/*.vs Source/Shaders/*.ps)
-+foreach(Shader ${ShaderFiles})
-+	cmake_path(GET Shader FILENAME ShaderName)
-+	configure_file(${Shader} Shaders/${ShaderName} COPYONLY)
-+endforeach()
-+
- if(MSVC)
- 	target_compile_options(DxRenderDojo PRIVATE /W3 /utf-8)
- 	target_sources(DxRenderDojo PRIVATE DxRenderDojo.manifest)</pre>
-					</figure>
-						<ul class="walk">
-							<li class="entry"><code>file(GLOB ShaderFiles CONFIGURE_DEPENDS ...)</code> <code>Source/Shaders</code> 의 <code>.vs</code>·<code>.ps</code> 를 모음. 셰이더 파일을 더해도 목록에 적지 않음</li>
-							<li class="entry"><code>configure_file(... COPYONLY)</code> 설정 단계에서 파일을 복사함. 원본을 고치면 다음 빌드 때 CMake 가 다시 돌아 새로 복사함</li>
-						</ul>
-					</details>
-					<details class="fold">
-						<summary>원문과 비교</summary>
-						<p>원문은 위치를 <code>float4</code> 로 받고 w 를 1 로 덮어써요. 정점 버퍼의 위치는 세 성분이라 이 교재는 <code>float3</code> 로 받아 w 를 붙여요. 구조체 이름은 <code>VertexInputType</code> 이 <code>FVertexInput</code>, <code>PixelInputType</code> 이 <code>FPixelInput</code> 이에요.</p>
-						<p>원문은 <code>../Engine/color.vs</code> 를 작업 디렉터리 기준으로 열어요. 작업 디렉터리는 Visual Studio 에서 실행할 때와 exe 를 더블클릭할 때가 달라서, 이 교재는 exe 옆에 두고 exe 폴더를 기준으로 읽어요.</p>
-					</details>
 					<div class="learn">
 						<p class="box-label">스스로 설명해 보기</p>
-						<p>세 정점에 빨강·초록·파랑을 하나씩 주면 삼각형 가운데는 무슨 색이 될까요? <code>Color.ps</code> 가 받는 <code>Input.Color</code> 가 어디서 오는지로 설명해 보세요.</p>
-					</div>
-					<div class="checkpoint">
-						<p class="box-label">여기까지</p>
-						<p>화면은 그대로예요. exe 가 있는 폴더(Debug 는 <code>x64\Debug</code>)에 <code>Shaders\Color.vs</code>·<code>Color.ps</code> 가 생겨요.</p>
+						<p>세 정점에 빨강·초록·파랑을 하나씩 주면 삼각형 가운데는 무슨 색이 될까요? <code>ColorPixelShader</code> 가 받는 <code>Input.Color</code> 가 어디서 오는지로 설명해 보세요.</p>
 					</div>
 				</div>
 			</li>
@@ -1229,110 +1077,11 @@ std::filesystem::path FPaths::GetExecutableDirectory()
 							<li class="entry"><code>parent_path()</code> 경로에서 파일 이름을 뗌</li>
 						</ul>
 					</details>
-					<p>셰이더를 맡는 새 클래스 <code>FColorShader</code> 를 <code>Source/Shaders</code> 에 만들어요.</p>
-					<figure class="code">
-						<figcaption><span class="path">Source/Shaders/FColorShader.h</span><span class="badge new">신규</span><span class="badge">파일 전체</span></figcaption>
-<pre class="src" data-lang="cpp">#pragma once
-
-#include &lt;d3d11.h&gt;
-#include &lt;wrl/client.h&gt;
-
-class FColorShader
-{
-public:
-	FColorShader() = default;
-	FColorShader(const FColorShader&amp; Other) = delete;
-	FColorShader&amp; operator=(const FColorShader&amp; Other) = delete;
-
-	void Initialize(ID3D11Device* Device);
-
-private:
-	Microsoft::WRL::ComPtr&lt;ID3D11VertexShader&gt; VertexShader;
-	Microsoft::WRL::ComPtr&lt;ID3D11PixelShader&gt; PixelShader;
-	Microsoft::WRL::ComPtr&lt;ID3D11InputLayout&gt; InputLayout;
-};</pre>
-					</figure>
-					<p><code>CompileShader</code> 는 HLSL 파일 하나를 바이트코드로 컴파일해요. 실패하면 컴파일러가 돌려준 오류 문자열을 로그로 남기고 멈춰요.</p>
-					<figure class="code">
-						<figcaption><span class="path">Source/Shaders/FColorShader.cpp</span><span class="badge new">신규</span><span class="badge">파일 맨 위 include · CompileShader</span></figcaption>
-<pre class="snip" data-lang="cpp">#include "Shaders/FColorShader.h"
-
-#include &lt;array&gt;
-#include &lt;d3dcompiler.h&gt;
-#include &lt;filesystem&gt;
-#include &lt;format&gt;
-#include &lt;string&gt;
-#include &lt;string_view&gt;
-
-#include "Utility/Check.h"
-#include "Utility/FLog.h"
-#include "Utility/FPaths.h"
-
-using Microsoft::WRL::ComPtr;
-
-namespace
-{
-	ComPtr&lt;ID3DBlob&gt; CompileShader(const std::filesystem::path&amp; Path, const char* EntryPoint, const char* Target)
-	{
-		UINT Flags = D3DCOMPILE_ENABLE_STRICTNESS;
-		// 디버그 빌드는 그래픽 디버거(RenderDoc·PIX)에서 HLSL 을 줄 단위로 따라갈 수 있게 컴파일한다.
-#ifndef NDEBUG
-		Flags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-#endif
-
-		ComPtr&lt;ID3DBlob&gt; Code;
-		ComPtr&lt;ID3DBlob&gt; Errors;
-		const HRESULT CompileResult = D3DCompileFromFile(
-		    Path.c_str(), nullptr, nullptr, EntryPoint, Target, Flags, 0, Code.GetAddressOf(), Errors.GetAddressOf());
-
-		// 컴파일러 문자열 속 경로는 한글이 ? 로 바뀔 수 있어 경로를 따로 남긴다.
-		if (FAILED(CompileResult))
-		{
-			FLog::Error(std::format(L"셰이더 컴파일 실패 : {}", Path.wstring()));
-		}
-
-		// 성공해도 경고가 담겨 올 수 있다.
-		if (Errors != nullptr)
-		{
-			std::string_view Text(static_cast&lt;const char*&gt;(Errors-&gt;GetBufferPointer()));
-			Text = Text.substr(0, Text.find_last_not_of("\r\n") + 1);
-
-			const int TextLength = static_cast&lt;int&gt;(Text.size());
-			std::wstring Message(MultiByteToWideChar(CP_ACP, 0, Text.data(), TextLength, nullptr, 0), L'\0');
-			MultiByteToWideChar(CP_ACP, 0, Text.data(), TextLength, Message.data(), static_cast&lt;int&gt;(Message.size()));
-
-			if (SUCCEEDED(CompileResult))
-			{
-				FLog::Warning(Message);
-			}
-			else
-			{
-				FLog::Error(Message);
-			}
-		}
-
-		CHECK_FATAL(CompileResult);
-		return Code;
-	}
-} // namespace</pre>
-					</figure>
-					<details class="fold">
-						<summary>줄 단위 풀이</summary>
-						<ul class="walk">
-							<li class="entry"><code>namespace { ... }</code> 이름 없는 네임스페이스. <code>CompileShader</code> 는 이 파일에서만 보임</li>
-							<li class="entry"><code>D3DCOMPILE_ENABLE_STRICTNESS</code> 옛 문법을 오류로 봄</li>
-							<li class="entry"><code>D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION</code> 디버그 빌드만. RenderDoc 이나 PIX 같은 그래픽 디버거에서 HLSL 을 줄 단위로 따라갈 수 있음</li>
-							<li class="entry"><code>Errors</code> 오류와 경고 문자열. 컴파일이 성공해도 경고가 있으면 담겨 와서 <code>[경고]</code> 로 남김</li>
-							<li class="entry"><code>L"셰이더 컴파일 실패 : {}"</code> 컴파일러 문자열 속 경로는 폴더 이름의 한글 일부가 <code>?</code> 로 바뀌어 올 수 있음. 온전한 경로를 먼저 한 줄 남김</li>
-							<li class="entry"><code>MultiByteToWideChar(CP_ACP, ...)</code> 컴파일러 문자열은 시스템 코드 페이지(한국어 Windows 는 CP949)의 <code>char</code> 문자열. <code>FLog</code> 가 받는 <code>wchar_t</code> 문자열로 바꿈</li>
-							<li class="entry"><code>CHECK_FATAL(CompileResult)</code> 파일이 없으면 <code>HRESULT 0x80070002</code></li>
-						</ul>
-					</details>
-					<p>입력 레이아웃은 C++ 의 <code>FVertex</code> 와 HLSL 의 <code>FVertexInput</code> 사이의 약속이에요. 원소마다 시맨틱 이름과 형식, 정점 안에서 몇 바이트째에 있는지를 적어요. <code>CreateInputLayout</code> 은 정점 셰이더의 바이트코드를 함께 받아 셰이더 입력과 맞는지 확인해요.</p>
+					<p>입력 레이아웃은 C++ 의 정점 구조체와 HLSL 의 <code>FVertexInput</code> 사이의 약속이에요. 원소마다 시맨틱 이름과 형식, 정점 안에서 몇 바이트째에 있는지를 적어요. 이 표는 정점 구조체와 짝이라, 한쪽만 고치고 다른 쪽을 잊지 않게 구조체 안에 둬요.</p>
 					<figure class="diagram">
-						<svg viewBox="0 0 820 268" role="img" aria-label="FVertex 28바이트 가운데 0~11 바이트는 POSITION, 12~27 바이트는 COLOR 원소로 읽혀 HLSL 입력의 Position 과 Color 로 들어가는 그림">
+						<svg viewBox="0 0 820 268" role="img" aria-label="C++ 정점 구조체 28바이트 가운데 0~11 바이트는 POSITION, 12~27 바이트는 COLOR 원소로 읽혀 HLSL 입력의 Position 과 Color 로 들어가는 그림">
 							<defs><marker id="d45-h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path class="dg-head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
-							<text class="dg-t" x="0" y="46">C++ <tspan class="dg-ms" dx="4">FVertex</tspan></text>
+							<text class="dg-t" x="0" y="46">C++ 정점</text>
 							<text class="dg-s" x="0" y="66">28바이트</text>
 							<rect class="dg-box accent" x="180" y="26" width="240" height="46" rx="6"/>
 							<rect class="dg-box amber" x="420" y="26" width="320" height="46" rx="6"/>
@@ -1362,73 +1111,213 @@ namespace
 						<figcaption>입력 레이아웃이 가운데에서 두 쪽을 이어요. 바이트 위치는 위의 C++ 구조체와, 시맨틱 이름은 아래의 HLSL 입력과 맞아야 해요.</figcaption>
 					</figure>
 					<figure class="code">
+						<figcaption><span class="path">Source/Graphics/FVertexTypes.h</span><span class="badge mod">수정</span><span class="badge">include, InputElements 선언, 크기 검사</span></figcaption>
+<pre class="diff" data-lang="cpp">@@ -1,9 +1,17 @@
+ #pragma once
+ 
+ #include &lt;DirectXMath.h&gt;
++#include &lt;array&gt;
++#include &lt;d3d11.h&gt;
+ 
+ struct FVertexPositionColor
+ {
+ 	DirectX::XMFLOAT3 Position;
+ 	DirectX::XMFLOAT4 Color;
++
++	// 정의는 FVertexTypes.cpp 에 있다. 오프셋을 offsetof 로 적으려면 구조체가 다 정의된 뒤여야 한다.
++	static const std::array&lt;D3D11_INPUT_ELEMENT_DESC, 2&gt; InputElements;
+ };
++
++// InputElements 의 형식(float 3개, float 4개)과 크기가 맞는지 본다.
++static_assert(sizeof(FVertexPositionColor) == 28);</pre>
+					</figure>
+					<p>표의 값은 새 파일 <code>Source/Graphics/FVertexTypes.cpp</code> 에 적어요. 바이트 위치를 <code>offsetof</code> 로 구조체에서 바로 계산하는데, <code>offsetof</code> 는 구조체가 다 정의된 뒤에만 쓸 수 있어서 구조체 안이 아니라 <code>.cpp</code> 에 둬요.</p>
+					<figure class="code">
+						<figcaption><span class="path">Source/Graphics/FVertexTypes.cpp</span><span class="badge new">신규</span><span class="badge">파일 전체</span></figcaption>
+<pre class="src" data-lang="cpp">#include "Graphics/FVertexTypes.h"
+
+#include &lt;cstddef&gt;
+
+const std::array&lt;D3D11_INPUT_ELEMENT_DESC, 2&gt; FVertexPositionColor::InputElements = {{
+    {"POSITION",
+     0,
+     DXGI_FORMAT_R32G32B32_FLOAT,
+     0,
+     offsetof(FVertexPositionColor, Position),
+     D3D11_INPUT_PER_VERTEX_DATA,
+     0},
+    {"COLOR",
+     0,
+     DXGI_FORMAT_R32G32B32A32_FLOAT,
+     0,
+     offsetof(FVertexPositionColor, Color),
+     D3D11_INPUT_PER_VERTEX_DATA,
+     0},
+}};</pre>
+					</figure>
+					<details class="fold">
+						<summary>줄 단위 풀이</summary>
+						<ul class="walk">
+							<li class="entry"><code>static const std::array&lt;D3D11_INPUT_ELEMENT_DESC, 2&gt; InputElements;</code> 구조체에 딸린 표 하나. 정점마다 들지 않고 프로그램에 하나만 있음</li>
+							<li class="entry"><code>static_assert(sizeof(FVertexPositionColor) == 28);</code> 표의 형식(<code>float</code> 셋과 넷)과 구조체 크기가 맞는지 컴파일할 때 봄. 멤버의 형을 바꾸고 표를 잊으면 빌드가 멈춤</li>
+							<li class="entry"><code>"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0</code> 시맨틱 이름, 시맨틱 번호, 형식(<code>float</code> 셋), 입력 슬롯</li>
+							<li class="entry"><code>offsetof(FVertexPositionColor, Color)</code> 정점 안에서 <code>Color</code> 가 시작하는 바이트 위치. 12</li>
+							<li class="entry"><code>D3D11_INPUT_PER_VERTEX_DATA, 0</code> 정점마다 한 번씩 읽음</li>
+						</ul>
+					</details>
+					<p>셰이더를 맡는 새 클래스 <code>FColorShader</code> 를 <code>Source/Shaders</code> 에 만들어요.</p>
+					<figure class="code">
+						<figcaption><span class="path">Source/Shaders/FColorShader.h</span><span class="badge new">신규</span><span class="badge">파일 전체</span></figcaption>
+<pre class="src" data-lang="cpp">#pragma once
+
+#include &lt;d3d11.h&gt;
+#include &lt;wrl/client.h&gt;
+
+class FColorShader
+{
+public:
+	void Initialize(ID3D11Device* Device);
+
+private:
+	Microsoft::WRL::ComPtr&lt;ID3D11VertexShader&gt; VertexShader;
+	Microsoft::WRL::ComPtr&lt;ID3D11PixelShader&gt; PixelShader;
+	Microsoft::WRL::ComPtr&lt;ID3D11InputLayout&gt; InputLayout;
+};</pre>
+					</figure>
+					<p><code>CompileShader</code> 는 HLSL 파일 하나에서 시작 함수 하나를 골라 바이트코드로 컴파일해요. 실패하면 컴파일러가 돌려준 오류 문자열을 로그로 남기고 멈춰요.</p>
+					<figure class="code">
+						<figcaption><span class="path">Source/Shaders/FColorShader.cpp</span><span class="badge new">신규</span><span class="badge">파일 맨 위 include · CompileShader</span></figcaption>
+<pre class="snip" data-lang="cpp">#include "Shaders/FColorShader.h"
+
+#include &lt;d3dcompiler.h&gt;
+#include &lt;filesystem&gt;
+#include &lt;format&gt;
+#include &lt;string&gt;
+#include &lt;string_view&gt;
+
+#include "Graphics/FVertexTypes.h"
+#include "Utility/Check.h"
+#include "Utility/FLog.h"
+#include "Utility/FPaths.h"
+#include "Utility/FStringConv.h"
+
+using Microsoft::WRL::ComPtr;
+
+namespace
+{
+	ComPtr&lt;ID3DBlob&gt; CompileShader(const std::filesystem::path&amp; Path, const char* EntryPoint, const char* Target)
+	{
+		UINT Flags = D3DCOMPILE_ENABLE_STRICTNESS;
+		// 디버그 빌드는 그래픽 디버거(RenderDoc·PIX)에서 HLSL 을 줄 단위로 따라갈 수 있게 컴파일한다.
+#ifndef NDEBUG
+		Flags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+#endif
+
+		ComPtr&lt;ID3DBlob&gt; Code;
+		ComPtr&lt;ID3DBlob&gt; Errors;
+		// include 처리기를 넘기지 않으면 셰이더 안의 #include 가 컴파일 에러가 된다.
+		const HRESULT CompileResult = D3DCompileFromFile(Path.c_str(),
+		                                                 nullptr,
+		                                                 D3D_COMPILE_STANDARD_FILE_INCLUDE,
+		                                                 EntryPoint,
+		                                                 Target,
+		                                                 Flags,
+		                                                 0,
+		                                                 Code.ReleaseAndGetAddressOf(),
+		                                                 Errors.ReleaseAndGetAddressOf());
+
+		// 컴파일러 문자열 속 경로는 한글이 ? 로 바뀔 수 있어 경로를 따로 남긴다.
+		if (FAILED(CompileResult))
+		{
+			FLog::Error(std::format(L"셰이더 컴파일 실패 : {}", Path.wstring()));
+		}
+
+		// 성공해도 경고가 담겨 올 수 있다.
+		if (Errors != nullptr)
+		{
+			std::string_view Text(static_cast&lt;const char*&gt;(Errors-&gt;GetBufferPointer()));
+			Text = Text.substr(0, Text.find_last_not_of("\r\n") + 1);
+			const std::wstring Message = FStringConv::ToWide(Text);
+
+			if (SUCCEEDED(CompileResult))
+			{
+				FLog::Warning(Message);
+			}
+			else
+			{
+				FLog::Error(Message);
+			}
+		}
+
+		CHECK_FATAL(CompileResult);
+		return Code;
+	}
+} // namespace</pre>
+					</figure>
+					<details class="fold">
+						<summary>줄 단위 풀이</summary>
+						<ul class="walk">
+							<li class="entry"><code>namespace { ... }</code> 이름 없는 네임스페이스. <code>CompileShader</code> 는 이 파일에서만 보임</li>
+							<li class="entry"><code>D3DCOMPILE_ENABLE_STRICTNESS</code> 옛 문법을 오류로 봄</li>
+							<li class="entry"><code>D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION</code> 디버그 빌드만. RenderDoc 이나 PIX 같은 그래픽 디버거에서 HLSL 을 줄 단위로 따라갈 수 있음</li>
+							<li class="entry"><code>D3D_COMPILE_STANDARD_FILE_INCLUDE</code> 셰이더 안의 <code>#include</code> 를 파일에서 찾아 주는 기본 처리기. 지금 셰이더에는 <code>#include</code> 가 없음</li>
+							<li class="entry"><code>Errors</code> 오류와 경고 문자열. 컴파일이 성공해도 경고가 있으면 담겨 와서 <code>[경고]</code> 로 남김</li>
+							<li class="entry"><code>L"셰이더 컴파일 실패 : {}"</code> 컴파일러 문자열 속 경로는 폴더 이름의 한글 일부가 <code>?</code> 로 바뀌어 올 수 있음. 온전한 경로를 먼저 한 줄 남김</li>
+							<li class="entry"><code>FStringConv::ToWide(Text)</code> 컴파일러 문자열은 시스템 코드 페이지(한국어 Windows 는 CP949)의 <code>char</code> 문자열. 02편의 넓히기 함수로 <code>FLog</code> 가 받는 문자열로 바꿈</li>
+							<li class="entry"><code>CHECK_FATAL(CompileResult)</code> 파일이 없으면 <code>HRESULT 0x80070002</code></li>
+						</ul>
+					</details>
+					<figure class="code">
 						<figcaption><span class="path">Source/Shaders/FColorShader.cpp</span><span class="badge new">신규</span><span class="badge">FColorShader::Initialize · 이름 없는 네임스페이스 다음</span></figcaption>
 <pre class="snip" data-lang="cpp">void FColorShader::Initialize(ID3D11Device* Device)
 {
 	// 빌드가 셰이더 파일을 exe 옆 Shaders 폴더로 복사한다.
-	const std::filesystem::path ShaderDirectory = FPaths::GetExecutableDirectory() / L"Shaders";
-	const ComPtr&lt;ID3DBlob&gt; VertexCode = CompileShader(ShaderDirectory / L"Color.vs", "ColorVertexShader", "vs_5_0");
-	const ComPtr&lt;ID3DBlob&gt; PixelCode = CompileShader(ShaderDirectory / L"Color.ps", "ColorPixelShader", "ps_5_0");
+	const std::filesystem::path ShaderPath = FPaths::GetExecutableDirectory() / L"Shaders" / L"Color.hlsl";
+	const ComPtr&lt;ID3DBlob&gt; VertexCode = CompileShader(ShaderPath, "ColorVertexShader", "vs_5_0");
+	const ComPtr&lt;ID3DBlob&gt; PixelCode = CompileShader(ShaderPath, "ColorPixelShader", "ps_5_0");
 
 	CHECK_FATAL(Device-&gt;CreateVertexShader(
-	    VertexCode-&gt;GetBufferPointer(), VertexCode-&gt;GetBufferSize(), nullptr, VertexShader.GetAddressOf()));
+	    VertexCode-&gt;GetBufferPointer(), VertexCode-&gt;GetBufferSize(), nullptr, VertexShader.ReleaseAndGetAddressOf()));
 	CHECK_FATAL(Device-&gt;CreatePixelShader(
-	    PixelCode-&gt;GetBufferPointer(), PixelCode-&gt;GetBufferSize(), nullptr, PixelShader.GetAddressOf()));
+	    PixelCode-&gt;GetBufferPointer(), PixelCode-&gt;GetBufferSize(), nullptr, PixelShader.ReleaseAndGetAddressOf()));
 
-	constexpr std::array&lt;D3D11_INPUT_ELEMENT_DESC, 2&gt; InputElements = {{
-	    {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-	    {"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-	}};
-	CHECK_FATAL(Device-&gt;CreateInputLayout(InputElements.data(),
-	                                      static_cast&lt;UINT&gt;(InputElements.size()),
+	CHECK_FATAL(Device-&gt;CreateInputLayout(FVertexPositionColor::InputElements.data(),
+	                                      static_cast&lt;UINT&gt;(FVertexPositionColor::InputElements.size()),
 	                                      VertexCode-&gt;GetBufferPointer(),
 	                                      VertexCode-&gt;GetBufferSize(),
-	                                      InputLayout.GetAddressOf()));
+	                                      InputLayout.ReleaseAndGetAddressOf()));
 }</pre>
 					</figure>
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
-							<li class="entry"><code>FPaths::GetExecutableDirectory() / L"Shaders"</code> exe 옆 <code>Shaders</code> 폴더. <a href="#step-hlsl">4단계</a>의 빌드 설정이 셰이더 파일을 여기로 복사함</li>
-							<li class="entry"><code>"ColorVertexShader"</code> HLSL 파일 안에서 시작할 함수 이름</li>
+							<li class="entry"><code>FPaths::GetExecutableDirectory() / L"Shaders" / L"Color.hlsl"</code> exe 옆 <code>Shaders</code> 폴더의 셰이더 파일. <a href="#step-hlsl">4단계</a>의 빌드 설정이 여기로 복사함</li>
+							<li class="entry"><code>"ColorVertexShader"</code>·<code>"vs_5_0"</code> 같은 파일에서 정점 셰이더의 시작 함수를 골라 정점 셰이더로 컴파일</li>
 							<li class="entry"><code>CreateVertexShader(..., nullptr, ...)</code> 세 번째 인자는 셰이더 클래스 연결. 쓰지 않음</li>
-							<li class="entry"><code>{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, ...}</code> 시맨틱 이름, 시맨틱 번호, 형식(<code>float</code> 셋), 입력 슬롯, 정점 안의 바이트 위치, 정점마다 읽기</li>
-							<li class="entry"><code>D3D11_APPEND_ALIGNED_ELEMENT</code> 앞 원소 바로 뒤. 위치 12바이트 다음이라 12</li>
+							<li class="entry"><code>CreateInputLayout(FVertexPositionColor::InputElements.data(), ...)</code> 정점 구조체의 표와 정점 셰이더의 바이트코드를 함께 받아 둘이 맞는지 확인함. 시맨틱 이름이 셰이더 입력에 없으면 실패</li>
 						</ul>
 					</details>
-					<p><code>FVertex</code> 위에는 짝이 되는 두 곳을 주석으로 적어 둬요.</p>
-					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FModel.h</span><span class="badge mod">수정</span><span class="badge">struct FVertex 위</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -16,6 +16,7 @@
- 	void Render(ID3D11DeviceContext* Context) const;
- 
- private:
-+	// FColorShader 의 입력 레이아웃, Color.vs 의 FVertexInput 과 멤버 순서·형식이 같아야 한다.
- 	struct FVertex
- 	{
- 		DirectX::XMFLOAT3 Position;</pre>
-					</figure>
 					<p><code>FApplication</code> 이 셰이더를 멤버로 갖고 모델 다음에 초기화해요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/App/FApplication.h</span><span class="badge mod">수정</span><span class="badge">include 와 셰이더 멤버</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -3,6 +3,7 @@
- #include &lt;array&gt;
+<pre class="diff" data-lang="cpp">@@ -1,6 +1,7 @@
+ #pragma once
  
  #include "Graphics/FModel.h"
 +#include "Shaders/FColorShader.h"
  
  class FD3D11Graphics;
  
-@@ -23,4 +24,5 @@
+@@ -14,4 +15,5 @@
+ 
  private:
- 	std::array&lt;float, 4&gt; ClearColor = {0.5f, 0.5f, 0.5f, 1.0f};
  	FModel Model;
 +	FColorShader ColorShader;
  };</pre>
 					</figure>
 					<figure class="code">
 						<figcaption><span class="path">Source/App/FApplication.cpp</span><span class="badge mod">수정</span><span class="badge">FApplication::Initialize</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -8,6 +8,7 @@
+<pre class="diff" data-lang="cpp">@@ -5,6 +5,7 @@
  void FApplication::Initialize(FD3D11Graphics&amp; Graphics)
  {
  	Model.Initialize(Graphics.GetDevice());
@@ -1437,66 +1326,10 @@ namespace
  
  void FApplication::Update()</pre>
 					</figure>
-					<p>Visual Studio 에서는 <code>Shaders</code> 필터에 <code>FColorShader.h</code>·<code>FColorShader.cpp</code> 를, <code>Utility</code> 필터에 <code>FPaths.h</code>·<code>FPaths.cpp</code> 를 넣고 아래를 고쳐요. 이 조작들이 <code>DxRenderDojo.vcxproj</code> 와 <code>DxRenderDojo.vcxproj.filters</code> 를 바꿔요.</p>
+					<p>Visual Studio 에서는 <code>Shaders</code> 필터에 <code>FColorShader.h</code>·<code>FColorShader.cpp</code> 를, <code>Utility</code> 필터에 <code>FPaths.h</code>·<code>FPaths.cpp</code> 를, <code>Graphics</code> 필터에 <code>FVertexTypes.cpp</code> 를 넣고 아래를 고쳐요.</p>
 					<ul class="walk">
-						<li>모든 구성 · 링커 › 입력 › 추가 종속성 : <code>d3dcompiler.lib</code> 를 더함. <code>D3DCompileFromFile</code> 이 이 라이브러리에 있음</li>
+						<li>모든 구성 · 링커 › 입력 › 추가 종속성 : <code>dxguid.lib;</code> 뒤에 <code>d3dcompiler.lib;</code> 를 더함. <code>D3DCompileFromFile</code> 이 이 라이브러리에 있음</li>
 					</ul>
-					<details class="fold">
-						<summary>참고 : 위 조작이 프로젝트 파일에 남기는 diff · 따로 치지 않음</summary>
-					<figure class="code">
-						<figcaption><span class="path">DxRenderDojo.vcxproj</span><span class="badge mod">수정</span><span class="badge">새 파일과 추가 종속성</span></figcaption>
-<pre class="diff" data-lang="xml">@@ -47,7 +47,7 @@
-     &lt;Link&gt;
-       &lt;SubSystem&gt;Windows&lt;/SubSystem&gt;
-       &lt;GenerateDebugInformation&gt;true&lt;/GenerateDebugInformation&gt;
--      &lt;AdditionalDependencies&gt;d3d11.lib;dxgi.lib;%(AdditionalDependencies)&lt;/AdditionalDependencies&gt;
-+      &lt;AdditionalDependencies&gt;d3d11.lib;dxgi.lib;d3dcompiler.lib;%(AdditionalDependencies)&lt;/AdditionalDependencies&gt;
-     &lt;/Link&gt;
-     &lt;Manifest&gt;
-       &lt;EnableDpiAwareness&gt;false&lt;/EnableDpiAwareness&gt;
-@@ -78,8 +78,10 @@
-     &lt;ClCompile Include="Source\Core\FWindow.cpp" /&gt;
-     &lt;ClCompile Include="Source\Graphics\FD3D11Graphics.cpp" /&gt;
-     &lt;ClCompile Include="Source\Graphics\FModel.cpp" /&gt;
-+    &lt;ClCompile Include="Source\Shaders\FColorShader.cpp" /&gt;
-     &lt;ClCompile Include="Source\Utility\Check.cpp" /&gt;
-     &lt;ClCompile Include="Source\Utility\FLog.cpp" /&gt;
-+    &lt;ClCompile Include="Source\Utility\FPaths.cpp" /&gt;
-   &lt;/ItemGroup&gt;
-   &lt;ItemGroup&gt;
-     &lt;ClInclude Include="Source\App\FApplication.h" /&gt;
-@@ -89,8 +91,10 @@
-     &lt;ClInclude Include="Source\Core\FWindow.h" /&gt;
-     &lt;ClInclude Include="Source\Graphics\FD3D11Graphics.h" /&gt;
-     &lt;ClInclude Include="Source\Graphics\FModel.h" /&gt;
-+    &lt;ClInclude Include="Source\Shaders\FColorShader.h" /&gt;
-     &lt;ClInclude Include="Source\Utility\Check.h" /&gt;
-     &lt;ClInclude Include="Source\Utility\FLog.h" /&gt;
-+    &lt;ClInclude Include="Source\Utility\FPaths.h" /&gt;
-     &lt;ClInclude Include="Source\Utility\TSingleton.h" /&gt;
-   &lt;/ItemGroup&gt;
-   &lt;ItemGroup&gt;</pre>
-					</figure>
-					</details>
-					<details class="fold">
-						<summary>CMake · 맥 빌드와 검사용, VS 만 쓰면 건너뜀</summary>
-					<figure class="code">
-						<figcaption><span class="path">CMakeLists.txt</span><span class="badge mod">수정</span><span class="badge">d3dcompiler 링크</span></figcaption>
-<pre class="diff" data-lang="cmake">@@ -7,7 +7,7 @@
- target_include_directories(DxRenderDojo SYSTEM PRIVATE external/DirectXMath/Inc)
- target_compile_features(DxRenderDojo PRIVATE cxx_std_20)
- target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN)
--target_link_libraries(DxRenderDojo PRIVATE d3d11 dxgi)
-+target_link_libraries(DxRenderDojo PRIVATE d3d11 dxgi d3dcompiler)
- 
- # 셰이더는 실행 중에 컴파일한다. exe 옆 Shaders 폴더로 복사하고, configure_file 은 원본이 바뀌면 다시 복사한다.
- file(GLOB ShaderFiles CONFIGURE_DEPENDS Source/Shaders/*.vs Source/Shaders/*.ps)</pre>
-					</figure>
-					</details>
-					<details class="fold">
-						<summary>원문과 비교</summary>
-						<p>원문은 컴파일 오류를 <code>shader-error.txt</code> 에 쓰고 메시지 상자를 띄운 뒤 <code>false</code> 를 돌려줘요. 이 교재는 오류 문자열을 로그로 남기고 02편의 <code>CHECK_FATAL</code> 로 멈춰요.</p>
-					</details>
 					<details class="fold">
 						<summary>언리얼로 치면</summary>
 						<aside class="ue">
@@ -1506,11 +1339,7 @@ namespace
 					</details>
 					<div class="learn">
 						<p class="box-label">스스로 설명해 보기</p>
-						<p><code>FVertex</code> 의 <code>Position</code> 을 <code>XMFLOAT4</code> 로 바꾸고 입력 레이아웃은 그대로 두면, <code>COLOR</code> 는 정점의 몇 바이트째부터 읽힐까요? <code>D3D11_APPEND_ALIGNED_ELEMENT</code> 가 무엇을 보고 자리를 정하는지로 말해 보세요.</p>
-					</div>
-					<div class="checkpoint">
-						<p class="box-label">여기까지</p>
-						<p>화면은 그대로예요. 컴파일이 실패하는 길도 일부러 확인해요. <code>Color.ps</code> 의 <code>Input.Color</code> 를 <code>Input.Colr</code> 로 바꾸고 실행하면 로그에 <code>Color.ps(10,9-18): error X3018: invalid subscript 'Colr'</code> 와 <code>[CHECK FATAL] CompileResult</code> 가 찍히고 상자가 떠요. F5 로 실행했다면 Visual Studio 가 먼저 멈추니 계속(F5)을 눌러요. 확인했으면 되돌려요.</p>
+						<p><code>FVertexPositionColor</code> 의 <code>Position</code> 을 <code>XMFLOAT4</code> 로 바꾸고 표의 형식은 그대로 두면 어디서 알게 될까요? <code>offsetof</code> 와 <code>static_assert</code> 가 각각 무엇을 맞춰 주는지로 말해 보세요.</p>
 					</div>
 				</div>
 			</li>
@@ -1518,7 +1347,129 @@ namespace
 			<li class="step" id="step-draw">
 				<div class="step-body">
 					<h3>삼각형을 그린다</h3>
-					<p>행렬 없이 그리면 정점 좌표가 곧 화면 좌표예요. x·y 의 -1~1 이 창의 네 끝이라서, 삼각형이 창을 채우고 창 비율을 따라 늘어나요.</p>
+					<p>그리기는 두 쪽이 나눠 맡아요. 셰이더는 자기 상태를 파이프라인에 묶고(<code>Bind</code>), 모델은 자기 버퍼를 묶은 뒤 인덱스 개수만큼 그려요(<code>Draw</code>). 그리기 호출은 인덱스 개수를 가진 모델이 해요.</p>
+					<figure class="code">
+						<figcaption><span class="path">Source/Graphics/FModel.h</span><span class="badge mod">수정</span><span class="badge">Draw</span></figcaption>
+<pre class="diff" data-lang="cpp">@@ -8,6 +8,8 @@
+ public:
+ 	void Initialize(ID3D11Device* Device);
+ 
++	void Draw(ID3D11DeviceContext* Context) const;
++
+ private:
+ 	Microsoft::WRL::ComPtr&lt;ID3D11Buffer&gt; VertexBuffer;
+ 	Microsoft::WRL::ComPtr&lt;ID3D11Buffer&gt; IndexBuffer;</pre>
+					</figure>
+					<figure class="code">
+						<figcaption><span class="path">Source/Graphics/FModel.cpp</span><span class="badge new">신규</span><span class="badge">FModel::Draw · Initialize 다음</span></figcaption>
+<pre class="snip" data-lang="cpp">void FModel::Draw(ID3D11DeviceContext* Context) const
+{
+	constexpr UINT Stride = sizeof(FVertexPositionColor);
+	constexpr UINT Offset = 0;
+	Context-&gt;IASetVertexBuffers(0, 1, VertexBuffer.GetAddressOf(), &amp;Stride, &amp;Offset);
+	Context-&gt;IASetIndexBuffer(IndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+	Context-&gt;IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	Context-&gt;DrawIndexed(IndexCount, 0, 0);
+}</pre>
+					</figure>
+					<details class="fold">
+						<summary>줄 단위 풀이</summary>
+						<ul class="walk">
+							<li class="entry"><code>Stride = sizeof(FVertexPositionColor)</code> 정점 하나의 바이트 수. 다음 정점까지 건너뛸 거리</li>
+							<li class="entry"><code>IASetVertexBuffers(0, 1, VertexBuffer.GetAddressOf(), ...)</code> 입력 슬롯 0 에 버퍼 하나. 넘겨 주는 입력 배열이라 <code>GetAddressOf()</code></li>
+							<li class="entry"><code>DXGI_FORMAT_R32_UINT</code> 인덱스 하나가 32비트 정수</li>
+							<li class="entry"><code>DrawIndexed(IndexCount, 0, 0)</code> 인덱스 개수, 첫 인덱스 위치, 인덱스에 더할 값</li>
+						</ul>
+					</details>
+					<figure class="code">
+						<figcaption><span class="path">Source/Shaders/FColorShader.h</span><span class="badge mod">수정</span><span class="badge">Bind</span></figcaption>
+<pre class="diff" data-lang="cpp">@@ -8,6 +8,8 @@
+ public:
+ 	void Initialize(ID3D11Device* Device);
+ 
++	void Bind(ID3D11DeviceContext* Context) const;
++
+ private:
+ 	Microsoft::WRL::ComPtr&lt;ID3D11VertexShader&gt; VertexShader;
+ 	Microsoft::WRL::ComPtr&lt;ID3D11PixelShader&gt; PixelShader;</pre>
+					</figure>
+					<figure class="code">
+						<figcaption><span class="path">Source/Shaders/FColorShader.cpp</span><span class="badge new">신규</span><span class="badge">FColorShader::Bind · Initialize 다음</span></figcaption>
+<pre class="snip" data-lang="cpp">void FColorShader::Bind(ID3D11DeviceContext* Context) const
+{
+	Context-&gt;IASetInputLayout(InputLayout.Get());
+	Context-&gt;VSSetShader(VertexShader.Get(), nullptr, 0);
+	Context-&gt;PSSetShader(PixelShader.Get(), nullptr, 0);
+}</pre>
+					</figure>
+					<details class="fold">
+						<summary>줄 단위 풀이</summary>
+						<ul class="walk">
+							<li class="entry"><code>IASetInputLayout(InputLayout.Get())</code> 입력 레이아웃은 정점 셰이더의 바이트코드로 만들어서 셰이더 쪽이 묶음</li>
+							<li class="entry"><code>VSSetShader(VertexShader.Get(), nullptr, 0)</code> 뒤의 두 인자는 셰이더 클래스 연결. 쓰지 않음</li>
+						</ul>
+					</details>
+					<p>그릴 때 쓸 컨텍스트는 <code>FD3D11Graphics</code> 가 내주고, <code>FApplication::Render</code> 는 그래픽 객체를 받아요.</p>
+					<figure class="code">
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.h</span><span class="badge mod">수정</span><span class="badge">GetContext</span></figcaption>
+<pre class="diff" data-lang="cpp">@@ -17,6 +17,7 @@
+ 	void Initialize(HWND WindowHandle, int Width, int Height, bool bEnableVSync);
+ 
+ 	ID3D11Device* GetDevice() const { return Device.Get(); }
++	ID3D11DeviceContext* GetContext() const { return Context.Get(); }
+ 
+ 	void Resize(int Width, int Height);
+ </pre>
+					</figure>
+					<figure class="code">
+						<figcaption><span class="path">Source/App/FApplication.h</span><span class="badge mod">수정</span><span class="badge">Render 인자</span></figcaption>
+<pre class="diff" data-lang="cpp">@@ -11,7 +11,7 @@
+ 	void Initialize(FD3D11Graphics&amp; Graphics);
+ 
+ 	void Update();
+-	void Render();
++	void Render(FD3D11Graphics&amp; Graphics);
+ 
+ private:
+ 	FModel Model;</pre>
+					</figure>
+					<figure class="code">
+						<figcaption><span class="path">Source/App/FApplication.cpp</span><span class="badge mod">수정</span><span class="badge">FApplication::Render</span></figcaption>
+<pre class="diff" data-lang="cpp">@@ -12,6 +12,9 @@
+ {
+ }
+ 
+-void FApplication::Render()
++void FApplication::Render(FD3D11Graphics&amp; Graphics)
+ {
++	ID3D11DeviceContext* Context = Graphics.GetContext();
++	ColorShader.Bind(Context);
++	Model.Draw(Context);
+ }</pre>
+					</figure>
+					<figure class="code">
+						<figcaption><span class="path">Source/Core/FSystem.cpp</span><span class="badge mod">수정</span><span class="badge">FSystem::Frame</span></figcaption>
+<pre class="diff" data-lang="cpp">@@ -49,7 +49,7 @@
+ 
+ 	Application.Update();
+ 	Graphics.BeginScene();
+-	Application.Render();
++	Application.Render(Graphics);
+ 	Graphics.EndScene();
+ }
+ </pre>
+					</figure>
+					<div class="learn">
+						<p class="box-label">스스로 설명해 보기</p>
+						<p><code>FColorShader::Bind</code> 는 매 프레임 같은 입력 레이아웃과 셰이더를 묶어요. 이 둘을 <code>FApplication::Initialize</code> 에서 한 번만 묶어도 삼각형이 계속 보일까요? 2단계의 RTV 와 무엇이 다른지로 말해 보세요.</p>
+					</div>
+				</div>
+			</li>
+
+			<li class="step" id="step-camera">
+				<div class="step-body">
+					<h3>카메라로 뷰·투영 행렬을 만든다</h3>
+					<p>삼각형이 창 비율을 따라 늘어나지 않게 하려면 원근과 창 비율을 담은 행렬을 정점에 곱해야 해요. 행렬 없이 그리면 정점 좌표가 곧 화면 좌표라서, x·y 의 -1~1 이 창의 네 끝에 펼쳐져요.</p>
 					<figure class="diagram">
 						<svg viewBox="0 0 820 230" role="img" aria-label="-1~1 정사각형 좌표의 삼각형이 800×600 창과 가로로 넓힌 창에 각각 창 크기대로 펼쳐지는 그림">
 							<defs><marker id="d46-h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path class="dg-head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
@@ -1538,300 +1489,15 @@ namespace
 						</svg>
 						<figcaption>뷰포트는 -1~1 을 창 크기로 펼쳐요. 행렬이 없으면 삼각형도 창과 같은 비율로 늘어나요.</figcaption>
 					</figure>
-					<p><code>DrawIndexed</code> 는 그릴 인덱스 개수를 받아요. <code>FModel</code> 이 버퍼를 만들 때 개수를 기억해 두고 내줘요.</p>
-					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FModel.h</span><span class="badge mod">수정</span><span class="badge">GetIndexCount 와 개수 멤버</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -13,6 +13,8 @@
- 
- 	void Initialize(ID3D11Device* Device);
- 
-+	UINT GetIndexCount() const { return IndexCount; }
-+
- 	void Render(ID3D11DeviceContext* Context) const;
- 
- private:
-@@ -25,4 +27,5 @@
- 
- 	Microsoft::WRL::ComPtr&lt;ID3D11Buffer&gt; VertexBuffer;
- 	Microsoft::WRL::ComPtr&lt;ID3D11Buffer&gt; IndexBuffer;
-+	UINT IndexCount = 0;
- };</pre>
-					</figure>
-					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FModel.cpp</span><span class="badge mod">수정</span><span class="badge">FModel::Initialize 끝</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -34,6 +34,8 @@
- 	D3D11_SUBRESOURCE_DATA IndexData = {};
- 	IndexData.pSysMem = Indices.data();
- 	CHECK_FATAL(Device-&gt;CreateBuffer(&amp;IndexBufferDesc, &amp;IndexData, IndexBuffer.GetAddressOf()));
-+
-+	IndexCount = static_cast&lt;UINT&gt;(Indices.size());
- }
- 
- void FModel::Render(ID3D11DeviceContext* Context) const</pre>
-					</figure>
-					<p><code>FColorShader::Render</code> 가 입력 레이아웃과 두 셰이더를 묶고 <code>DrawIndexed</code> 를 불러요. 버퍼는 <code>FModel::Render</code> 가 먼저 묶어 둬요.</p>
-					<figure class="code">
-						<figcaption><span class="path">Source/Shaders/FColorShader.h</span><span class="badge mod">수정</span><span class="badge">Render</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -12,6 +12,8 @@
- 
- 	void Initialize(ID3D11Device* Device);
- 
-+	void Render(ID3D11DeviceContext* Context, UINT IndexCount) const;
-+
- private:
- 	Microsoft::WRL::ComPtr&lt;ID3D11VertexShader&gt; VertexShader;
- 	Microsoft::WRL::ComPtr&lt;ID3D11PixelShader&gt; PixelShader;</pre>
-					</figure>
-					<figure class="code">
-						<figcaption><span class="path">Source/Shaders/FColorShader.cpp</span><span class="badge new">신규</span><span class="badge">FColorShader::Render · Initialize 다음</span></figcaption>
-<pre class="snip" data-lang="cpp">void FColorShader::Render(ID3D11DeviceContext* Context, UINT IndexCount) const
-{
-	Context-&gt;IASetInputLayout(InputLayout.Get());
-	Context-&gt;VSSetShader(VertexShader.Get(), nullptr, 0);
-	Context-&gt;PSSetShader(PixelShader.Get(), nullptr, 0);
-	Context-&gt;DrawIndexed(IndexCount, 0, 0);
-}</pre>
-					</figure>
-					<details class="fold">
-						<summary>줄 단위 풀이</summary>
-						<ul class="walk">
-							<li class="entry"><code>VSSetShader(VertexShader.Get(), nullptr, 0)</code> 뒤의 두 인자는 셰이더 클래스 연결. 쓰지 않음</li>
-							<li class="entry"><code>DrawIndexed(IndexCount, 0, 0)</code> 인덱스 개수, 첫 인덱스 위치, 인덱스에 더할 값</li>
-						</ul>
-					</details>
-					<p>지우는 색은 원문대로 검정으로 바꿔요.</p>
-					<figure class="code">
-						<figcaption><span class="path">Source/App/FApplication.h</span><span class="badge mod">수정</span><span class="badge">ClearColor</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -22,7 +22,7 @@
- 	void Render(FD3D11Graphics&amp; Graphics);
- 
- private:
--	std::array&lt;float, 4&gt; ClearColor = {0.5f, 0.5f, 0.5f, 1.0f};
-+	std::array&lt;float, 4&gt; ClearColor = {0.0f, 0.0f, 0.0f, 1.0f};
- 	FModel Model;
- 	FColorShader ColorShader;
- };</pre>
-					</figure>
-					<figure class="code">
-						<figcaption><span class="path">Source/App/FApplication.cpp</span><span class="badge mod">수정</span><span class="badge">FApplication::Render 끝</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -23,4 +23,5 @@
- {
- 	ID3D11DeviceContext* Context = Graphics.GetContext();
- 	Model.Render(Context);
-+	ColorShader.Render(Context, Model.GetIndexCount());
- }</pre>
-					</figure>
-					<div class="learn">
-						<p class="box-label">스스로 설명해 보기</p>
-						<p><code>FColorShader::Render</code> 는 매 프레임 같은 입력 레이아웃과 셰이더를 묶어요. 이 둘을 <code>FApplication::Initialize</code> 에서 한 번만 묶어도 삼각형이 계속 보일까요? 2단계의 RTV 와 무엇이 다른지로 말해 보세요.</p>
-					</div>
-					<div class="checkpoint">
-						<p class="box-label">여기까지</p>
-						<p>검은 창에 초록 삼각형이 그려져요. 아래 두 꼭짓점은 창의 아래 두 모서리에, 위 꼭짓점은 창 위쪽 가운데에 있어요. 테두리를 끌어 가로로만 넓히면 삼각형도 옆으로 늘어나요.</p>
-					</div>
-				</div>
-			</li>
-
-			<li class="step" id="step-cbuffer">
-				<div class="step-body">
-					<h3>상수 버퍼로 행렬을 넘긴다</h3>
-					<p>삼각형이 창 비율을 따라 늘어나지 않게 하려면 정점 셰이더가 C++ 이 계산한 행렬을 곱해야 해요. 이 단계는 행렬을 넘기는 길인 상수 버퍼를 놓아요.</p>
 					<details class="fold" open>
-						<summary>D3D 개념 · 좌표 공간과 상수 버퍼</summary>
+						<summary>D3D 개념 · 좌표 공간</summary>
 						<aside class="concept">
 							<ul class="walk">
 								<li><strong>좌표 공간</strong> : 모델 공간 → 월드 공간 → 뷰 공간 → 투영 공간. 행렬 하나가 한 칸씩 옮김. 월드 행렬은 모델을 세상 안에 놓고, 뷰 행렬은 세상을 카메라 기준으로 옮기고, 투영 행렬은 원근을 주어 화면에 맞춤</li>
-								<li><strong>상수 버퍼</strong> : 그리기 한 번 동안 모든 정점이 함께 읽는 값을 담는 버퍼. <code>D3D11_BIND_CONSTANT_BUFFER</code> 로 만듦</li>
 							</ul>
 						</aside>
 					</details>
-					<figure class="code">
-						<figcaption><span class="path">Source/Shaders/Color.vs</span><span class="badge mod">수정</span><span class="badge">cbuffer 와 ColorVertexShader</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -1,3 +1,11 @@
-+// FColorShader::FMatrixBuffer 와 멤버 순서가 같아야 한다. b0 은 VSSetConstantBuffers 의 슬롯 0 이다.
-+cbuffer MatrixBuffer : register(b0)
-+{
-+	matrix World;
-+	matrix View;
-+	matrix Projection;
-+};
-+
- struct FVertexInput
- {
- 	float3 Position : POSITION;
-@@ -14,7 +22,9 @@
- FPixelInput ColorVertexShader(FVertexInput Input)
- {
- 	FPixelInput Output;
--	Output.Position = float4(Input.Position, 1.0f);
-+	Output.Position = mul(float4(Input.Position, 1.0f), World);
-+	Output.Position = mul(Output.Position, View);
-+	Output.Position = mul(Output.Position, Projection);
- 	Output.Color = Input.Color;
- 	return Output;
- }</pre>
-					</figure>
-					<details class="fold">
-						<summary>줄 단위 풀이</summary>
-						<ul class="walk">
-							<li class="entry"><code>cbuffer MatrixBuffer : register(b0)</code> <code>b0</code> 은 상수 버퍼 0번 슬롯</li>
-							<li class="entry"><code>matrix</code> 4×4 <code>float</code> 행렬</li>
-							<li class="entry"><code>mul(float4(Input.Position, 1.0f), World)</code> w 가 1 이라야 4×4 행렬의 이동 성분이 위치에 더해짐</li>
-						</ul>
-					</details>
-					<figure class="code">
-						<figcaption><span class="path">Source/Shaders/FColorShader.h</span><span class="badge mod">수정</span><span class="badge">Render 인자, 행렬 구조체와 상수 버퍼 멤버</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -1,5 +1,6 @@
- #pragma once
- 
-+#include &lt;DirectXMath.h&gt;
- #include &lt;d3d11.h&gt;
- #include &lt;wrl/client.h&gt;
- 
-@@ -12,10 +13,23 @@
- 
- 	void Initialize(ID3D11Device* Device);
- 
--	void Render(ID3D11DeviceContext* Context, UINT IndexCount) const;
-+	void Render(ID3D11DeviceContext* Context,
-+	            UINT IndexCount,
-+	            const DirectX::XMMATRIX&amp; World,
-+	            const DirectX::XMMATRIX&amp; View,
-+	            const DirectX::XMMATRIX&amp; Projection) const;
- 
- private:
-+	// Color.vs 의 cbuffer MatrixBuffer 와 멤버 순서가 같아야 한다.
-+	struct FMatrixBuffer
-+	{
-+		DirectX::XMFLOAT4X4 World;
-+		DirectX::XMFLOAT4X4 View;
-+		DirectX::XMFLOAT4X4 Projection;
-+	};
-+
- 	Microsoft::WRL::ComPtr&lt;ID3D11VertexShader&gt; VertexShader;
- 	Microsoft::WRL::ComPtr&lt;ID3D11PixelShader&gt; PixelShader;
- 	Microsoft::WRL::ComPtr&lt;ID3D11InputLayout&gt; InputLayout;
-+	Microsoft::WRL::ComPtr&lt;ID3D11Buffer&gt; MatrixBuffer;
- };</pre>
-					</figure>
-					<details class="fold">
-						<summary>줄 단위 풀이</summary>
-						<ul class="walk">
-							<li class="entry"><code>const DirectX::XMMATRIX&amp; World</code> 행렬은 참조로 받음. 헤더에서는 <code>using namespace</code> 를 쓰지 않아 <code>DirectX::</code> 를 붙임</li>
-						</ul>
-					</details>
-					<p>상수 버퍼는 <code>Initialize</code> 끝에서 만들어요.</p>
-					<figure class="code">
-						<figcaption><span class="path">Source/Shaders/FColorShader.cpp</span><span class="badge mod">수정</span><span class="badge">using 줄 · Initialize 끝, CreateInputLayout 다음</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -14,4 +14,5 @@
- using Microsoft::WRL::ComPtr;
-+using namespace DirectX;
- 
- namespace
- {
-@@ -80,4 +81,13 @@
- 	                                      VertexCode-&gt;GetBufferPointer(),
- 	                                      VertexCode-&gt;GetBufferSize(),
- 	                                      InputLayout.GetAddressOf()));
-+
-+	// 상수 버퍼 크기는 16 바이트의 배수여야 한다.
-+	static_assert(sizeof(FMatrixBuffer) % 16 == 0);
-+	D3D11_BUFFER_DESC MatrixBufferDesc = {};
-+	MatrixBufferDesc.ByteWidth = sizeof(FMatrixBuffer);
-+	MatrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-+	MatrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-+	MatrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-+	CHECK_FATAL(Device-&gt;CreateBuffer(&amp;MatrixBufferDesc, nullptr, MatrixBuffer.GetAddressOf()));
- }</pre>
-					</figure>
-					<details class="fold">
-						<summary>줄 단위 풀이</summary>
-						<ul class="walk">
-							<li class="entry"><code>static_assert(sizeof(FMatrixBuffer) % 16 == 0);</code> 상수 버퍼 크기는 16바이트의 배수여야 함. 행렬 셋은 192바이트</li>
-							<li class="entry"><code>D3D11_USAGE_DYNAMIC</code> CPU 가 자주 새로 쓰는 버퍼. 행렬은 매 프레임 바뀜</li>
-							<li class="entry"><code>D3D11_CPU_ACCESS_WRITE</code> CPU 가 쓸 수 있게 함. <code>DYNAMIC</code> 과 짝</li>
-							<li class="entry"><code>nullptr</code> 처음 채울 데이터 없음. 그릴 때마다 채움</li>
-						</ul>
-					</details>
-					<p>행렬은 상수 버퍼에 넣기 전에 전치해요. DirectXMath 는 행렬을 행 우선으로 메모리에 두고, HLSL 은 상수 버퍼의 행렬을 기본으로 열 우선으로 읽어요. 전치해서 넣어야 셰이더의 <code>mul(위치, 행렬)</code> 이 C++ 에서 곱한 것과 같은 결과를 내요.</p>
-					<figure class="code">
-						<figcaption><span class="path">Source/Shaders/FColorShader.cpp</span><span class="badge mod">수정</span><span class="badge">FColorShader::Render</span></figcaption>
-<pre class="snip" data-lang="cpp">void FColorShader::Render(ID3D11DeviceContext* Context,
-                          UINT IndexCount,
-                          const XMMATRIX&amp; World,
-                          const XMMATRIX&amp; View,
-                          const XMMATRIX&amp; Projection) const
-{
-	// HLSL 은 행렬을 열 우선으로 읽는다. DirectXMath 의 행 우선 행렬을 전치해서 넣는다.
-	D3D11_MAPPED_SUBRESOURCE Mapped = {};
-	CHECK_FATAL(Context-&gt;Map(MatrixBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &amp;Mapped));
-	FMatrixBuffer* Matrices = static_cast&lt;FMatrixBuffer*&gt;(Mapped.pData);
-	XMStoreFloat4x4(&amp;Matrices-&gt;World, XMMatrixTranspose(World));
-	XMStoreFloat4x4(&amp;Matrices-&gt;View, XMMatrixTranspose(View));
-	XMStoreFloat4x4(&amp;Matrices-&gt;Projection, XMMatrixTranspose(Projection));
-	Context-&gt;Unmap(MatrixBuffer.Get(), 0);
-
-	Context-&gt;IASetInputLayout(InputLayout.Get());
-	Context-&gt;VSSetShader(VertexShader.Get(), nullptr, 0);
-	Context-&gt;VSSetConstantBuffers(0, 1, MatrixBuffer.GetAddressOf());
-	Context-&gt;PSSetShader(PixelShader.Get(), nullptr, 0);
-	Context-&gt;DrawIndexed(IndexCount, 0, 0);
-}</pre>
-					</figure>
-					<details class="fold">
-						<summary>줄 단위 풀이</summary>
-						<ul class="walk">
-							<li class="entry"><code>Map(..., D3D11_MAP_WRITE_DISCARD, ...)</code> 버퍼의 옛 내용을 버리고 새로 쓸 메모리를 받음. GPU 가 옛 값을 아직 읽는 중이어도 기다리지 않음</li>
-							<li class="entry"><code>XMStoreFloat4x4(&amp;Matrices-&gt;World, XMMatrixTranspose(World))</code> 전치한 행렬을 <code>XMFLOAT4X4</code> 멤버에 저장</li>
-							<li class="entry"><code>Unmap</code> 다 썼다고 알림. 이 뒤로 GPU 가 새 값을 읽음</li>
-							<li class="entry"><code>VSSetConstantBuffers(0, 1, ...)</code> 정점 셰이더의 상수 버퍼 슬롯 0. <code>Color.vs</code> 의 <code>register(b0)</code></li>
-						</ul>
-					</details>
-					<p><code>FApplication::Render</code> 는 아직 세 행렬을 모두 항등 행렬로 넘겨요. 항등 행렬은 곱해도 위치를 바꾸지 않아요.</p>
-					<figure class="code">
-						<figcaption><span class="path">Source/App/FApplication.cpp</span><span class="badge mod">수정</span><span class="badge">using 줄과 FApplication::Render</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -5,6 +5,8 @@
- #include "Core/FSystem.h"
- #include "Graphics/FD3D11Graphics.h"
- 
-+using namespace DirectX;
-+
- void FApplication::Initialize(FD3D11Graphics&amp; Graphics)
- {
- 	Model.Initialize(Graphics.GetDevice());
-@@ -21,7 +23,11 @@
- 
- void FApplication::Render(FD3D11Graphics&amp; Graphics)
- {
-+	const XMMATRIX World = XMMatrixIdentity();
-+	const XMMATRIX View = XMMatrixIdentity();
-+	const XMMATRIX Projection = XMMatrixIdentity();
-+
- 	ID3D11DeviceContext* Context = Graphics.GetContext();
- 	Model.Render(Context);
--	ColorShader.Render(Context, Model.GetIndexCount());
-+	ColorShader.Render(Context, Model.GetIndexCount(), World, View, Projection);
- }</pre>
-					</figure>
-					<details class="fold">
-						<summary>원문과 비교</summary>
-						<p>원문은 <code>cbuffer</code> 에 슬롯을 적지 않아 컴파일러가 정해요. 이 교재는 <code>register(b0)</code> 으로 C++ 이 묶는 슬롯 번호와 맞춰 둬요.</p>
-					</details>
-					<div class="learn">
-						<p class="box-label">스스로 설명해 보기</p>
-						<p><code>FColorShader::Render</code> 에서 <code>XMMatrixTranspose</code> 를 빼도 지금 화면은 달라지지 않아요. 왜 그럴까요? 항등 행렬을 전치하면 무엇이 되는지로 말해 보세요.</p>
-					</div>
-					<div class="checkpoint">
-						<p class="box-label">여기까지</p>
-						<p>모양은 6단계와 같아요. 행렬이 셰이더까지 가는지는 일부러 바꿔 보고 확인해요. <code>World</code> 를 <code>XMMatrixTranslation(0.5f, 0.0f, 0.0f)</code> 로 바꾸면 삼각형이 창 너비의 4분의 1 만큼 오른쪽으로 가요. 이 상태에서 <code>FColorShader::Render</code> 의 <code>XMMatrixTranspose(World)</code> 를 <code>World</code> 로 바꾸면 왼쪽 아래 꼭짓점이 창 밖으로 나가며 모양이 찌그러져요. 확인했으면 둘 다 되돌려요.</p>
-					</div>
-				</div>
-			</li>
-
-			<li class="step" id="step-camera">
-				<div class="step-body">
-					<h3>카메라로 뷰·투영 행렬을 만든다</h3>
-					<p>뷰 행렬로 카메라를 z = -5 로 물려 삼각형을 정면에서 보게 하고, 투영 행렬로 원근과 창 비율을 넣어요. 투영 행렬이 창의 가로세로 비율을 알면 창을 가로로 넓혀도 삼각형이 옆으로 늘어나지 않아요.</p>
+					<p>카메라는 위치와 렌즈(시야각·가까운 면·먼 면)를 갖고, 부를 때마다 뷰·투영 행렬을 계산해 돌려줘요. 투영 행렬은 창의 가로세로 비율을 인자로 받아요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/Graphics/FCamera.h</span><span class="badge new">신규</span><span class="badge">파일 전체</span></figcaption>
 <pre class="src" data-lang="cpp">#pragma once
@@ -1841,12 +1507,8 @@ namespace
 class FCamera
 {
 public:
-	FCamera() = default;
-	FCamera(const FCamera&amp; Other) = delete;
-	FCamera&amp; operator=(const FCamera&amp; Other) = delete;
-
-	DirectX::XMMATRIX GetViewMatrix() const;
-	DirectX::XMMATRIX GetProjectionMatrix(float AspectRatio) const;
+	DirectX::XMMATRIX XM_CALLCONV GetViewMatrix() const;
+	DirectX::XMMATRIX XM_CALLCONV GetProjectionMatrix(float AspectRatio) const;
 
 	void SetPosition(float X, float Y, float Z);
 
@@ -1863,7 +1525,7 @@ private:
 
 using namespace DirectX;
 
-XMMATRIX FCamera::GetViewMatrix() const
+XMMATRIX XM_CALLCONV FCamera::GetViewMatrix() const
 {
 	const XMVECTOR Eye = XMLoadFloat3(&amp;Position);
 	const XMVECTOR Forward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
@@ -1871,7 +1533,7 @@ XMMATRIX FCamera::GetViewMatrix() const
 	return XMMatrixLookToLH(Eye, Forward, Up);
 }
 
-XMMATRIX FCamera::GetProjectionMatrix(float AspectRatio) const
+XMMATRIX XM_CALLCONV FCamera::GetProjectionMatrix(float AspectRatio) const
 {
 	return XMMatrixPerspectiveFovLH(FovAngleY, AspectRatio, NearZ, FarZ);
 }
@@ -1884,71 +1546,44 @@ void FCamera::SetPosition(float X, float Y, float Z)
 					<details class="fold">
 						<summary>줄 단위 풀이</summary>
 						<ul class="walk">
+							<li class="entry"><code>XM_CALLCONV</code> 행렬이나 벡터를 받거나 돌려주는 함수에 붙이는 호출 규약. MSVC x64 에서는 <code>__vectorcall</code> 이 되어 <code>XMMATRIX</code> 를 메모리를 거치지 않고 SIMD 레지스터로 주고받음. 선언과 정의에 둘 다 붙임</li>
+							<li class="entry"><code>DirectX::XMFLOAT3 Position</code> 위치는 저장용 형으로 들고, 계산할 때 <code>XMLoadFloat3</code> 으로 불러옴</li>
 							<li class="entry"><code>float FovAngleY = DirectX::XM_PIDIV4;</code> 세로 시야각 45°(π/4)</li>
 							<li class="entry"><code>NearZ = 0.3f</code>, <code>FarZ = 1000.0f</code> 카메라에서 이 거리 사이에 있는 것만 그림</li>
 							<li class="entry"><code>XMMatrixLookToLH(Eye, Forward, Up)</code> 카메라 위치에서 +z 방향을 보는 뷰 행렬. 위쪽은 +y. <code>LH</code> 는 왼손 좌표계(+x 오른쪽, +y 위, +z 화면 안쪽)</li>
 							<li class="entry"><code>XMMatrixPerspectiveFovLH(FovAngleY, AspectRatio, NearZ, FarZ)</code> 세로 시야각과 종횡비(가로÷세로)로 가로 시야를 정함</li>
 						</ul>
 					</details>
-					<figure class="code">
-						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.h</span><span class="badge mod">수정</span><span class="badge">GetAspectRatio</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -21,6 +21,7 @@
- 
- 	ID3D11Device* GetDevice() const { return Device.Get(); }
- 	ID3D11DeviceContext* GetContext() const { return Context.Get(); }
-+	float GetAspectRatio() const { return Viewport.Width / Viewport.Height; }
- 
- 	void Resize(int Width, int Height);
- </pre>
-					</figure>
+					<p><code>FApplication</code> 이 카메라를 멤버로 갖고 초기화할 때 z = -5 에 놓아요.</p>
 					<figure class="code">
 						<figcaption><span class="path">Source/App/FApplication.h</span><span class="badge mod">수정</span><span class="badge">include 와 카메라 멤버</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -2,6 +2,7 @@
- 
- #include &lt;array&gt;
+<pre class="diff" data-lang="cpp">@@ -1,5 +1,6 @@
+ #pragma once
  
 +#include "Graphics/FCamera.h"
  #include "Graphics/FModel.h"
  #include "Shaders/FColorShader.h"
  
-@@ -23,6 +24,7 @@
+@@ -14,6 +15,7 @@
+ 	void Render(FD3D11Graphics&amp; Graphics);
  
  private:
- 	std::array&lt;float, 4&gt; ClearColor = {0.0f, 0.0f, 0.0f, 1.0f};
 +	FCamera Camera;
  	FModel Model;
  	FColorShader ColorShader;
  };</pre>
 					</figure>
 					<figure class="code">
-						<figcaption><span class="path">Source/App/FApplication.cpp</span><span class="badge mod">수정</span><span class="badge">Initialize 와 Render 의 뷰·투영 행렬</span></figcaption>
-<pre class="diff" data-lang="cpp">@@ -9,6 +9,7 @@
+						<figcaption><span class="path">Source/App/FApplication.cpp</span><span class="badge mod">수정</span><span class="badge">FApplication::Initialize 첫 줄</span></figcaption>
+<pre class="diff" data-lang="cpp">@@ -4,6 +4,7 @@
  
  void FApplication::Initialize(FD3D11Graphics&amp; Graphics)
  {
 +	Camera.SetPosition(0.0f, 0.0f, -5.0f);
  	Model.Initialize(Graphics.GetDevice());
  	ColorShader.Initialize(Graphics.GetDevice());
- }
-@@ -24,8 +25,8 @@
- void FApplication::Render(FD3D11Graphics&amp; Graphics)
- {
- 	const XMMATRIX World = XMMatrixIdentity();
--	const XMMATRIX View = XMMatrixIdentity();
--	const XMMATRIX Projection = XMMatrixIdentity();
-+	const XMMATRIX View = Camera.GetViewMatrix();
-+	const XMMATRIX Projection = Camera.GetProjectionMatrix(Graphics.GetAspectRatio());
- 
- 	ID3D11DeviceContext* Context = Graphics.GetContext();
- 	Model.Render(Context);</pre>
+ }</pre>
 					</figure>
-					<details class="fold">
-						<summary>줄 단위 풀이</summary>
-						<ul class="walk">
-							<li class="entry"><code>GetAspectRatio()</code> 뷰포트 너비÷높이. 2단계에서 백 버퍼 크기로 채운 값이라 창 크기를 따라 매 프레임 바뀜</li>
-							<li class="entry"><code>XMMatrixIdentity()</code> 월드 행렬은 그대로 항등 행렬. 삼각형을 원점에 둠</li>
-						</ul>
-					</details>
 					<p>카메라는 z = -5 에서 원점을 봐요. 시야각 45° 로 거리 5 를 보면 화면 세로에 2 × 5 × tan 22.5° ≈ 4.14 만큼 담겨요. 높이 2 인 삼각형은 2 ÷ 4.14 ≈ 0.48 을 차지해서, 창 높이가 600 픽셀이면 약 290 픽셀이에요.</p>
 					<figure class="diagram">
 						<svg viewBox="0 0 820 280" role="img" aria-label="z = -5 의 카메라에서 세로 시야각 45° 로 z = 0 평면을 보면 높이 4.14 가 화면에 담기고, 높이 2 인 삼각형은 그 가운데 0.48 을 차지하는 옆모습">
@@ -1971,34 +1606,7 @@ void FCamera::SetPosition(float X, float Y, float Z)
 						</svg>
 						<figcaption>세로 시야각이 정해져 있어서 삼각형 크기는 창 높이를 따라가요. 창을 가로로만 넓히면 크기는 그대로예요.</figcaption>
 					</figure>
-					<p>Visual Studio 에서는 <code>Graphics</code> 필터에 <code>FCamera.h</code>·<code>FCamera.cpp</code> 를 넣어요. 이 조작이 <code>DxRenderDojo.vcxproj</code> 와 <code>DxRenderDojo.vcxproj.filters</code> 를 바꿔요.</p>
-					<details class="fold">
-						<summary>참고 : 위 조작이 프로젝트 파일에 남기는 diff · 따로 치지 않음</summary>
-					<figure class="code">
-						<figcaption><span class="path">DxRenderDojo.vcxproj</span><span class="badge mod">수정</span><span class="badge">새 파일</span></figcaption>
-<pre class="diff" data-lang="xml">@@ -76,6 +76,7 @@
-     &lt;ClCompile Include="Source\Core\FInput.cpp" /&gt;
-     &lt;ClCompile Include="Source\Core\FSystem.cpp" /&gt;
-     &lt;ClCompile Include="Source\Core\FWindow.cpp" /&gt;
-+    &lt;ClCompile Include="Source\Graphics\FCamera.cpp" /&gt;
-     &lt;ClCompile Include="Source\Graphics\FD3D11Graphics.cpp" /&gt;
-     &lt;ClCompile Include="Source\Graphics\FModel.cpp" /&gt;
-     &lt;ClCompile Include="Source\Shaders\FColorShader.cpp" /&gt;
-@@ -89,6 +90,7 @@
-     &lt;ClInclude Include="Source\Core\FInput.h" /&gt;
-     &lt;ClInclude Include="Source\Core\FSystem.h" /&gt;
-     &lt;ClInclude Include="Source\Core\FWindow.h" /&gt;
-+    &lt;ClInclude Include="Source\Graphics\FCamera.h" /&gt;
-     &lt;ClInclude Include="Source\Graphics\FD3D11Graphics.h" /&gt;
-     &lt;ClInclude Include="Source\Graphics\FModel.h" /&gt;
-     &lt;ClInclude Include="Source\Shaders\FColorShader.h" /&gt;</pre>
-					</figure>
-					</details>
-					<details class="fold">
-						<summary>원문과 비교</summary>
-						<p>원문은 투영·월드·직교 행렬을 <code>D3DClass</code> 가 초기화 때 만들어 두고 게터로 내줘요. 저는 투영 행렬을 카메라로 옮겼어요. 시야각과 가까운 면·먼 면은 카메라 렌즈의 값이고, 창 비율은 매 프레임 받으면 크기가 바뀔 때 따로 맞출 값이 없어요. 원문의 <code>SCREEN_NEAR</code>·<code>SCREEN_DEPTH</code> 가 <code>NearZ</code>·<code>FarZ</code> 예요.</p>
-						<p>원문 <code>CameraClass</code> 의 회전과 <code>GetPosition</code>·<code>GetRotation</code> 은 이 편에서 쓰는 곳이 없어 넣지 않았어요. 원문 <code>ApplicationClass::Render</code> 는 <code>m_Camera-&gt;Render()</code> 로 뷰 행렬을 갱신한 뒤 게터로 받아요. 이 교재의 <code>GetViewMatrix</code> 는 부를 때 계산해서 돌려줘요.</p>
-					</details>
+					<p>Visual Studio 에서는 <code>Graphics</code> 필터에 <code>FCamera.h</code>·<code>FCamera.cpp</code> 를 넣어요.</p>
 					<details class="fold">
 						<summary>언리얼로 치면</summary>
 						<aside class="ue">
@@ -2010,9 +1618,195 @@ void FCamera::SetPosition(float X, float Y, float Z)
 						<p class="box-label">스스로 설명해 보기</p>
 						<p><code>FarZ</code> 를 4 로 줄이면 삼각형은 보일까요? 카메라와 삼각형 사이의 거리로 설명해 보세요.</p>
 					</div>
-					<div class="checkpoint">
-						<p class="box-label">여기까지</p>
-						<p>창 가운데에 삼각형이 작게 그려져요. 800×600 창에서 삼각형을 감싸는 상자가 약 290×290 픽셀이에요. 테두리를 끌어 가로로만 넓혀도 상자는 정사각형으로 남고, 크기는 창 높이를 따라 바뀌어요. 이제 <a href="#check">다 됐는지 확인</a> 목록과 맞춰 보세요.</p>
+				</div>
+			</li>
+
+			<li class="step" id="step-cbuffer">
+				<div class="step-body">
+					<h3>상수 버퍼로 행렬을 넘긴다</h3>
+					<p>7단계의 행렬을 정점 셰이더까지 넘기는 길이 상수 버퍼예요. <code>Color.hlsl</code> 의 <code>cbuffer</code> 가 받는 쪽이고, C++ 은 같은 모양의 구조체를 버퍼에 채워 슬롯 0 에 묶어요.</p>
+					<details class="fold" open>
+						<summary>D3D 개념 · 상수 버퍼</summary>
+						<aside class="concept">
+							<ul class="walk">
+								<li><strong>상수 버퍼</strong> : 그리기 한 번 동안 모든 정점이 함께 읽는 값을 담는 버퍼. <code>D3D11_BIND_CONSTANT_BUFFER</code> 로 만듦</li>
+								<li class="entry"><code>register(b0)</code> 상수 버퍼 0번 슬롯. C++ 의 <code>VSSetConstantBuffers(0, ...)</code> 가 같은 슬롯에 묶음</li>
+							</ul>
+						</aside>
+					</details>
+					<figure class="code">
+						<figcaption><span class="path">Source/Shaders/FColorShader.h</span><span class="badge mod">수정</span><span class="badge">include, SetMatrices, 행렬 구조체와 상수 버퍼 멤버</span></figcaption>
+<pre class="diff" data-lang="cpp">@@ -1,5 +1,6 @@
+ #pragma once
+ 
++#include &lt;DirectXMath.h&gt;
+ #include &lt;d3d11.h&gt;
+ #include &lt;wrl/client.h&gt;
+ 
+@@ -8,10 +9,24 @@
+ public:
+ 	void Initialize(ID3D11Device* Device);
+ 
++	void XM_CALLCONV SetMatrices(ID3D11DeviceContext* Context,
++	                             DirectX::FXMMATRIX World,
++	                             DirectX::CXMMATRIX View,
++	                             DirectX::CXMMATRIX Projection);
++
+ 	void Bind(ID3D11DeviceContext* Context) const;
+ 
+ private:
++	// Color.hlsl 의 cbuffer MatrixBuffer 와 멤버 순서가 같아야 한다.
++	struct FMatrixBuffer
++	{
++		DirectX::XMFLOAT4X4 World;
++		DirectX::XMFLOAT4X4 View;
++		DirectX::XMFLOAT4X4 Projection;
++	};
++
+ 	Microsoft::WRL::ComPtr&lt;ID3D11VertexShader&gt; VertexShader;
+ 	Microsoft::WRL::ComPtr&lt;ID3D11PixelShader&gt; PixelShader;
+ 	Microsoft::WRL::ComPtr&lt;ID3D11InputLayout&gt; InputLayout;
++	Microsoft::WRL::ComPtr&lt;ID3D11Buffer&gt; MatrixBuffer;
+ };</pre>
+					</figure>
+					<details class="fold">
+						<summary>줄 단위 풀이</summary>
+						<ul class="walk">
+							<li class="entry"><code>DirectX::FXMMATRIX World</code> 첫 번째 행렬 인자에 쓰는 형. <code>__vectorcall</code> 에서는 값(<code>const XMMATRIX</code>)이라 레지스터로 넘어가고, 그 밖에서는 <code>const XMMATRIX&amp;</code> 가 됨. 이미 <code>const</code> 가 들어 있어 덧붙이지 않음</li>
+							<li class="entry"><code>DirectX::CXMMATRIX View</code> 두 번째부터의 행렬 인자에 쓰는 형. 늘 <code>const XMMATRIX&amp;</code>. 레지스터로 넘길 수 있는 행렬은 하나라서 나머지는 참조로 넘김</li>
+							<li class="entry"><code>struct FMatrixBuffer</code> <code>cbuffer MatrixBuffer</code> 와 같은 순서의 행렬 셋. 저장용 형 <code>XMFLOAT4X4</code> 로 적음</li>
+							<li class="entry"><code>SetMatrices</code> 는 <code>const</code> 가 아님. 자기 상수 버퍼의 내용을 바꾸기 때문</li>
+						</ul>
+					</details>
+					<figure class="code">
+						<figcaption><span class="path">Source/Shaders/Color.hlsl</span><span class="badge mod">수정</span><span class="badge">cbuffer 위 주석</span></figcaption>
+<pre class="diff" data-lang="cpp">@@ -1,3 +1,4 @@
++// FColorShader::FMatrixBuffer 와 멤버 순서가 같아야 한다. b0 은 VSSetConstantBuffers 의 슬롯 0 이다.
+ cbuffer MatrixBuffer : register(b0)
+ {
+ 	matrix World;</pre>
+					</figure>
+					<p>상수 버퍼는 <code>Initialize</code> 끝에서 만들어요.</p>
+					<figure class="code">
+						<figcaption><span class="path">Source/Shaders/FColorShader.cpp</span><span class="badge mod">수정</span><span class="badge">using 줄</span></figcaption>
+<pre class="diff" data-lang="cpp">@@ -15,4 +15,5 @@
+ using Microsoft::WRL::ComPtr;
++using namespace DirectX;
+ 
+ namespace
+ {</pre>
+					</figure>
+					<figure class="code">
+						<figcaption><span class="path">Source/Shaders/FColorShader.cpp</span><span class="badge mod">수정</span><span class="badge">FColorShader::Initialize 끝, CreateInputLayout 다음</span></figcaption>
+<pre class="diff" data-lang="cpp">@@ -82,3 +83,13 @@
+ 	                                      VertexCode-&gt;GetBufferPointer(),
+ 	                                      VertexCode-&gt;GetBufferSize(),
+ 	                                      InputLayout.ReleaseAndGetAddressOf()));
++
++	// 상수 버퍼 크기는 16 바이트의 배수여야 한다.
++	static_assert(sizeof(FMatrixBuffer) % 16 == 0);
++	D3D11_BUFFER_DESC MatrixBufferDesc = {};
++	MatrixBufferDesc.ByteWidth = sizeof(FMatrixBuffer);
++	MatrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
++	MatrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
++	MatrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
++	CHECK_FATAL(Device-&gt;CreateBuffer(&amp;MatrixBufferDesc, nullptr, MatrixBuffer.ReleaseAndGetAddressOf()));
++}</pre>
+					</figure>
+					<details class="fold">
+						<summary>줄 단위 풀이</summary>
+						<ul class="walk">
+							<li class="entry"><code>static_assert(sizeof(FMatrixBuffer) % 16 == 0);</code> 상수 버퍼 크기는 16바이트의 배수여야 함. 행렬 셋은 192바이트</li>
+							<li class="entry"><code>D3D11_USAGE_DYNAMIC</code> CPU 가 자주 새로 쓰는 버퍼. 행렬은 매 프레임 바뀜</li>
+							<li class="entry"><code>D3D11_CPU_ACCESS_WRITE</code> CPU 가 쓸 수 있게 함. <code>DYNAMIC</code> 과 짝</li>
+							<li class="entry"><code>nullptr</code> 처음 채울 데이터 없음. 그릴 때마다 채움</li>
+						</ul>
+					</details>
+					<p>행렬은 상수 버퍼에 넣기 전에 전치해요. DirectXMath 는 행렬을 행 우선으로 메모리에 두고, HLSL 은 상수 버퍼의 행렬을 기본으로 열 우선으로 읽어요. 전치해서 넣어야 셰이더의 <code>mul(위치, 행렬)</code> 이 C++ 에서 곱한 것과 같은 결과를 내요.</p>
+					<figure class="code">
+						<figcaption><span class="path">Source/Shaders/FColorShader.cpp</span><span class="badge new">신규</span><span class="badge">FColorShader::SetMatrices · Initialize 다음, Bind 앞</span></figcaption>
+<pre class="snip" data-lang="cpp">void XM_CALLCONV FColorShader::SetMatrices(ID3D11DeviceContext* Context,
+                                           FXMMATRIX World,
+                                           CXMMATRIX View,
+                                           CXMMATRIX Projection)
+{
+	// HLSL 은 행렬을 열 우선으로 읽는다. DirectXMath 의 행 우선 행렬을 전치해서 넣는다.
+	D3D11_MAPPED_SUBRESOURCE Mapped = {};
+	CHECK_FATAL(Context-&gt;Map(MatrixBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &amp;Mapped));
+	FMatrixBuffer* Matrices = static_cast&lt;FMatrixBuffer*&gt;(Mapped.pData);
+	XMStoreFloat4x4(&amp;Matrices-&gt;World, XMMatrixTranspose(World));
+	XMStoreFloat4x4(&amp;Matrices-&gt;View, XMMatrixTranspose(View));
+	XMStoreFloat4x4(&amp;Matrices-&gt;Projection, XMMatrixTranspose(Projection));
+	Context-&gt;Unmap(MatrixBuffer.Get(), 0);
+}</pre>
+					</figure>
+					<details class="fold">
+						<summary>줄 단위 풀이</summary>
+						<ul class="walk">
+							<li class="entry"><code>Map(..., D3D11_MAP_WRITE_DISCARD, ...)</code> 버퍼의 옛 내용을 버리고 새로 쓸 메모리를 받음. GPU 가 옛 값을 아직 읽는 중이어도 기다리지 않음</li>
+							<li class="entry"><code>XMStoreFloat4x4(&amp;Matrices-&gt;World, XMMatrixTranspose(World))</code> 전치한 행렬을 <code>XMFLOAT4X4</code> 멤버에 저장</li>
+							<li class="entry"><code>Unmap</code> 다 썼다고 알림. 이 뒤로 GPU 가 새 값을 읽음</li>
+						</ul>
+					</details>
+					<p><code>Bind</code> 는 상수 버퍼도 정점 셰이더의 슬롯 0 에 묶어요.</p>
+					<figure class="code">
+						<figcaption><span class="path">Source/Shaders/FColorShader.cpp</span><span class="badge mod">수정</span><span class="badge">FColorShader::Bind</span></figcaption>
+<pre class="snip" data-lang="cpp">void FColorShader::Bind(ID3D11DeviceContext* Context) const
+{
+	Context-&gt;IASetInputLayout(InputLayout.Get());
+	Context-&gt;VSSetShader(VertexShader.Get(), nullptr, 0);
+	Context-&gt;VSSetConstantBuffers(0, 1, MatrixBuffer.GetAddressOf());
+	Context-&gt;PSSetShader(PixelShader.Get(), nullptr, 0);
+}</pre>
+					</figure>
+					<p><code>FApplication::Render</code> 가 세 행렬을 만들어 넘겨요. 투영 행렬은 매 프레임 창의 가로세로 비율을 받아요.</p>
+					<figure class="code">
+						<figcaption><span class="path">Source/Graphics/FD3D11Graphics.h</span><span class="badge mod">수정</span><span class="badge">GetAspectRatio</span></figcaption>
+<pre class="diff" data-lang="cpp">@@ -18,6 +18,7 @@
+ 
+ 	ID3D11Device* GetDevice() const { return Device.Get(); }
+ 	ID3D11DeviceContext* GetContext() const { return Context.Get(); }
++	float GetAspectRatio() const { return Viewport.Width / Viewport.Height; }
+ 
+ 	void Resize(int Width, int Height);
+ </pre>
+					</figure>
+					<figure class="code">
+						<figcaption><span class="path">Source/App/FApplication.cpp</span><span class="badge mod">수정</span><span class="badge">using 줄과 FApplication::Render</span></figcaption>
+<pre class="diff" data-lang="cpp">@@ -2,6 +2,8 @@
+ 
+ #include "Graphics/FD3D11Graphics.h"
+ 
++using namespace DirectX;
++
+ void FApplication::Initialize(FD3D11Graphics&amp; Graphics)
+ {
+ 	Camera.SetPosition(0.0f, 0.0f, -5.0f);
+@@ -15,7 +17,12 @@
+ 
+ void FApplication::Render(FD3D11Graphics&amp; Graphics)
+ {
++	const XMMATRIX World = XMMatrixIdentity();
++	const XMMATRIX View = Camera.GetViewMatrix();
++	const XMMATRIX Projection = Camera.GetProjectionMatrix(Graphics.GetAspectRatio());
++
+ 	ID3D11DeviceContext* Context = Graphics.GetContext();
++	ColorShader.SetMatrices(Context, World, View, Projection);
+ 	ColorShader.Bind(Context);
+ 	Model.Draw(Context);
+ }</pre>
+					</figure>
+					<details class="fold">
+						<summary>줄 단위 풀이</summary>
+						<ul class="walk">
+							<li class="entry"><code>GetAspectRatio()</code> 뷰포트 너비÷높이. 2단계에서 백 버퍼 크기로 채운 값이라 창 크기를 따라 바뀜</li>
+							<li class="entry"><code>XMMatrixIdentity()</code> 월드 행렬은 항등 행렬. 곱해도 위치가 바뀌지 않아 삼각형을 원점에 둠</li>
+							<li class="entry"><code>SetMatrices</code> → <code>Bind</code> → <code>Draw</code> 상수를 채우고, 파이프라인에 묶고, 그림</li>
+						</ul>
+					</details>
+					<div class="learn">
+						<p class="box-label">스스로 설명해 보기</p>
+						<p><code>SetMatrices</code> 에서 <code>XMMatrixTranspose</code> 를 모두 빼면 무엇이 어긋날까요? 월드 행렬이 항등 행렬이라는 점과, 뷰·투영 행렬은 그렇지 않다는 점으로 나눠 말해 보세요.</p>
 					</div>
 				</div>
 			</li>
@@ -2024,12 +1818,12 @@ void FCamera::SetPosition(float X, float Y, float Z)
 		<h2>다 됐는지 확인</h2>
 		<p class="section-note">로그는 Visual Studio 출력 창과 디버그 빌드의 콘솔 창에 찍혀요. 크기 값은 배율 100% 에서 시작했을 때예요.</p>
 		<ul class="checks">
-			<li><label><input type="checkbox"><span class="label">실행</span><span class="what">검은 창 가운데에 초록 삼각형. 800×600 창에서 삼각형을 감싸는 상자가 약 290×290 픽셀</span></label></li>
+			<li><label><input type="checkbox"><span class="label">실행</span><span class="what">회색 창 가운데에 초록 삼각형. 800×600 창에서 삼각형을 감싸는 상자가 약 290×290 픽셀</span></label></li>
 			<li><label><input type="checkbox"><span class="label">로그</span><span class="what">03편과 같은 시작 로그 두 줄. 디버그 빌드 콘솔에 <code>[경고]</code>·<code>[에러]</code> 줄이 없음</span></label></li>
 			<li><label><input type="checkbox"><span class="label">창 비율</span><span class="what">테두리를 끌어 가로로 넓혀도 삼각형은 옆으로 늘어나지 않고 가운데에 있음. 세로로 늘리면 창 높이를 따라 커짐</span></label></li>
 			<li><label><input type="checkbox"><span class="label">전체 화면</span><span class="what">Alt+Enter 로 켜고 끈 뒤에도 같은 모양</span></label></li>
 			<li><label><input type="checkbox"><span class="label">배율</span><span class="what">실행 중에 배율을 150% 로 바꿔도 같은 모양</span></label></li>
-			<li><label><input type="checkbox"><span class="label">셰이더 파일</span><span class="what">exe 가 있는 폴더(Debug 는 <code>x64\Debug</code>)에 <code>Shaders\Color.vs</code>·<code>Color.ps</code> 가 있음. 셰이더만 고치고 빌드해도 다시 복사됨</span></label></li>
+			<li><label><input type="checkbox"><span class="label">셰이더 파일</span><span class="what">exe 가 있는 폴더(Debug 는 <code>x64\Debug</code>)에 <code>Shaders\Color.hlsl</code> 이 있음. 셰이더만 고치고 빌드해도 다시 복사됨</span></label></li>
 			<li><label><input type="checkbox"><span class="label">종료</span><span class="what">ESC 로 끝내면 종료 코드 0</span></label></li>
 			<li><label><input type="checkbox"><span class="label">빌드</span><span class="what">Debug·Release x64 모두 경고 0개</span></label></li>
 		</ul>
@@ -2039,28 +1833,28 @@ void FCamera::SetPosition(float X, float Y, float Z)
 		<h2>흔한 실수</h2>
 		<div class="pitfalls">
 			<div class="pitfall">
-				<p class="symptom">창이 검은색뿐이고 삼각형이 없음. 디버그 빌드 콘솔에는 시작할 때 <code>[경고] [D3D] ID3D11DeviceContext::DrawIndexed: The Pixel Shader expects a Render Target View bound to slot 0, but the Render Target View was unbound during a call to Present.</code> 와 <code>... but none is bound.</code> 두 줄이 찍힘</p>
-				<p class="row"><b>원인</b><span>원문처럼 RTV 를 초기화 때 한 번만 묶었어요. 플립 모델에서는 <code>Present</code> 가 백 버퍼를 파이프라인에서 떼서 두 번째 프레임부터 그린 것이 버려져요. 크기가 바뀔 때마다 묶는 코드라면 크기를 바꿀 때마다 두 줄이 다시 찍혀요.</span></p>
+				<p class="symptom">창이 회색뿐이고 삼각형이 없음. 디버그 빌드 콘솔에는 시작할 때 <code>[경고] [D3D] ID3D11DeviceContext::DrawIndexed: The Pixel Shader expects a Render Target View bound to slot 0, but the Render Target View was unbound during a call to Present.</code> 와 <code>... but none is bound.</code> 두 줄이 찍힘</p>
+				<p class="row"><b>원인</b><span>RTV 를 초기화 때 한 번만 묶었어요. 플립 모델에서는 <code>Present</code> 가 백 버퍼를 파이프라인에서 떼서 두 번째 프레임부터 그린 것이 버려져요. 크기가 바뀔 때마다 묶는 코드라면 크기를 바꿀 때마다 두 줄이 다시 찍혀요.</span></p>
 				<p class="row"><b>해결</b><span><code>BeginScene</code> 에서 매 프레임 <code>OMSetRenderTargets</code> 를 불러요.</span></p>
 				<p class="row"><b>본문</b><span><a href="#step-bind">2단계</a> : <code>Present</code> 가 떼는 것</span></p>
 			</div>
 			<div class="pitfall">
-				<p class="symptom">시작하자마자 상자가 뜨고 종료 코드 1. 로그에는 <code>[에러] 셰이더 컴파일 실패 : ...\Shaders\Color.vs</code> 다음 <code>[CHECK FATAL] CompileResult</code> 와 <code>HRESULT 0x80070002</code></p>
+				<p class="symptom">시작하자마자 상자가 뜨고 종료 코드 1. 로그에는 <code>[에러] 셰이더 컴파일 실패 : ...\Shaders\Color.hlsl</code> 다음 <code>[CHECK FATAL] CompileResult</code> 와 <code>HRESULT 0x80070002</code></p>
 				<p class="row"><b>원인</b><span>exe 옆에 <code>Shaders</code> 폴더가 없어요. Visual Studio 에서 셰이더 파일의 항목 형식을 파일 복사로 바꾸지 않았거나 대상 디렉터리를 비워 두면 생겨요. <code>0x80070002</code> 는 파일을 찾지 못했다는 값이에요.</span></p>
 				<p class="row"><b>해결</b><span>셰이더 파일 속성에서 항목 형식과 대상 디렉터리를 정하고 다시 빌드해요.</span></p>
 				<p class="row"><b>본문</b><span><a href="#step-hlsl">4단계</a> : 셰이더 파일 속성</span></p>
 			</div>
 			<div class="pitfall">
-				<p class="symptom">시작하자마자 상자가 뜨고 종료 코드 1. 로그에는 <code>...\Shaders\Color.vs(1,1): error X3000: Illegal character in shader file</code></p>
+				<p class="symptom">시작하자마자 상자가 뜨고 종료 코드 1. 로그에는 <code>...\Shaders\Color.hlsl(1,1): error X3000: Illegal character in shader file</code></p>
 				<p class="row"><b>원인</b><span>셰이더 파일이 BOM 이 붙은 UTF-8 로 저장됐어요. <code>D3DCompileFromFile</code> 은 파일 맨 앞의 BOM 을 글자로 읽고 실패해요.</span></p>
 				<p class="row"><b>해결</b><span>셰이더 파일을 BOM 없는 UTF-8 로 다시 저장해요. Visual Studio 에서는 다른 이름으로 저장의 저장 단추 옆 ▾ › 인코딩하여 저장에서 "유니코드(서명 없는 UTF-8)" 을 골라요.</span></p>
 				<p class="row"><b>본문</b><span><a href="#step-hlsl">4단계</a> : 셰이더 파일 인코딩</span></p>
 			</div>
 			<div class="pitfall">
-				<p class="symptom">창이 검은색뿐이고 삼각형이 없음. 콘솔에 경고도 없음</p>
-				<p class="row"><b>원인</b><span>정점을 반시계 방향으로 적었거나(인덱스 <code>{0, 2, 1}</code> 등), 행렬을 전치하지 않고 상수 버퍼에 넣었어요. 앞의 경우 삼각형이 뒷면으로 보여 그려지지 않고, 뒤의 경우 셰이더가 전치된 다른 행렬을 곱해 삼각형이 보이지 않아요. 전치를 빠뜨린 것은 카메라 행렬이 들어오는 8단계부터 보여요. 둘 다 호출 자체는 올바라서 디버그 레이어도 알리지 않아요.</span></p>
-				<p class="row"><b>해결</b><span>정점과 인덱스를 시계 방향으로 적고, <code>FColorShader::Render</code> 에서 행렬마다 <code>XMMatrixTranspose</code> 를 거쳐요.</span></p>
-				<p class="row"><b>본문</b><span><a href="#step-buffer">3단계</a> : 정점 순서 · <a href="#step-cbuffer">7단계</a> : 전치</span></p>
+				<p class="symptom">창이 회색뿐이고 삼각형이 없음. 콘솔에 경고도 없음</p>
+				<p class="row"><b>원인</b><span>정점을 반시계 방향으로 적었거나(인덱스 <code>{0, 2, 1}</code> 등), 행렬을 전치하지 않고 상수 버퍼에 넣었어요. 앞의 경우 삼각형이 뒷면으로 보여 그려지지 않고, 뒤의 경우 셰이더가 전치된 다른 행렬을 곱해 삼각형이 보이지 않아요. 둘 다 호출 자체는 올바라서 디버그 레이어도 알리지 않아요.</span></p>
+				<p class="row"><b>해결</b><span>정점과 인덱스를 시계 방향으로 적고, <code>FColorShader::SetMatrices</code> 에서 행렬마다 <code>XMMatrixTranspose</code> 를 거쳐요.</span></p>
+				<p class="row"><b>본문</b><span><a href="#step-buffer">3단계</a> : 정점 순서 · <a href="#step-cbuffer">8단계</a> : 전치</span></p>
 			</div>
 		</div>
 	</section>
@@ -2070,24 +1864,24 @@ void FCamera::SetPosition(float X, float Y, float Z)
 		<h2>이 편에서 바뀐 파일</h2>
 		<p class="section-note">새 파일은 전체 코드, 바뀐 파일은 diff 예요. 전부 접어 뒀으니 필요한 것만 펼쳐 보세요. 묶음은 파일이 맡은 일로 나눴어요.</p>
 		<ul class="file-list">
-			<li><span class="mark a">+</span><span class="name">Source/Graphics/FModel.h</span><span class="note">+31</span></li>
-			<li><span class="mark a">+</span><span class="name">Source/Graphics/FModel.cpp</span><span class="note">+48</span></li>
-			<li><span class="mark a">+</span><span class="name">Source/Shaders/Color.vs</span><span class="note">+30</span></li>
-			<li><span class="mark a">+</span><span class="name">Source/Shaders/Color.ps</span><span class="note">+11</span></li>
-			<li><span class="mark a">+</span><span class="name">Source/Shaders/FColorShader.h</span><span class="note">+35</span></li>
-			<li><span class="mark a">+</span><span class="name">Source/Shaders/FColorShader.cpp</span><span class="note">+115</span></li>
-			<li><span class="mark a">+</span><span class="name">Source/Graphics/FCamera.h</span><span class="note">+22</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/Graphics/FVertexTypes.h</span><span class="note">+17</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/Graphics/FVertexTypes.cpp</span><span class="note">+20</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/Graphics/FModel.h</span><span class="note">+17</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/Graphics/FModel.cpp</span><span class="note">+50</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/Shaders/Color.hlsl</span><span class="note">+35</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/Shaders/FColorShader.h</span><span class="note">+32</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/Shaders/FColorShader.cpp</span><span class="note">+118</span></li>
+			<li><span class="mark a">+</span><span class="name">Source/Graphics/FCamera.h</span><span class="note">+18</span></li>
 			<li><span class="mark a">+</span><span class="name">Source/Graphics/FCamera.cpp</span><span class="note">+21</span></li>
-			<li><span class="mark m">~</span><span class="name">Source/Graphics/FD3D11Graphics.h</span><span class="note">+5</span></li>
-			<li><span class="mark m">~</span><span class="name">Source/Graphics/FD3D11Graphics.cpp</span><span class="note">+12 −1</span></li>
-			<li><span class="mark m">~</span><span class="name">Source/App/FApplication.h</span><span class="note">+13 −2</span></li>
-			<li><span class="mark m">~</span><span class="name">Source/App/FApplication.cpp</span><span class="note">+18 −1</span></li>
+			<li><span class="mark m">~</span><span class="name">Source/Graphics/FD3D11Graphics.h</span><span class="note">+7 −1</span></li>
+			<li><span class="mark m">~</span><span class="name">Source/Graphics/FD3D11Graphics.cpp</span><span class="note">+14 −3</span></li>
+			<li><span class="mark m">~</span><span class="name">Source/App/FApplication.h</span><span class="note">+14 −1</span></li>
+			<li><span class="mark m">~</span><span class="name">Source/App/FApplication.cpp</span><span class="note">+20 −1</span></li>
 			<li><span class="mark m">~</span><span class="name">Source/Core/FSystem.cpp</span><span class="note">+2 −1</span></li>
 			<li><span class="mark m">~</span><span class="name">Source/Main.cpp</span><span class="note">+5</span></li>
 			<li><span class="mark a">+</span><span class="name">Source/Utility/FPaths.h</span><span class="note">+9</span></li>
 			<li><span class="mark a">+</span><span class="name">Source/Utility/FPaths.cpp</span><span class="note">+16</span></li>
-			<li><span class="mark m">~</span><span class="name">CMakeLists.txt</span><span class="note">+9 −1</span></li>
-			<li><span class="mark m">~</span><span class="name">DxRenderDojo.vcxproj</span><span class="note">+18 −2</span></li>
+			<li><span class="mark m">~</span><span class="name">DxRenderDojo.vcxproj</span><span class="note">+17 −2</span></li>
 			<li><span class="mark m">~</span><span class="name">DxRenderDojo.vcxproj.filters</span><span class="note">VS 폴더 표시. 본문 생략</span></li>
 			<li><span class="mark a">+</span><span class="name">external/DirectXMath/</span><span class="note">공식 릴리스 jun2026 의 Inc 헤더 10개와 LICENSE. 본문 생략</span></li>
 		</ul>
@@ -2095,46 +1889,76 @@ void FCamera::SetPosition(float X, float Y, float Z)
 		<div class="file-group">
 			<h3>그리기</h3>
 			<details class="diff-file">
-				<summary><span class="path">Source/Graphics/FModel.h</span><span class="stat"><span class="plus">+31</span></span><span class="why">정점 구조체와 두 버퍼</span></summary>
+				<summary><span class="path">Source/Graphics/FVertexTypes.h</span><span class="stat"><span class="plus">+17</span></span><span class="why">정점 구조체와 입력 요소 표 선언</span></summary>
 <pre class="src" data-lang="cpp">#pragma once
 
 #include &lt;DirectXMath.h&gt;
+#include &lt;array&gt;
+#include &lt;d3d11.h&gt;
+
+struct FVertexPositionColor
+{
+	DirectX::XMFLOAT3 Position;
+	DirectX::XMFLOAT4 Color;
+
+	// 정의는 FVertexTypes.cpp 에 있다. 오프셋을 offsetof 로 적으려면 구조체가 다 정의된 뒤여야 한다.
+	static const std::array&lt;D3D11_INPUT_ELEMENT_DESC, 2&gt; InputElements;
+};
+
+// InputElements 의 형식(float 3개, float 4개)과 크기가 맞는지 본다.
+static_assert(sizeof(FVertexPositionColor) == 28);</pre>
+			</details>
+			<details class="diff-file">
+				<summary><span class="path">Source/Graphics/FVertexTypes.cpp</span><span class="stat"><span class="plus">+20</span></span><span class="why">입력 요소 표. 오프셋은 offsetof</span></summary>
+<pre class="src" data-lang="cpp">#include "Graphics/FVertexTypes.h"
+
+#include &lt;cstddef&gt;
+
+const std::array&lt;D3D11_INPUT_ELEMENT_DESC, 2&gt; FVertexPositionColor::InputElements = {{
+    {"POSITION",
+     0,
+     DXGI_FORMAT_R32G32B32_FLOAT,
+     0,
+     offsetof(FVertexPositionColor, Position),
+     D3D11_INPUT_PER_VERTEX_DATA,
+     0},
+    {"COLOR",
+     0,
+     DXGI_FORMAT_R32G32B32A32_FLOAT,
+     0,
+     offsetof(FVertexPositionColor, Color),
+     D3D11_INPUT_PER_VERTEX_DATA,
+     0},
+}};</pre>
+			</details>
+			<details class="diff-file">
+				<summary><span class="path">Source/Graphics/FModel.h</span><span class="stat"><span class="plus">+17</span></span><span class="why">두 버퍼와 인덱스 개수</span></summary>
+<pre class="src" data-lang="cpp">#pragma once
+
 #include &lt;d3d11.h&gt;
 #include &lt;wrl/client.h&gt;
 
 class FModel
 {
 public:
-	FModel() = default;
-	FModel(const FModel&amp; Other) = delete;
-	FModel&amp; operator=(const FModel&amp; Other) = delete;
-
 	void Initialize(ID3D11Device* Device);
 
-	UINT GetIndexCount() const { return IndexCount; }
-
-	void Render(ID3D11DeviceContext* Context) const;
+	void Draw(ID3D11DeviceContext* Context) const;
 
 private:
-	// FColorShader 의 입력 레이아웃, Color.vs 의 FVertexInput 과 멤버 순서·형식이 같아야 한다.
-	struct FVertex
-	{
-		DirectX::XMFLOAT3 Position;
-		DirectX::XMFLOAT4 Color;
-	};
-
 	Microsoft::WRL::ComPtr&lt;ID3D11Buffer&gt; VertexBuffer;
 	Microsoft::WRL::ComPtr&lt;ID3D11Buffer&gt; IndexBuffer;
 	UINT IndexCount = 0;
 };</pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">Source/Graphics/FModel.cpp</span><span class="stat"><span class="plus">+48</span></span><span class="why">버퍼 만들기와 입력 조립기에 묶기</span></summary>
+				<summary><span class="path">Source/Graphics/FModel.cpp</span><span class="stat"><span class="plus">+50</span></span><span class="why">버퍼 만들기, 묶고 그리기</span></summary>
 <pre class="src" data-lang="cpp">#include "Graphics/FModel.h"
 
 #include &lt;array&gt;
 #include &lt;cstdint&gt;
 
+#include "Graphics/FVertexTypes.h"
 #include "Utility/Check.h"
 
 using namespace DirectX;
@@ -2142,7 +1966,7 @@ using namespace DirectX;
 void FModel::Initialize(ID3D11Device* Device)
 {
 	// 시계 방향으로 적어야 앞면이다. 반대로 적으면 뒷면으로 보고 그리지 않는다.
-	constexpr std::array&lt;FVertex, 3&gt; Vertices = {{
+	constexpr std::array&lt;FVertexPositionColor, 3&gt; Vertices = {{
 	    {XMFLOAT3(-1.0f, -1.0f, 0.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)},
 	    {XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)},
 	    {XMFLOAT3(1.0f, -1.0f, 0.0f), XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)},
@@ -2156,7 +1980,7 @@ void FModel::Initialize(ID3D11Device* Device)
 
 	D3D11_SUBRESOURCE_DATA VertexData = {};
 	VertexData.pSysMem = Vertices.data();
-	CHECK_FATAL(Device-&gt;CreateBuffer(&amp;VertexBufferDesc, &amp;VertexData, VertexBuffer.GetAddressOf()));
+	CHECK_FATAL(Device-&gt;CreateBuffer(&amp;VertexBufferDesc, &amp;VertexData, VertexBuffer.ReleaseAndGetAddressOf()));
 
 	D3D11_BUFFER_DESC IndexBufferDesc = {};
 	IndexBufferDesc.ByteWidth = sizeof(Indices);
@@ -2165,22 +1989,23 @@ void FModel::Initialize(ID3D11Device* Device)
 
 	D3D11_SUBRESOURCE_DATA IndexData = {};
 	IndexData.pSysMem = Indices.data();
-	CHECK_FATAL(Device-&gt;CreateBuffer(&amp;IndexBufferDesc, &amp;IndexData, IndexBuffer.GetAddressOf()));
+	CHECK_FATAL(Device-&gt;CreateBuffer(&amp;IndexBufferDesc, &amp;IndexData, IndexBuffer.ReleaseAndGetAddressOf()));
 
 	IndexCount = static_cast&lt;UINT&gt;(Indices.size());
 }
 
-void FModel::Render(ID3D11DeviceContext* Context) const
+void FModel::Draw(ID3D11DeviceContext* Context) const
 {
-	constexpr UINT Stride = sizeof(FVertex);
+	constexpr UINT Stride = sizeof(FVertexPositionColor);
 	constexpr UINT Offset = 0;
 	Context-&gt;IASetVertexBuffers(0, 1, VertexBuffer.GetAddressOf(), &amp;Stride, &amp;Offset);
 	Context-&gt;IASetIndexBuffer(IndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 	Context-&gt;IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	Context-&gt;DrawIndexed(IndexCount, 0, 0);
 }</pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">Source/Shaders/Color.vs</span><span class="stat"><span class="plus">+30</span></span><span class="why">정점 셰이더와 행렬 상수 버퍼</span></summary>
+				<summary><span class="path">Source/Shaders/Color.hlsl</span><span class="stat"><span class="plus">+35</span></span><span class="why">정점·픽셀 셰이더와 행렬 상수 버퍼</span></summary>
 <pre class="src" data-lang="cpp">// FColorShader::FMatrixBuffer 와 멤버 순서가 같아야 한다. b0 은 VSSetConstantBuffers 의 슬롯 0 이다.
 cbuffer MatrixBuffer : register(b0)
 {
@@ -2195,7 +2020,7 @@ struct FVertexInput
 	float4 Color : COLOR;
 };
 
-// 정점 셰이더의 출력이 픽셀 셰이더의 입력이 된다. 두 파일의 FPixelInput 이 같아야 한다.
+// 정점 셰이더의 출력이 픽셀 셰이더의 입력이 된다.
 struct FPixelInput
 {
 	float4 Position : SV_POSITION;
@@ -2210,16 +2035,7 @@ FPixelInput ColorVertexShader(FVertexInput Input)
 	Output.Position = mul(Output.Position, Projection);
 	Output.Color = Input.Color;
 	return Output;
-}</pre>
-			</details>
-			<details class="diff-file">
-				<summary><span class="path">Source/Shaders/Color.ps</span><span class="stat"><span class="plus">+11</span></span><span class="why">픽셀 셰이더</span></summary>
-<pre class="src" data-lang="cpp">// 정점 셰이더의 출력이 픽셀 셰이더의 입력이 된다. 두 파일의 FPixelInput 이 같아야 한다.
-struct FPixelInput
-{
-	float4 Position : SV_POSITION;
-	float4 Color : COLOR;
-};
+}
 
 float4 ColorPixelShader(FPixelInput Input) : SV_TARGET
 {
@@ -2227,7 +2043,7 @@ float4 ColorPixelShader(FPixelInput Input) : SV_TARGET
 }</pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">Source/Shaders/FColorShader.h</span><span class="stat"><span class="plus">+35</span></span><span class="why">셰이더·입력 레이아웃·상수 버퍼</span></summary>
+				<summary><span class="path">Source/Shaders/FColorShader.h</span><span class="stat"><span class="plus">+32</span></span><span class="why">셰이더·입력 레이아웃·상수 버퍼</span></summary>
 <pre class="src" data-lang="cpp">#pragma once
 
 #include &lt;DirectXMath.h&gt;
@@ -2237,20 +2053,17 @@ float4 ColorPixelShader(FPixelInput Input) : SV_TARGET
 class FColorShader
 {
 public:
-	FColorShader() = default;
-	FColorShader(const FColorShader&amp; Other) = delete;
-	FColorShader&amp; operator=(const FColorShader&amp; Other) = delete;
-
 	void Initialize(ID3D11Device* Device);
 
-	void Render(ID3D11DeviceContext* Context,
-	            UINT IndexCount,
-	            const DirectX::XMMATRIX&amp; World,
-	            const DirectX::XMMATRIX&amp; View,
-	            const DirectX::XMMATRIX&amp; Projection) const;
+	void XM_CALLCONV SetMatrices(ID3D11DeviceContext* Context,
+	                             DirectX::FXMMATRIX World,
+	                             DirectX::CXMMATRIX View,
+	                             DirectX::CXMMATRIX Projection);
+
+	void Bind(ID3D11DeviceContext* Context) const;
 
 private:
-	// Color.vs 의 cbuffer MatrixBuffer 와 멤버 순서가 같아야 한다.
+	// Color.hlsl 의 cbuffer MatrixBuffer 와 멤버 순서가 같아야 한다.
 	struct FMatrixBuffer
 	{
 		DirectX::XMFLOAT4X4 World;
@@ -2265,19 +2078,20 @@ private:
 };</pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">Source/Shaders/FColorShader.cpp</span><span class="stat"><span class="plus">+115</span></span><span class="why">컴파일, 입력 레이아웃, 행렬 넣기와 그리기</span></summary>
+				<summary><span class="path">Source/Shaders/FColorShader.cpp</span><span class="stat"><span class="plus">+118</span></span><span class="why">컴파일, 입력 레이아웃, 행렬 넣기, 묶기</span></summary>
 <pre class="src" data-lang="cpp">#include "Shaders/FColorShader.h"
 
-#include &lt;array&gt;
 #include &lt;d3dcompiler.h&gt;
 #include &lt;filesystem&gt;
 #include &lt;format&gt;
 #include &lt;string&gt;
 #include &lt;string_view&gt;
 
+#include "Graphics/FVertexTypes.h"
 #include "Utility/Check.h"
 #include "Utility/FLog.h"
 #include "Utility/FPaths.h"
+#include "Utility/FStringConv.h"
 
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
@@ -2294,8 +2108,16 @@ namespace
 
 		ComPtr&lt;ID3DBlob&gt; Code;
 		ComPtr&lt;ID3DBlob&gt; Errors;
-		const HRESULT CompileResult = D3DCompileFromFile(
-		    Path.c_str(), nullptr, nullptr, EntryPoint, Target, Flags, 0, Code.GetAddressOf(), Errors.GetAddressOf());
+		// include 처리기를 넘기지 않으면 셰이더 안의 #include 가 컴파일 에러가 된다.
+		const HRESULT CompileResult = D3DCompileFromFile(Path.c_str(),
+		                                                 nullptr,
+		                                                 D3D_COMPILE_STANDARD_FILE_INCLUDE,
+		                                                 EntryPoint,
+		                                                 Target,
+		                                                 Flags,
+		                                                 0,
+		                                                 Code.ReleaseAndGetAddressOf(),
+		                                                 Errors.ReleaseAndGetAddressOf());
 
 		// 컴파일러 문자열 속 경로는 한글이 ? 로 바뀔 수 있어 경로를 따로 남긴다.
 		if (FAILED(CompileResult))
@@ -2308,10 +2130,7 @@ namespace
 		{
 			std::string_view Text(static_cast&lt;const char*&gt;(Errors-&gt;GetBufferPointer()));
 			Text = Text.substr(0, Text.find_last_not_of("\r\n") + 1);
-
-			const int TextLength = static_cast&lt;int&gt;(Text.size());
-			std::wstring Message(MultiByteToWideChar(CP_ACP, 0, Text.data(), TextLength, nullptr, 0), L'\0');
-			MultiByteToWideChar(CP_ACP, 0, Text.data(), TextLength, Message.data(), static_cast&lt;int&gt;(Message.size()));
+			const std::wstring Message = FStringConv::ToWide(Text);
 
 			if (SUCCEEDED(CompileResult))
 			{
@@ -2331,24 +2150,20 @@ namespace
 void FColorShader::Initialize(ID3D11Device* Device)
 {
 	// 빌드가 셰이더 파일을 exe 옆 Shaders 폴더로 복사한다.
-	const std::filesystem::path ShaderDirectory = FPaths::GetExecutableDirectory() / L"Shaders";
-	const ComPtr&lt;ID3DBlob&gt; VertexCode = CompileShader(ShaderDirectory / L"Color.vs", "ColorVertexShader", "vs_5_0");
-	const ComPtr&lt;ID3DBlob&gt; PixelCode = CompileShader(ShaderDirectory / L"Color.ps", "ColorPixelShader", "ps_5_0");
+	const std::filesystem::path ShaderPath = FPaths::GetExecutableDirectory() / L"Shaders" / L"Color.hlsl";
+	const ComPtr&lt;ID3DBlob&gt; VertexCode = CompileShader(ShaderPath, "ColorVertexShader", "vs_5_0");
+	const ComPtr&lt;ID3DBlob&gt; PixelCode = CompileShader(ShaderPath, "ColorPixelShader", "ps_5_0");
 
 	CHECK_FATAL(Device-&gt;CreateVertexShader(
-	    VertexCode-&gt;GetBufferPointer(), VertexCode-&gt;GetBufferSize(), nullptr, VertexShader.GetAddressOf()));
+	    VertexCode-&gt;GetBufferPointer(), VertexCode-&gt;GetBufferSize(), nullptr, VertexShader.ReleaseAndGetAddressOf()));
 	CHECK_FATAL(Device-&gt;CreatePixelShader(
-	    PixelCode-&gt;GetBufferPointer(), PixelCode-&gt;GetBufferSize(), nullptr, PixelShader.GetAddressOf()));
+	    PixelCode-&gt;GetBufferPointer(), PixelCode-&gt;GetBufferSize(), nullptr, PixelShader.ReleaseAndGetAddressOf()));
 
-	constexpr std::array&lt;D3D11_INPUT_ELEMENT_DESC, 2&gt; InputElements = {{
-	    {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-	    {"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-	}};
-	CHECK_FATAL(Device-&gt;CreateInputLayout(InputElements.data(),
-	                                      static_cast&lt;UINT&gt;(InputElements.size()),
+	CHECK_FATAL(Device-&gt;CreateInputLayout(FVertexPositionColor::InputElements.data(),
+	                                      static_cast&lt;UINT&gt;(FVertexPositionColor::InputElements.size()),
 	                                      VertexCode-&gt;GetBufferPointer(),
 	                                      VertexCode-&gt;GetBufferSize(),
-	                                      InputLayout.GetAddressOf()));
+	                                      InputLayout.ReleaseAndGetAddressOf()));
 
 	// 상수 버퍼 크기는 16 바이트의 배수여야 한다.
 	static_assert(sizeof(FMatrixBuffer) % 16 == 0);
@@ -2357,14 +2172,13 @@ void FColorShader::Initialize(ID3D11Device* Device)
 	MatrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	MatrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	MatrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	CHECK_FATAL(Device-&gt;CreateBuffer(&amp;MatrixBufferDesc, nullptr, MatrixBuffer.GetAddressOf()));
+	CHECK_FATAL(Device-&gt;CreateBuffer(&amp;MatrixBufferDesc, nullptr, MatrixBuffer.ReleaseAndGetAddressOf()));
 }
 
-void FColorShader::Render(ID3D11DeviceContext* Context,
-                          UINT IndexCount,
-                          const XMMATRIX&amp; World,
-                          const XMMATRIX&amp; View,
-                          const XMMATRIX&amp; Projection) const
+void XM_CALLCONV FColorShader::SetMatrices(ID3D11DeviceContext* Context,
+                                           FXMMATRIX World,
+                                           CXMMATRIX View,
+                                           CXMMATRIX Projection)
 {
 	// HLSL 은 행렬을 열 우선으로 읽는다. DirectXMath 의 행 우선 행렬을 전치해서 넣는다.
 	D3D11_MAPPED_SUBRESOURCE Mapped = {};
@@ -2374,16 +2188,18 @@ void FColorShader::Render(ID3D11DeviceContext* Context,
 	XMStoreFloat4x4(&amp;Matrices-&gt;View, XMMatrixTranspose(View));
 	XMStoreFloat4x4(&amp;Matrices-&gt;Projection, XMMatrixTranspose(Projection));
 	Context-&gt;Unmap(MatrixBuffer.Get(), 0);
+}
 
+void FColorShader::Bind(ID3D11DeviceContext* Context) const
+{
 	Context-&gt;IASetInputLayout(InputLayout.Get());
 	Context-&gt;VSSetShader(VertexShader.Get(), nullptr, 0);
 	Context-&gt;VSSetConstantBuffers(0, 1, MatrixBuffer.GetAddressOf());
 	Context-&gt;PSSetShader(PixelShader.Get(), nullptr, 0);
-	Context-&gt;DrawIndexed(IndexCount, 0, 0);
 }</pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">Source/Graphics/FCamera.h</span><span class="stat"><span class="plus">+22</span></span><span class="why">위치와 렌즈</span></summary>
+				<summary><span class="path">Source/Graphics/FCamera.h</span><span class="stat"><span class="plus">+18</span></span><span class="why">위치와 렌즈</span></summary>
 <pre class="src" data-lang="cpp">#pragma once
 
 #include &lt;DirectXMath.h&gt;
@@ -2391,12 +2207,8 @@ void FColorShader::Render(ID3D11DeviceContext* Context,
 class FCamera
 {
 public:
-	FCamera() = default;
-	FCamera(const FCamera&amp; Other) = delete;
-	FCamera&amp; operator=(const FCamera&amp; Other) = delete;
-
-	DirectX::XMMATRIX GetViewMatrix() const;
-	DirectX::XMMATRIX GetProjectionMatrix(float AspectRatio) const;
+	DirectX::XMMATRIX XM_CALLCONV GetViewMatrix() const;
+	DirectX::XMMATRIX XM_CALLCONV GetProjectionMatrix(float AspectRatio) const;
 
 	void SetPosition(float X, float Y, float Z);
 
@@ -2413,7 +2225,7 @@ private:
 
 using namespace DirectX;
 
-XMMATRIX FCamera::GetViewMatrix() const
+XMMATRIX XM_CALLCONV FCamera::GetViewMatrix() const
 {
 	const XMVECTOR Eye = XMLoadFloat3(&amp;Position);
 	const XMVECTOR Forward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
@@ -2421,7 +2233,7 @@ XMMATRIX FCamera::GetViewMatrix() const
 	return XMMatrixLookToLH(Eye, Forward, Up);
 }
 
-XMMATRIX FCamera::GetProjectionMatrix(float AspectRatio) const
+XMMATRIX XM_CALLCONV FCamera::GetProjectionMatrix(float AspectRatio) const
 {
 	return XMMatrixPerspectiveFovLH(FovAngleY, AspectRatio, NearZ, FarZ);
 }
@@ -2436,10 +2248,17 @@ void FCamera::SetPosition(float X, float Y, float Z)
 		<div class="file-group">
 			<h3>파이프라인</h3>
 			<details class="diff-file">
-				<summary><span class="path">Source/Graphics/FD3D11Graphics.h</span><span class="stat"><span class="plus">+5</span></span><span class="why">게터 셋과 뷰포트</span></summary>
-<pre class="diff" data-lang="cpp">@@ -19,6 +19,10 @@
+				<summary><span class="path">Source/Graphics/FD3D11Graphics.h</span><span class="stat"><span class="plus">+7</span> <span class="minus">−1</span></span><span class="why">게터 셋, 뷰포트, XMFLOAT4 지우는 색</span></summary>
+<pre class="diff" data-lang="cpp">@@ -1,5 +1,6 @@
+ #pragma once
  
- 	void Initialize(const FWindow&amp; Window, const FDisplaySettings&amp; Settings);
++#include &lt;DirectXMath.h&gt;
+ #include &lt;d3d11.h&gt;
+ #include &lt;dxgi1_2.h&gt;
+ #include &lt;dxgidebug.h&gt;
+@@ -15,6 +16,10 @@
+ 
+ 	void Initialize(HWND WindowHandle, int Width, int Height, bool bEnableVSync);
  
 +	ID3D11Device* GetDevice() const { return Device.Get(); }
 +	ID3D11DeviceContext* GetContext() const { return Context.Get(); }
@@ -2447,18 +2266,20 @@ void FCamera::SetPosition(float X, float Y, float Z)
 +
  	void Resize(int Width, int Height);
  
- 	void BeginScene(const std::array&lt;float, 4&gt;&amp; Color);
-@@ -34,5 +38,6 @@
+ 	void BeginScene();
+@@ -32,6 +37,7 @@
  	Microsoft::WRL::ComPtr&lt;IDXGISwapChain1&gt; SwapChain;
  	Microsoft::WRL::ComPtr&lt;ID3D11RenderTargetView&gt; RenderTargetView;
  	Microsoft::WRL::ComPtr&lt;IDXGIInfoQueue&gt; InfoQueue;
+-	DXGI_RGBA ClearColor = {0.5f, 0.5f, 0.5f, 1.0f};
 +	D3D11_VIEWPORT Viewport = {};
++	DirectX::XMFLOAT4 ClearColor = {0.5f, 0.5f, 0.5f, 1.0f};
  	bool bVSync = true;
  };</pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="stat"><span class="plus">+12</span> <span class="minus">−1</span></span><span class="why">매 프레임 RTV·뷰포트 묶기, 크기 변경 때 떼기</span></summary>
-<pre class="diff" data-lang="cpp">@@ -124,7 +124,9 @@
+				<summary><span class="path">Source/Graphics/FD3D11Graphics.cpp</span><span class="stat"><span class="plus">+14</span> <span class="minus">−3</span></span><span class="why">매 프레임 RTV·뷰포트 묶기, 크기 변경 때 떼기</span></summary>
+<pre class="diff" data-lang="cpp">@@ -134,7 +134,9 @@
  
  void FD3D11Graphics::Resize(int Width, int Height)
  {
@@ -2469,20 +2290,24 @@ void FCamera::SetPosition(float X, float Y, float Z)
  	RenderTargetView.Reset();
  	Context-&gt;Flush();
  
-@@ -136,6 +138,9 @@
- void FD3D11Graphics::BeginScene(const std::array&lt;float, 4&gt;&amp; Color)
+@@ -145,8 +147,11 @@
+ 
+ void FD3D11Graphics::BeginScene()
  {
- 	Context-&gt;ClearRenderTargetView(RenderTargetView.Get(), Color.data());
+-	// ClearRenderTargetView 는 float 4개 배열을 받는다. DXGI_RGBA 는 r·g·b·a 를 이 순서로 이어 둔다.
+-	Context-&gt;ClearRenderTargetView(RenderTargetView.Get(), &amp;ClearColor.r);
++	// ClearRenderTargetView 는 float 4개 배열을 받는다. XMFLOAT4 는 x·y·z·w 를 이 순서로 이어 둔다.
++	Context-&gt;ClearRenderTargetView(RenderTargetView.Get(), &amp;ClearColor.x);
 +	// 플립 모델은 Present 가 백 버퍼를 파이프라인에서 떼므로 매 프레임 다시 묶는다.
 +	Context-&gt;OMSetRenderTargets(1, RenderTargetView.GetAddressOf(), nullptr);
 +	Context-&gt;RSSetViewports(1, &amp;Viewport);
  }
  
  void FD3D11Graphics::EndScene()
-@@ -149,6 +154,12 @@
+@@ -160,6 +165,12 @@
  	ComPtr&lt;ID3D11Texture2D&gt; BackBuffer;
- 	CHECK_FATAL(SwapChain-&gt;GetBuffer(0, IID_PPV_ARGS(BackBuffer.GetAddressOf())));
- 	CHECK_FATAL(Device-&gt;CreateRenderTargetView(BackBuffer.Get(), nullptr, RenderTargetView.GetAddressOf()));
+ 	CHECK_FATAL(SwapChain-&gt;GetBuffer(0, IID_PPV_ARGS(BackBuffer.ReleaseAndGetAddressOf())));
+ 	CHECK_FATAL(Device-&gt;CreateRenderTargetView(BackBuffer.Get(), nullptr, RenderTargetView.ReleaseAndGetAddressOf()));
 +
 +	D3D11_TEXTURE2D_DESC BackBufferDesc = {};
 +	BackBuffer-&gt;GetDesc(&amp;BackBufferDesc);
@@ -2498,10 +2323,9 @@ void FCamera::SetPosition(float X, float Y, float Z)
 		<div class="file-group">
 			<h3>앱과 프레임</h3>
 			<details class="diff-file">
-				<summary><span class="path">Source/App/FApplication.h</span><span class="stat"><span class="plus">+13</span> <span class="minus">−2</span></span><span class="why">카메라·모델·셰이더 멤버, 검정 지우는 색</span></summary>
-<pre class="diff" data-lang="cpp">@@ -2,6 +2,12 @@
- 
- #include &lt;array&gt;
+				<summary><span class="path">Source/App/FApplication.h</span><span class="stat"><span class="plus">+14</span> <span class="minus">−1</span></span><span class="why">카메라·모델·셰이더 멤버</span></summary>
+<pre class="diff" data-lang="cpp">@@ -1,8 +1,21 @@
+ #pragma once
  
 +#include "Graphics/FCamera.h"
 +#include "Graphics/FModel.h"
@@ -2512,32 +2336,23 @@ void FCamera::SetPosition(float X, float Y, float Z)
  class FApplication
  {
  public:
-@@ -9,11 +15,16 @@
- 	FApplication(const FApplication&amp; Other) = delete;
- 	FApplication&amp; operator=(const FApplication&amp; Other) = delete;
- 
 +	void Initialize(FD3D11Graphics&amp; Graphics);
 +
- 	const std::array&lt;float, 4&gt;&amp; GetClearColor() const { return ClearColor; }
- 
  	void Update();
 -	void Render();
 +	void Render(FD3D11Graphics&amp; Graphics);
- 
- private:
--	std::array&lt;float, 4&gt; ClearColor = {0.5f, 0.5f, 0.5f, 1.0f};
-+	std::array&lt;float, 4&gt; ClearColor = {0.0f, 0.0f, 0.0f, 1.0f};
++
++private:
 +	FCamera Camera;
 +	FModel Model;
 +	FColorShader ColorShader;
  };</pre>
 			</details>
 			<details class="diff-file">
-				<summary><span class="path">Source/App/FApplication.cpp</span><span class="stat"><span class="plus">+18</span> <span class="minus">−1</span></span><span class="why">초기화와 그리기</span></summary>
-<pre class="diff" data-lang="cpp">@@ -3,6 +3,16 @@
- #include &lt;Windows.h&gt;
+				<summary><span class="path">Source/App/FApplication.cpp</span><span class="stat"><span class="plus">+20</span> <span class="minus">−1</span></span><span class="why">초기화와 그리기</span></summary>
+<pre class="diff" data-lang="cpp">@@ -1,9 +1,28 @@
+ #include "App/FApplication.h"
  
- #include "Core/FSystem.h"
 +#include "Graphics/FD3D11Graphics.h"
 +
 +using namespace DirectX;
@@ -2548,11 +2363,9 @@ void FCamera::SetPosition(float X, float Y, float Z)
 +	Model.Initialize(Graphics.GetDevice());
 +	ColorShader.Initialize(Graphics.GetDevice());
 +}
- 
++
  void FApplication::Update()
  {
-@@ -12,6 +22,13 @@
- 	}
  }
  
 -void FApplication::Render()
@@ -2563,24 +2376,25 @@ void FCamera::SetPosition(float X, float Y, float Z)
 +	const XMMATRIX Projection = Camera.GetProjectionMatrix(Graphics.GetAspectRatio());
 +
 +	ID3D11DeviceContext* Context = Graphics.GetContext();
-+	Model.Render(Context);
-+	ColorShader.Render(Context, Model.GetIndexCount(), World, View, Projection);
++	ColorShader.SetMatrices(Context, World, View, Projection);
++	ColorShader.Bind(Context);
++	Model.Draw(Context);
  }</pre>
 			</details>
 			<details class="diff-file">
 				<summary><span class="path">Source/Core/FSystem.cpp</span><span class="stat"><span class="plus">+2</span> <span class="minus">−1</span></span><span class="why">앱 초기화, Render 에 Graphics 넘기기</span></summary>
-<pre class="diff" data-lang="cpp">@@ -13,6 +13,7 @@
+<pre class="diff" data-lang="cpp">@@ -15,6 +15,7 @@
  	    L"창 생성 : {}x{} (DPI {}, 배율 {}%)", Window.GetWidth(), Window.GetHeight(), Window.GetDpi(), ScalePercent));
  
- 	Graphics.Initialize(Window, Display);
+ 	Graphics.Initialize(Window.GetHandle(), Window.GetWidth(), Window.GetHeight(), Settings.bVSync);
 +	Application.Initialize(Graphics);
  
  	Window.SetMessageCallback([this](UINT Message, WPARAM WParam, LPARAM LParam)
  	                          { OnWindowMessage(Message, WParam, LParam); });
-@@ -46,7 +47,7 @@
- {
+@@ -48,7 +49,7 @@
+ 
  	Application.Update();
- 	Graphics.BeginScene(Application.GetClearColor());
+ 	Graphics.BeginScene();
 -	Application.Render();
 +	Application.Render(Graphics);
  	Graphics.EndScene();
@@ -2589,7 +2403,7 @@ void FCamera::SetPosition(float X, float Y, float Z)
 			</details>
 			<details class="diff-file">
 				<summary><span class="path">Source/Main.cpp</span><span class="stat"><span class="plus">+5</span></span><span class="why">CPU 확인</span></summary>
-<pre class="diff" data-lang="cpp">@@ -1,10 +1,15 @@
+<pre class="diff" data-lang="cpp">@@ -1,6 +1,8 @@
 +#include &lt;DirectXMath.h&gt;
  #include &lt;Windows.h&gt;
  
@@ -2597,7 +2411,10 @@ void FCamera::SetPosition(float X, float Y, float Z)
 +#include "Utility/Check.h"
  #include "Utility/FLog.h"
  
- int WINAPI wWinMain(_In_ HINSTANCE Instance, _In_opt_ HINSTANCE PrevInstance, _In_ PWSTR CmdLine, _In_ int ShowCmd)
+ int WINAPI wWinMain([[maybe_unused]] _In_ HINSTANCE Instance,
+@@ -8,6 +10,9 @@
+                     [[maybe_unused]] _In_ PWSTR CmdLine,
+                     _In_ int ShowCmd)
  {
 +	// DirectXMath 가 쓰는 SIMD 명령을 이 CPU 가 지원하는지 먼저 본다.
 +	CHECK_FATAL(DirectX::XMVerifyCPUSupport());
@@ -2646,29 +2463,7 @@ std::filesystem::path FPaths::GetExecutableDirectory()
 		<div class="file-group">
 			<h3>빌드</h3>
 			<details class="diff-file">
-				<summary><span class="path">CMakeLists.txt</span><span class="stat"><span class="plus">+9</span> <span class="minus">−1</span></span><span class="why">DirectXMath 포함 경로, d3dcompiler, 셰이더 복사</span></summary>
-<pre class="diff" data-lang="cmake">@@ -4,9 +4,17 @@
- file(GLOB_RECURSE SourceFiles CONFIGURE_DEPENDS Source/*.cpp)
- add_executable(DxRenderDojo WIN32 ${SourceFiles})
- target_include_directories(DxRenderDojo PRIVATE Source)
-+target_include_directories(DxRenderDojo SYSTEM PRIVATE external/DirectXMath/Inc)
- target_compile_features(DxRenderDojo PRIVATE cxx_std_20)
- target_compile_definitions(DxRenderDojo PRIVATE UNICODE _UNICODE WIN32_LEAN_AND_MEAN)
--target_link_libraries(DxRenderDojo PRIVATE d3d11 dxgi)
-+target_link_libraries(DxRenderDojo PRIVATE d3d11 dxgi d3dcompiler)
-+
-+# 셰이더는 실행 중에 컴파일한다. exe 옆 Shaders 폴더로 복사하고, configure_file 은 원본이 바뀌면 다시 복사한다.
-+file(GLOB ShaderFiles CONFIGURE_DEPENDS Source/Shaders/*.vs Source/Shaders/*.ps)
-+foreach(Shader ${ShaderFiles})
-+	cmake_path(GET Shader FILENAME ShaderName)
-+	configure_file(${Shader} Shaders/${ShaderName} COPYONLY)
-+endforeach()
- 
- if(MSVC)
- 	target_compile_options(DxRenderDojo PRIVATE /W3 /utf-8)</pre>
-			</details>
-			<details class="diff-file">
-				<summary><span class="path">DxRenderDojo.vcxproj</span><span class="stat"><span class="plus">+18</span> <span class="minus">−2</span></span><span class="why">같은 내용을 VS 프로젝트에. 셰이더는 파일 복사 항목</span></summary>
+				<summary><span class="path">DxRenderDojo.vcxproj</span><span class="stat"><span class="plus">+17</span> <span class="minus">−2</span></span><span class="why">DirectXMath 포함 경로, d3dcompiler, 새 파일. 셰이더는 파일 복사 항목</span></summary>
 <pre class="diff" data-lang="xml">@@ -42,12 +42,12 @@
        &lt;ConformanceMode&gt;true&lt;/ConformanceMode&gt;
        &lt;LanguageStandard&gt;stdcpp20&lt;/LanguageStandard&gt;
@@ -2679,47 +2474,47 @@ std::filesystem::path FPaths::GetExecutableDirectory()
      &lt;Link&gt;
        &lt;SubSystem&gt;Windows&lt;/SubSystem&gt;
        &lt;GenerateDebugInformation&gt;true&lt;/GenerateDebugInformation&gt;
--      &lt;AdditionalDependencies&gt;d3d11.lib;dxgi.lib;%(AdditionalDependencies)&lt;/AdditionalDependencies&gt;
-+      &lt;AdditionalDependencies&gt;d3d11.lib;dxgi.lib;d3dcompiler.lib;%(AdditionalDependencies)&lt;/AdditionalDependencies&gt;
+-      &lt;AdditionalDependencies&gt;d3d11.lib;dxgi.lib;dxguid.lib;%(AdditionalDependencies)&lt;/AdditionalDependencies&gt;
++      &lt;AdditionalDependencies&gt;d3d11.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;%(AdditionalDependencies)&lt;/AdditionalDependencies&gt;
      &lt;/Link&gt;
      &lt;Manifest&gt;
        &lt;EnableDpiAwareness&gt;false&lt;/EnableDpiAwareness&gt;
-@@ -76,9 +76,13 @@
+@@ -76,9 +76,14 @@
      &lt;ClCompile Include="Source\Core\FInput.cpp" /&gt;
      &lt;ClCompile Include="Source\Core\FSystem.cpp" /&gt;
      &lt;ClCompile Include="Source\Core\FWindow.cpp" /&gt;
 +    &lt;ClCompile Include="Source\Graphics\FCamera.cpp" /&gt;
      &lt;ClCompile Include="Source\Graphics\FD3D11Graphics.cpp" /&gt;
 +    &lt;ClCompile Include="Source\Graphics\FModel.cpp" /&gt;
++    &lt;ClCompile Include="Source\Graphics\FVertexTypes.cpp" /&gt;
 +    &lt;ClCompile Include="Source\Shaders\FColorShader.cpp" /&gt;
      &lt;ClCompile Include="Source\Utility\Check.cpp" /&gt;
      &lt;ClCompile Include="Source\Utility\FLog.cpp" /&gt;
 +    &lt;ClCompile Include="Source\Utility\FPaths.cpp" /&gt;
+     &lt;ClCompile Include="Source\Utility\FStringConv.cpp" /&gt;
    &lt;/ItemGroup&gt;
    &lt;ItemGroup&gt;
-     &lt;ClInclude Include="Source\App\FApplication.h" /&gt;
-@@ -86,14 +90,26 @@
+@@ -87,9 +92,14 @@
      &lt;ClInclude Include="Source\Core\FInput.h" /&gt;
      &lt;ClInclude Include="Source\Core\FSystem.h" /&gt;
      &lt;ClInclude Include="Source\Core\FWindow.h" /&gt;
 +    &lt;ClInclude Include="Source\Graphics\FCamera.h" /&gt;
      &lt;ClInclude Include="Source\Graphics\FD3D11Graphics.h" /&gt;
 +    &lt;ClInclude Include="Source\Graphics\FModel.h" /&gt;
++    &lt;ClInclude Include="Source\Graphics\FVertexTypes.h" /&gt;
 +    &lt;ClInclude Include="Source\Shaders\FColorShader.h" /&gt;
      &lt;ClInclude Include="Source\Utility\Check.h" /&gt;
      &lt;ClInclude Include="Source\Utility\FLog.h" /&gt;
 +    &lt;ClInclude Include="Source\Utility\FPaths.h" /&gt;
+     &lt;ClInclude Include="Source\Utility\FStringConv.h" /&gt;
      &lt;ClInclude Include="Source\Utility\TSingleton.h" /&gt;
    &lt;/ItemGroup&gt;
-   &lt;ItemGroup&gt;
+@@ -97,5 +107,10 @@
      &lt;None Include="DxRenderDojo.manifest" /&gt;
      &lt;None Include="DxRenderDojo.rc" /&gt;
    &lt;/ItemGroup&gt;
 +  &lt;ItemGroup&gt;
-+    &lt;CopyFileToFolders Include="Source\Shaders\Color.ps"&gt;
-+      &lt;DestinationFolders&gt;$(OutDir)Shaders&lt;/DestinationFolders&gt;
-+    &lt;/CopyFileToFolders&gt;
-+    &lt;CopyFileToFolders Include="Source\Shaders\Color.vs"&gt;
++    &lt;CopyFileToFolders Include="Source\Shaders\Color.hlsl"&gt;
 +      &lt;DestinationFolders&gt;$(OutDir)Shaders&lt;/DestinationFolders&gt;
 +    &lt;/CopyFileToFolders&gt;
 +  &lt;/ItemGroup&gt;
@@ -2738,15 +2533,15 @@ std::filesystem::path FPaths::GetExecutableDirectory()
 			<p>입력 레이아웃은 무엇과 무엇을 잇나요? 두 쪽에서 이름이 같아야 하는 것은 무엇인가요?</p>
 			<details class="fold">
 				<summary>답 보기</summary>
-				<p>C++ 정점 구조체 <code>FVertex</code> 의 바이트 배치와 정점 셰이더의 입력 <code>FVertexInput</code> 을 이어요. 레이아웃 원소의 시맨틱 이름(<code>POSITION</code>·<code>COLOR</code>)이 HLSL 입력 변수의 시맨틱과 같아야 해요. <code>CreateInputLayout</code> 이 정점 셰이더의 바이트코드를 받아 둘이 맞는지 확인해요. (<a href="#step-compile">5단계</a>)</p>
+				<p>C++ 정점 구조체 <code>FVertexPositionColor</code> 의 바이트 배치와 정점 셰이더의 입력 <code>FVertexInput</code> 을 이어요. 레이아웃 원소의 시맨틱 이름(<code>POSITION</code>·<code>COLOR</code>)이 HLSL 입력 변수의 시맨틱과 같아야 해요. <code>CreateInputLayout</code> 이 정점 셰이더의 바이트코드를 받아 둘이 맞는지 확인해요. (<a href="#step-compile">5단계</a>)</p>
 			</details>
 		</div>
 		<div class="learn">
 			<p class="box-label">2</p>
-			<p><code>FColorShader::Render</code> 는 행렬을 상수 버퍼에 넣기 전에 전치해요. 빼면 어떻게 되고, 왜 그런가요?</p>
+			<p><code>FColorShader::SetMatrices</code> 는 행렬을 상수 버퍼에 넣기 전에 전치해요. 빼면 어떻게 되고, 왜 그런가요?</p>
 			<details class="fold">
 				<summary>답 보기</summary>
-				<p>삼각형이 보이지 않아요. DirectXMath 는 행렬을 행 우선으로 두고 HLSL 은 상수 버퍼의 행렬을 열 우선으로 읽어서, 전치하지 않으면 셰이더가 전치된 다른 행렬을 곱해요. 호출 자체는 올바라서 디버그 레이어도 알리지 않아요. (<a href="#step-cbuffer">7단계</a>)</p>
+				<p>삼각형이 보이지 않아요. DirectXMath 는 행렬을 행 우선으로 두고 HLSL 은 상수 버퍼의 행렬을 열 우선으로 읽어서, 전치하지 않으면 셰이더가 전치된 다른 행렬을 곱해요. 호출 자체는 올바라서 디버그 레이어도 알리지 않아요. (<a href="#step-cbuffer">8단계</a>)</p>
 			</details>
 		</div>
 		<div class="learn">
@@ -2754,7 +2549,7 @@ std::filesystem::path FPaths::GetExecutableDirectory()
 			<p><code>BeginScene</code> 은 매 프레임 <code>OMSetRenderTargets</code> 를 불러요. 초기화 때 한 번만 부르면 무엇이 달라지나요?</p>
 			<details class="fold">
 				<summary>답 보기</summary>
-				<p>두 번째 프레임부터 삼각형이 보이지 않아요. 플립 모델에서는 <code>Present</code> 가 성공할 때마다 백 버퍼를 파이프라인에서 떼서, 그 뒤의 그리기는 묶인 렌더 타깃이 없어 버려져요. 지우기는 RTV 를 직접 받는 <code>ClearRenderTargetView</code> 라 계속 돼서 화면은 검은색이에요. (<a href="#step-bind">2단계</a>)</p>
+				<p>두 번째 프레임부터 삼각형이 보이지 않아요. 플립 모델에서는 <code>Present</code> 가 성공할 때마다 백 버퍼를 파이프라인에서 떼서, 그 뒤의 그리기는 묶인 렌더 타깃이 없어 버려져요. 지우기는 RTV 를 직접 받는 <code>ClearRenderTargetView</code> 라 계속 돼서 화면은 지우는 색인 회색이에요. (<a href="#step-bind">2단계</a>)</p>
 			</details>
 		</div>
 	</section>
@@ -2763,10 +2558,10 @@ std::filesystem::path FPaths::GetExecutableDirectory()
 		<h2>바꿔 보기</h2>
 		<p class="section-note">확인이 끝났으면 하나씩 고쳐 보세요. 고칠 파일을 먼저 짐작한 다음에 찾아보는 쪽을 권해요.</p>
 		<ul class="labeled">
-			<li><span class="label">1</span><span>삼각형을 빨강으로 변경 (원문 과제 2)</span></li>
-			<li><span class="label">2</span><span>삼각형을 사각형으로 변경. 정점 넷과 인덱스 여섯, 두 삼각형 모두 시계 방향 (원문 과제 3)</span></li>
-			<li><span class="label">3</span><span>카메라를 지금보다 10 더 뒤(z = -15)로 이동 (원문 과제 4). 약 290 픽셀이던 삼각형 높이가 몇 픽셀이 될지 8단계의 계산으로 먼저 구한 뒤 확인</span></li>
-			<li><span class="label">4</span><span>픽셀 셰이더에서 색을 절반 밝기로 변경 (원문 과제 5). 셰이더만 고치고 빌드한 뒤 exe 옆 복사본도 바뀌었는지 확인</span></li>
+			<li><span class="label">1</span><span>삼각형을 빨강으로 변경</span></li>
+			<li><span class="label">2</span><span>삼각형을 사각형으로 변경. 정점 넷과 인덱스 여섯, 두 삼각형 모두 시계 방향</span></li>
+			<li><span class="label">3</span><span>카메라를 지금보다 10 더 뒤(z = -15)로 이동. 약 290 픽셀이던 삼각형 높이가 몇 픽셀이 될지 7단계의 계산으로 먼저 구한 뒤 확인</span></li>
+			<li><span class="label">4</span><span>픽셀 셰이더에서 색을 절반 밝기로 변경. 셰이더만 고치고 빌드한 뒤 exe 옆 복사본도 바뀌었는지 확인</span></li>
 			<li><span class="label">5</span><span><code>FApplication::Render</code> 가 넘기는 종횡비를 <code>800.0f / 600.0f</code> 로 고정하고 창을 가로로 넓혀 보기. 삼각형이 옆으로 늘어나는 것을 확인</span></li>
 		</ul>
 	</section>
@@ -2804,7 +2599,6 @@ std::filesystem::path FPaths::GetExecutableDirectory()
 <nav class="rail" aria-label="이 페이지" data-block="rail-outline" data-source="자동">
 	<ol id="page-outline">
 		<li><a href="#goal">이 편을 마치면</a></li>
-		<li><a href="#diverge">원문과 다른 점</a></li>
 		<li><a href="#overview">한눈에 보기</a></li>
 		<li><a href="#predict">먼저 예측</a></li>
 		<li><a href="#steps">따라 하기</a></li>
