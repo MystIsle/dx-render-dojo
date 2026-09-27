@@ -14,6 +14,8 @@ void FSystem::Initialize(int ShowCmd)
 	FLog::Info(std::format(
 	    L"창 생성 : {}x{} (DPI {}, 배율 {}%)", Window.GetWidth(), Window.GetHeight(), Window.GetDpi(), ScalePercent));
 
+	Graphics.Initialize(Window.GetHandle(), Window.GetWidth(), Window.GetHeight(), Settings.bVSync);
+
 	Window.SetMessageCallback([this](UINT Message, WPARAM WParam, LPARAM LParam)
 	                          { OnWindowMessage(Message, WParam, LParam); });
 	Window.SetResizeCallback([this](int NewWidth, int NewHeight) { OnResize(NewWidth, NewHeight); });

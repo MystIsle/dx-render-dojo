@@ -6,4 +6,5 @@ struct FDisplaySettings
 	int Height = 600;
 	bool bFullScreen = false;
 	bool bHideCursor = false;
+	bool bVSync = true;
 };
