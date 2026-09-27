@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Graphics/FModel.h"
+#include "Shaders/FColorShader.h"
 
 class FD3D11Graphics;
 
@@ -14,4 +15,5 @@ public:
 
 private:
 	FModel Model;
+	FColorShader ColorShader;
 };
