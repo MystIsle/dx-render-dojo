@@ -13,6 +13,7 @@ public:
 	FWindow() = default;
 	FWindow(const FWindow& Other) = delete;
 	FWindow& operator=(const FWindow& Other) = delete;
+	~FWindow();
 
 	void Initialize(const FDisplaySettings& Settings, int ShowCmd);
 
