@@ -1,3 +1,4 @@
+// FColorShader::FMatrixBuffer 와 멤버 순서가 같아야 한다. b0 은 VSSetConstantBuffers 의 슬롯 0 이다.
 cbuffer MatrixBuffer : register(b0)
 {
 	matrix World;

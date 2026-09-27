@@ -13,6 +13,7 @@
 #include "Utility/FStringConv.h"
 
 using Microsoft::WRL::ComPtr;
+using namespace DirectX;
 
 namespace
 {
@@ -82,11 +83,36 @@ void FColorShader::Initialize(ID3D11Device* Device)
 	                                      VertexCode->GetBufferPointer(),
 	                                      VertexCode->GetBufferSize(),
 	                                      InputLayout.ReleaseAndGetAddressOf()));
+
+	// 상수 버퍼 크기는 16 바이트의 배수여야 한다.
+	static_assert(sizeof(FMatrixBuffer) % 16 == 0);
+	D3D11_BUFFER_DESC MatrixBufferDesc = {};
+	MatrixBufferDesc.ByteWidth = sizeof(FMatrixBuffer);
+	MatrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	MatrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	MatrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	CHECK_FATAL(Device->CreateBuffer(&MatrixBufferDesc, nullptr, MatrixBuffer.ReleaseAndGetAddressOf()));
+}
+
+void XM_CALLCONV FColorShader::SetMatrices(ID3D11DeviceContext* Context,
+                                           FXMMATRIX World,
+                                           CXMMATRIX View,
+                                           CXMMATRIX Projection)
+{
+	// HLSL 은 행렬을 열 우선으로 읽는다. DirectXMath 의 행 우선 행렬을 전치해서 넣는다.
+	D3D11_MAPPED_SUBRESOURCE Mapped = {};
+	CHECK_FATAL(Context->Map(MatrixBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &Mapped));
+	FMatrixBuffer* Matrices = static_cast<FMatrixBuffer*>(Mapped.pData);
+	XMStoreFloat4x4(&Matrices->World, XMMatrixTranspose(World));
+	XMStoreFloat4x4(&Matrices->View, XMMatrixTranspose(View));
+	XMStoreFloat4x4(&Matrices->Projection, XMMatrixTranspose(Projection));
+	Context->Unmap(MatrixBuffer.Get(), 0);
 }
 
 void FColorShader::Bind(ID3D11DeviceContext* Context) const
 {
 	Context->IASetInputLayout(InputLayout.Get());
 	Context->VSSetShader(VertexShader.Get(), nullptr, 0);
+	Context->VSSetConstantBuffers(0, 1, MatrixBuffer.GetAddressOf());
 	Context->PSSetShader(PixelShader.Get(), nullptr, 0);
 }
