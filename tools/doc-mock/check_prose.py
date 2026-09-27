@@ -522,9 +522,12 @@ def blank_out(text, pattern):
 
 
 def check_source_mentions(source, report):
-    """원문 언급·출처. 독자는 원문을 보지 않는다. <script>·<style> 과 목차 마커가 채우는 자리는 빼고, 한 줄을 한 건으로 센다."""
+    """원문 언급·출처. 독자는 원문을 보지 않는다. <script>·<style>, 목차 마커가 채우는 자리, 푸터는 빼고, 한 줄을 한 건으로 센다.
+
+    푸터의 출처·라이선스 표시는 읽는 흐름 밖의 저작권 표시라 남긴다.
+    """
     text = source
-    for pattern in (r"<script\b.*?</script>", r"<style\b.*?</style>", *TOC_SLOTS):
+    for pattern in (r"<script\b.*?</script>", r"<style\b.*?</style>", r"<footer\b.*?</footer>", *TOC_SLOTS):
         text = blank_out(text, pattern)
     for number, line in enumerate(text.split("\n"), 1):
         words = sorted({match.group(0).lower() for match in SOURCE_MENTION.finditer(line)})
