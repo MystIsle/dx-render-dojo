@@ -2,8 +2,11 @@
 
 원고의 따라 하기 조각과 문장 안내만 옮겨서 이전 태그 코드가 이 편 태그 코드가 되는지 보는 시험(`docs/DOC_STYLE.md` 8절)에 쓰는 도구입니다. 시험하는 쪽이 기억으로 코드를 채우지 않도록 생성본에서 조각을 기계적으로 뽑아 넣습니다.
 
+시험은 둘입니다. 조각을 끝까지 옮긴 뒤 편 끝에서 한 번 빌드·실행하는 것과, 단계 커밋을 차례로 컴파일만 하는 것입니다. 독자도 편 끝에서 한 번 빌드하므로 단계마다 빌드·실행하지 않습니다.
+
 ## 파일
 
+- `compile_steps.ps1 -Lesson NN [-WorkDir <시험 폴더>]` : 단계 커밋 `tutNN-s1` 부터 마지막 단계까지 차례로 컴파일만 함. 아래 "단계 커밋 컴파일"
 - `dump_steps.py <tutorial-NN.html>` : 생성본의 따라 하기 절을 텍스트로 뽑음. `## STEP` 은 단계, `FOLD` 는 접기 제목, `CAPTION` 은 조각 캡션(배지와 넣을 자리), 코드 블록은 조각
 - `apply.py` : 뽑은 조각을 worktree 에 넣음. 대상은 환경 변수 `ACC_WT`(worktree)와 `ACC_STEPS`(`dump_steps.py` 결과)
 - `cmp_steps.py <옛.md> <새.md>` : 두 원고판의 조각·캡션·접기 제목을 비교함. 원고만 고친 판에 재시험이 필요한지 볼 때 씀
@@ -33,26 +36,42 @@ $env:ACC_WT='<시험 폴더>\wt'; $env:ACC_STEPS='<시험 폴더>\steps.md'; pyt
 
 ## 절차
 
+1~7 은 편 끝 한 번 빌드·실행, 8 은 단계 커밋 컴파일입니다.
+
 1. 이전 편 태그를 리포 밖 폴더에 풂 : `git worktree add --detach <시험 폴더>\wt tutMM`. 리포 작업 트리는 다른 작업이 쓰고 있을 수 있으니 건드리지 않음
 2. 생성본 저장 : `cmd /c "git show <커밋>:tools/doc-mock/tutorial-NN.html > <파일>"`. PowerShell 의 `>` 는 인코딩을 바꿈
 3. 조각 뽑기 : `python -X utf8 tools\accept\dump_steps.py <파일>` 의 출력을 `steps.md` 로
-4. 단계 순서대로 적용
+4. 단계 순서대로 끝까지 적용. 단계 사이에 빌드하지 않음
    - 캡션의 배지(신규·수정·삭제)와 넣을 자리로 동작을 고름. 접기 안 조각도 넣음
    - 제목이 "참고 … 따로 치지 않음" 인 접기는 넣지 않고 대조에만 씀
-   - Visual Studio 조작(필터, 기존 항목 추가·제거, 속성)은 `.vcxproj`·`.vcxproj.filters` 를 VS 가 쓰는 XML 대로 손으로 고쳐 흉내 냄. 문장만으로 정할 수 없는 곳은 기록
+   - Visual Studio 조작(필터, 기존 항목 추가·제거, 속성)은 `.vcxproj`·`.vcxproj.filters` 를 VS 가 쓰는 XML 대로 손으로 고쳐 흉내 냄. 프로젝트 파일 diff 는 원고에 보이지 않으므로(`docs/DOC_STYLE.md` 2절) 문장만 보고 고침. 문장만으로 정할 수 없는 곳은 기록
    - 조각을 고치거나 빠진 코드를 채우지 않음. 판정 전에는 목표 태그의 소스를 보지 않음
-5. 빌드 : MSBuild Debug·Release x64(`/m /nr:false /nologo /v:m`), CMake(`vcvars64.bat` 뒤 Ninja). 코드 경고 0. 시험 폴더가 임시 폴더 아래면 MSB8029·경로 길이 경고가 나는데 환경 경고라 따로 셈
+5. 빌드 : MSBuild Debug·Release x64(`/m /nr:false /nologo /v:m`). 코드 경고 0. CMake(`vcvars64.bat` 뒤 Ninja)는 01·02편만 봄. 03편부터는 원고가 `CMakeLists.txt` 를 다루지 않음. 시험 폴더가 임시 폴더 아래면 MSB8029·경로 길이 경고가 나는데 환경 경고라 따로 셈
 6. 실행 확인 : 원고의 "다 됐는지 확인" 값과 대조. exe 는 `Start-Process` 로 띄움. 동기로 실행하면 창이 닫힐 때까지 명령이 멈춤
 7. 판정
    - `git add -A -- <판정 경로> DxRenderDojo.vcxproj DxRenderDojo.vcxproj.filters`
    - `git diff --cached -w --ignore-blank-lines tutNN -- <판정 경로>` 가 비면 통과
-   - 판정 경로 : `Source CMakeLists.txt DxRenderDojo.manifest DxRenderDojo.rc`, 04편부터 `external` 을 더함
+   - 판정 경로 : `Source DxRenderDojo.manifest DxRenderDojo.rc`. 01·02편은 `CMakeLists.txt`, 04편부터는 `external` 을 더함
    - 프로젝트 파일은 diff 가 아니라 빌드·실행 결과로 판정. `git diff --cached --stat tutNN` 으로 무엇이 다른지만 적음
-8. 정리 : 떠 있는 exe 를 닫고 `git worktree remove --force <시험 폴더>\wt` 뒤 `git worktree prune`
+8. 단계 커밋 컴파일 : `pwsh tools\accept\compile_steps.ps1 -Lesson NN -WorkDir <시험 폴더>`. 모든 단계가 `pass` 면 통과
+9. 정리 : 떠 있는 exe 를 닫고 `git worktree remove --force <시험 폴더>\wt` 뒤 `git worktree prune`
 
-## 단계 태그로 시험할 때
+## 단계 커밋 컴파일
 
-02편부터 따라 하기 N단계마다 커밋 `tutNN-sN` 이 있습니다. 단계 k 는 `tutNN-s(k-1)`(첫 단계는 이전 편 태그)에서 그 단계 조각만 넣고 `tutNN-sk` 와 비교하면 어긋난 단계를 바로 짚습니다. 이 방식으로는 아직 돌려 보지 않았습니다 [미확인].
+02편부터 따라 하기 N단계마다 커밋 `tutNN-sN` 이 있습니다. 중간 커밋은 컴파일만 되면 됩니다(링크·실행 안 함). 컴파일이 "쓰기 전에 선언했는가" 를 봅니다(`docs/DOC_STYLE.md` 2절).
+
+```
+pwsh tools\accept\compile_steps.ps1 -Lesson 04 -WorkDir <시험 폴더>
+```
+
+- 임시 worktree `<시험 폴더>\tutNN-steps` 에 s1 부터 마지막 단계까지 차례로 체크아웃하고 `MSBuild DxRenderDojo.vcxproj /t:ClCompile /p:Configuration=Debug /p:Platform=x64` 만 돌림. 같은 worktree 를 이어 쓰므로 바뀐 파일과 그 파일을 include 하는 cpp 만 다시 컴파일됨
+- MSBuild 는 vswhere 가 찾은 가장 새 Visual Studio 의 것
+- `-WorkDir` 를 빼면 리포 옆 `<리포 폴더>-accept`. 시스템 임시 폴더 아래와 리포 안은 거절함. 임시 폴더 아래는 MSB8029 가 나고 증분 컴파일을 믿을 수 없음
+- 단계마다 `pass`·`FAIL` 을 찍음. 실패하면 첫 에러 다섯 줄(`-ErrorLines` 로 바꿈)과 로그 파일 `<시험 폴더>\tutNN-sK.log` 를 보이고 다음 단계로 넘어감. 하나라도 실패하면 종료 코드 1
+- 끝나면 임시 worktree 를 지움(`git worktree remove`). 컴파일 산출물은 `.gitignore` 에 있어 `--force` 가 필요 없음. 실패한 단계의 로그는 남김
+- `-Configuration Release` 로 Release 구성도 컴파일함
+
+편 끝 diff 가 비지 않을 때 어긋난 단계를 짚으려면 단계 k 조각만 `tutNN-s(k-1)`(첫 단계는 이전 편 태그)에 넣고 `tutNN-sk` 와 비교할 수 있습니다. 비교만 하고 단계마다 빌드·실행하지는 않습니다. 이 방식으로는 아직 돌려 보지 않았습니다 [미확인].
 
 ## 여러 편을 나란히 시험할 때
 
@@ -73,3 +92,4 @@ $env:ACC_WT='<시험 폴더>\wt'; $env:ACC_STEPS='<시험 폴더>\steps.md'; pyt
 - 로그 받기와 캡처를 한 PowerShell 프로세스에서 같이 하면 캡처 뒤 로그가 안 잡힌 적이 있음. 따로 돌림
 - VS 에서 "모든 구성" 으로 속성을 고칠 때 조건 없는 그룹에 적히는지 구성마다 따로 적히는지 [미확인]. 빌드 결과는 같음
 - 04편 DirectXMath 는 원고대로 GitHub 릴리스를 받거나, 같은 커밋(`jun2026` = `93e6399`)의 사본을 씀
+- `compile_steps.ps1` : 2026-09-27 에 02·03·04편의 모든 단계가 통과함(Debug, 03편은 Release 도). 한 편에 16~31초. 실패 경로는 일부러 깨뜨린 단계를 넣은 임시 클론에서 확인함. vswhere 가 고른 것은 VS 2026(18.10)의 MSBuild 이고, 이 PC 의 VS 2026 에 v143 도구 집합(14.44)이 있어 그 `cl.exe` 로 컴파일됨. 가장 새 VS 에 v143 이 없는 PC 에서는 도구 집합을 찾지 못해 실패할 것 [미확인]
