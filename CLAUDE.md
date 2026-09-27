@@ -1,6 +1,6 @@
 # dx-render-dojo
 
-렌더러 공부방. Rastertek DirectX 11 튜토리얼을 "원문은 스펙, 코드는 내 것" 방식으로 다시 쓰는 학습 리포입니다. 원문은 편마다 무엇을 그리는지의 스펙이고, 구조는 기준 구현(DirectXTK·MS 샘플)을 먼저 봅니다(`docs/CODING_STYLE.md` 머리).
+렌더러 공부방. Rastertek DirectX 11 튜토리얼을 "원문은 스펙, 코드는 내 것" 방식으로 다시 쓰는 학습 리포입니다. 원문은 편마다 무엇을 그리는지의 스펙이고, 구조를 정하는 순서는 `docs/CODING_STYLE.md` 머리에 있습니다.
 
 ## 원칙
 
