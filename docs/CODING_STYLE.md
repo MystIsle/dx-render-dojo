@@ -122,6 +122,7 @@ Rider 이름 규칙(`DxRenderDojo.sln.DotSettings`)은 이 절을 옮긴 것입�
 
 - `#pragma once` 사용
 - 매개변수 이름 : 항상 표기
+- 쓰지 않는 매개변수 : 이름을 남기고 `[[maybe_unused]]` 를 붙임(`wWinMain` 의 `PrevInstance`, 콜백의 `LParam`). 이름을 지우거나 `UNREFERENCED_PARAMETER` 를 쓰지 않음. 경고 수준이 `/W4` 라 표시가 없으면 C4100 이 뜸
 - 값으로 받는 매개변수 : `const` 를 붙이지 않음. 호출하는 쪽에는 차이가 없음. 참조·포인터로 받을 때만 가리키는 대상에 `const` (`const FWindow& Window`)
 - DirectXMath 인자 : 행렬·벡터를 받거나 돌려주는 함수는 선언과 정의에 `XM_CALLCONV` 를 붙임. 행렬은 첫째 `FXMMATRIX`, 나머지 `CXMMATRIX`. 벡터는 1~3번째 `FXMVECTOR`, 4번째 `GXMVECTOR`, 5·6번째 `HXMVECTOR`, 나머지 `CXMVECTOR`. 별칭에 `const` 와 `&` 가 들어 있어 덧붙이지 않음. 인자를 SIMD 레지스터로 넘기는 MS 관례(DirectXMath 문서 "Library Internals"). 생성자는 예외로 `XM_CALLCONV` 없이 행렬을 `CXMMATRIX` 로 받음
 - DirectXMath 멤버 : 계산에 쓰는 행렬·벡터는 `XMFLOAT4X4`·`XMFLOAT3` 같은 저장 타입으로 들고, `XMLoad*`·`XMStore*` 로 지역 `XMMATRIX`·`XMVECTOR` 와 오감. 정렬을 따지지 않고 크기가 작음(DirectXMath 문서 "Getting started")
